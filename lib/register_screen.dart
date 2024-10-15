@@ -5,6 +5,7 @@ class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _RegisterScreenState createState() => _RegisterScreenState();
 }
 
@@ -146,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   // Navigate to Verification Screen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => VerificationScreen()), // Navigate to the new screen
+                    MaterialPageRoute(builder: (context) => const VerificationScreen()), // Navigate to the new screen
                   );
                 }
               },

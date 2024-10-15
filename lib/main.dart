@@ -9,7 +9,7 @@ void main() async {
     url: 'https://vgmozfdlyvgbrbmyxtae.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnbW96ZmRseXZnYnJibXl4dGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg5MzQ3MzEsImV4cCI6MjA0NDUxMDczMX0.PswuUCQPndx4h6J-Xn78xe-lmV44eyUd7es8O8uhLUUl',
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomeScreen(),
     );
