@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'verification_screen.dart'; 
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'verification_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _RegisterScreenState createState() => _RegisterScreenState();
 }
 
@@ -14,6 +14,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _fullName = '';
   String _email = '';
   String _password = '';
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   // Function to get the color for input field labels
   Color _getLabelColor(String text) {
@@ -31,6 +34,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } else {
       return const Color(0xffc3f3a5);
     }
+  }
+
+  // Fuction to register user data into database
+  Future<void> _registerUser() async {
+    final supabase = Supabase.instance.client;
+
+    final sm = ScaffoldMessenger.of(context);
+    final authResponse = await supabase.auth.signUp(
+        password: _passwordController.text,
+        email: _emailController.text,
+        data: {'full_name': _fullNameController.text},
+        emailRedirectTo: 'com.supabase.staging://login-callback/');
+
+    sm.showSnackBar(
+        SnackBar(content: Text("Logged in: ${authResponse.user!.email!}")));
   }
 
   @override
@@ -63,6 +81,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             // Name Field
             TextField(
+              controller: _fullNameController,
               onChanged: (value) {
                 setState(() {
                   _fullName = value;
@@ -81,6 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             // Email Field
             TextField(
+              controller: _emailController,
               onChanged: (value) {
                 setState(() {
                   _email = value;
@@ -99,6 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             // Password Field
             TextField(
+              controller: _passwordController,
               obscureText: !_isPasswordVisible,
               onChanged: (value) {
                 setState(() {
@@ -111,9 +132,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 labelStyle: TextStyle(color: _getLabelColor(_password)),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
                     });
@@ -143,12 +166,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               onPressed: () {
-                if (_fullName.isNotEmpty && _email.isNotEmpty && _password.isNotEmpty) {
-                  // Navigate to Verification Screen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const VerificationScreen()), // Navigate to the new screen
-                  );
+                if (_fullName.isNotEmpty &&
+                    _email.isNotEmpty &&
+                    _password.isNotEmpty) {
+                  _registerUser();
                 }
               },
               child: const Text(
