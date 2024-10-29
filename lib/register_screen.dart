@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/utils/features/auth/auth_controller.dart';
+import 'package:newifchaly/utils/form_validators.dart';
 import 'login_screen.dart'; // Import login screen to navigate
 
 class RegisterScreen extends StatefulWidget {
@@ -147,12 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   obscureText: !_showPassword,
-                  validator: ValidationBuilder()
-                      .minLength(
-                          8, 'Password must be at least 8 characters long')
-                      .maxLength(
-                          20, 'Password cannot be more than 20 characters')
-                      .build(),
+                  validator: validatePassword,
                   onChanged: (text) {
                     setState(() {});
                   },
