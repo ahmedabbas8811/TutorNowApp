@@ -1,8 +1,41 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+class TeachingDetail extends StatefulWidget {
+  @override
+  _TeachingDetailState createState() => _TeachingDetailState();
+}
 
+class _TeachingDetailState extends State<TeachingDetail> {
+  bool _switchValue = false;                                       // Checks whether switch is on or off
+  TextEditingController _startDateController = TextEditingController();
+  TextEditingController _endDateController = TextEditingController();
 
-class TeachingDetail extends StatelessWidget {
+  // Function to show a date picker and set the selected date in  TextEditingController
+  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null) {
+      // ((Format)) the picked date and set it in the controller
+      setState(() {
+        controller.text = DateFormat('dd/MM/yyyy').format(pickedDate);                       
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    //  TextEditingControllers when this widget is destroyed(DISPOSED)
+    _startDateController.dispose();
+    _endDateController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,14 +47,12 @@ class TeachingDetail extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context); // Go back to the previous screen
           },
         ),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          double screenWidth = constraints.maxWidth;
-
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -29,29 +60,25 @@ class TeachingDetail extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Add Teaching',
+                    'Add Teaching Experience',
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
-                  const Text(
-                    'Experience',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
 
-                  // Education Level label
+                  // TextField education level
                   TextField(
                     decoration: InputDecoration(
                       labelText: 'Education Level of Students',
                       labelStyle: const TextStyle(color: Colors.grey),
                       hintText: 'Ex. Matric',
-                      hintStyle:const TextStyle(color: Colors.grey),
+                      hintStyle: const TextStyle(color: Colors.grey),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
-                      enabledBorder: OutlineInputBorder(
+                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide:const  BorderSide(color: Colors.grey),
+                        borderSide: const BorderSide(color: Colors.grey),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -62,18 +89,23 @@ class TeachingDetail extends StatelessWidget {
                   ),
                   const SizedBox(height: 15),
 
-                  // Institute Name label
+                  // TextField selecting start date 
                   TextField(
+                    controller: _startDateController,
+                    readOnly: true, // Read-only to restrict manual typing
                     decoration: InputDecoration(
-                      labelText: 'Institute Name',
+                      labelText: 'Start Date',
                       labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: 'Ex. IMCB',
-                      hintStyle: const TextStyle(color: Colors.grey),
+                      hintText: 'Select Start Date',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_today, color: Colors.grey),
+                        onPressed: () => _selectDate(context, _startDateController),
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide:const  BorderSide(color: Colors.grey),
+                        borderSide: const BorderSide(color: Colors.grey),
                       ),
-                      enabledBorder: OutlineInputBorder(
+                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
@@ -84,9 +116,67 @@ class TeachingDetail extends StatelessWidget {
                     ),
                     keyboardAppearance: Brightness.light,
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
 
-                  // Upload Proof Of Qualification Section
+                  // TextField for selecting end date, disabled if "I Still Work Here" is active
+                  TextField(
+                    controller: _endDateController,
+                    readOnly: true, // Read-only to open only the date picker
+                    enabled: !_switchValue, // Disable when "I Still Work Here" is active
+                    decoration: InputDecoration(
+                      labelText: 'End Date',
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      hintText: 'Select End Date',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_today, color: Colors.grey),
+                        onPressed: !_switchValue
+                            ? () => _selectDate(context, _endDateController)
+                            : null,
+                      ),
+                      filled: _switchValue,
+                      fillColor: _switchValue ? const Color(0xff87e64c).withOpacity(0.4) : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                       enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                        focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                    ),
+                    style: TextStyle(
+                      color: _switchValue ? Colors.grey.withOpacity(0.5) : Colors.black,
+                    ),
+                    keyboardAppearance: Brightness.light,
+                  ),
+                  const SizedBox(height: 5),
+
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text("I Still Work Here",style: TextStyle(fontWeight: FontWeight.bold),),
+                        CupertinoSwitch(
+                          value: _switchValue,
+                          activeColor: const Color(0xff87e64c),
+                          onChanged: (value) {
+                            setState(() {
+                              _switchValue = value;
+                              if (value) _endDateController.clear(); // Clear end date if switch is on
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+
+                  // Container for uploading proof of qualification
                   Container(
                     width: 330,
                     height: 210,
@@ -116,7 +206,7 @@ class TeachingDetail extends StatelessWidget {
                         ),
                         const SizedBox(height: 7),
 
-                        // Inside container
+                        // Inner container for upload PDF
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: InkWell(
@@ -127,10 +217,10 @@ class TeachingDetail extends StatelessWidget {
                               width: double.infinity,
                               height: 130,
                               child: CustomPaint(
-                                painter: DashedBorderPainter(),
-                                child:const  Column(
+                                painter: DashedBorderPainter(), // Custom painter for dashed border
+                                child: const Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children:  [
+                                  children: [
                                     Icon(
                                       Icons.cloud_upload,
                                       size: 50,
@@ -155,18 +245,19 @@ class TeachingDetail extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 70),
+                  const SizedBox(height: 10),
 
-                  // Another Button
+                  // "Add Another +" button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(builder: (context) => QualificationScreen()),
-                      //   );
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => TeachingDetail()),
+                        );
                       },
+
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -180,18 +271,13 @@ class TeachingDetail extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
 
-                  // Next Button
+                  // "Submit For Verification" 
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(builder: (context) => TeachingDetail()),
-                        // );
-                      },
+                      onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff87e64c),
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -200,7 +286,7 @@ class TeachingDetail extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'Next',
+                        'Submit For Verification',
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
                     ),
@@ -215,6 +301,7 @@ class TeachingDetail extends StatelessWidget {
   }
 }
 
+// Custom painter class for creating a dashed border
 class DashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -273,9 +360,6 @@ class DashedBorderPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+    return false; // No repainting needed as border properties are static
   }
 }
-
-
-
