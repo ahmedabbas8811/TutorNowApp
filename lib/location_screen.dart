@@ -1,3 +1,4 @@
+import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
 import 'location2_screen.dart'; // Import the Location2Screen
 
@@ -27,27 +28,35 @@ class LocationScreen extends StatelessWidget {
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-             TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Choose Loation',
-                      labelStyle: TextStyle(color: Colors.grey),
-                      hintText: 'Search for your area',
-                      hintStyle: TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
-                    ),
-                    keyboardAppearance: Brightness.light,
-                  ),
+            //  TextField(
+            //         decoration: InputDecoration(
+            //           labelText: 'Choose Loation',
+            //           labelStyle: TextStyle(color: Colors.grey),
+            //           hintText: 'Search for your area',
+            //           hintStyle: TextStyle(color: Colors.grey),
+            //           border: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(8),
+            //             borderSide: BorderSide(color: Colors.grey),
+            //           ),
+            //           enabledBorder: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(8),
+            //             borderSide: BorderSide(color: Colors.grey),
+            //           ),
+            //           focusedBorder: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(8),
+            //             borderSide: BorderSide(color: Colors.grey),
+            //           ),
+            //         ),
+            //         keyboardAppearance: Brightness.light,
+            //       ),
+            CSCPicker(
+   layout: Layout.vertical,
+   flagState: CountryFlag.DISABLE, 
+   onCountryChanged: (country){},
+   onStateChanged: (state){},
+   onCityChanged:(city){},
+),
+
                   const SizedBox(height: 15),
             const SizedBox(height: 10),
             const Spacer(), // Pushes the button to the bottom
