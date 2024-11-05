@@ -23,6 +23,8 @@ class AuthController extends GetxController {
     final AuthResponse response = await authApi.login(email, password);
     loginLoading.value = false;
     log("The login response is ${response.user?.toJson()}");
+    final session = Supabase.instance.client.auth.currentSession;
+
 
   }
 
@@ -33,4 +35,8 @@ class AuthController extends GetxController {
     signupLoading.value = false;
     log("The Sign Up response is ${response.user?.toJson()}");
   }
+
+  
+
 }
+
