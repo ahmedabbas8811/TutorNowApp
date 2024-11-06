@@ -1,8 +1,36 @@
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'location2_screen.dart'; // Import the Location2Screen
 
-class LocationScreen extends StatelessWidget {
+class LocationScreen extends StatefulWidget {
+  @override
+  _LocationScreenState createState() => _LocationScreenState();
+}
+
+class _LocationScreenState extends State<LocationScreen> {
+  String? _country;
+  String? _state;
+  String? _city;
+
+  Future<void> _storeLocation() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user != null && _country != null && _state != null && _city != null) {
+      try {
+        final response =
+            await Supabase.instance.client.from('location').insert({
+          'country': _country,
+          'state': _state,
+          'city': _city,
+          'user_id': user.id,
+        }).select();
+
+      } catch (e) {
+        print("Error storing location: $e");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,42 +56,35 @@ class LocationScreen extends StatelessWidget {
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            //  TextField(
-            //         decoration: InputDecoration(
-            //           labelText: 'Choose Loation',
-            //           labelStyle: TextStyle(color: Colors.grey),
-            //           hintText: 'Search for your area',
-            //           hintStyle: TextStyle(color: Colors.grey),
-            //           border: OutlineInputBorder(
-            //             borderRadius: BorderRadius.circular(8),
-            //             borderSide: BorderSide(color: Colors.grey),
-            //           ),
-            //           enabledBorder: OutlineInputBorder(
-            //             borderRadius: BorderRadius.circular(8),
-            //             borderSide: BorderSide(color: Colors.grey),
-            //           ),
-            //           focusedBorder: OutlineInputBorder(
-            //             borderRadius: BorderRadius.circular(8),
-            //             borderSide: BorderSide(color: Colors.grey),
-            //           ),
-            //         ),
-            //         keyboardAppearance: Brightness.light,
-            //       ),
             CSCPicker(
-   layout: Layout.vertical,
-   flagState: CountryFlag.DISABLE, 
-   onCountryChanged: (country){},
-   onStateChanged: (state){},
-   onCityChanged:(city){},
-),
-
-                  const SizedBox(height: 15),
+              layout: Layout.vertical,
+              flagState: CountryFlag.DISABLE,
+              onCountryChanged: (country) {
+                setState(() {
+                  _country = country;
+                });
+              },
+              onStateChanged: (state) {
+                setState(() {
+                  _state = state;
+                });
+              },
+              onCityChanged: (city) {
+                setState(() {
+                  _city = city;
+                });
+              },
+            ),
+            const SizedBox(height: 15),
             const SizedBox(height: 10),
             const Spacer(), // Pushes the button to the bottom
             SizedBox(
               width: 330,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  // Store location in the database
+                  await _storeLocation();
+
                   // Navigate to Location2Screen
                   Navigator.push(
                     context,
@@ -72,7 +93,8 @@ class LocationScreen extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff87e64c),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
