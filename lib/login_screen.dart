@@ -154,12 +154,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Perform login action if validation passes
                         controller.login(
                             _emailController.text, _passwordController.text);
-                        final user = Supabase.instance.client.auth.currentUser;
-                        if (user != null) {
-                          print("User UUID: ${user.id}");
-                        } else {
-                          print("No user is currently logged in.");
-                        }
+                      final user = Supabase.instance.client.auth.currentUser;
+                     if (user != null) {
+                    print("User UUID: ${user.id}");
+
+                     } else {
+                      print("No user is currently logged in.");
+      }
+
                       }
                     },
                     style: ElevatedButton.styleFrom(

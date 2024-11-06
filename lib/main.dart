@@ -17,9 +17,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp( // Change MaterialApp to GetMaterialApp
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: LoginScreen(), // Your initial screen
     );
   }
 }
+
