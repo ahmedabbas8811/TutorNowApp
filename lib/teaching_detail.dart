@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TeachingDetail extends StatefulWidget {
   @override
@@ -8,9 +9,13 @@ class TeachingDetail extends StatefulWidget {
 }
 
 class _TeachingDetailState extends State<TeachingDetail> {
+DateTime? _startDate;
+DateTime? _endDate;
+
   bool _switchValue = false;                                       // Checks whether switch is on or off
   TextEditingController _startDateController = TextEditingController();
   TextEditingController _endDateController = TextEditingController();
+  TextEditingController _educationLevelController = TextEditingController();
 
   // Function to show a date picker and set the selected date in  TextEditingController
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
@@ -27,6 +32,39 @@ class _TeachingDetailState extends State<TeachingDetail> {
       });
     }
   }
+   Future<void> _storeExperiencen() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    final educationLevel = _educationLevelController.text;
+    final startDate = _startDateController.text;
+    final endDate = _endDateController.text;
+    final stillWorking = _switchValue;
+  
+
+    if (user != null && _educationLevelController.text.isNotEmpty &&
+        _startDateController.text.isNotEmpty) {
+      try {
+        final response = await Supabase.instance.client
+            .from('experience') 
+            .insert({
+              'student_education_level': educationLevel,
+              'start_date': startDate,
+              'end_date': endDate.isEmpty ? null : endDate,
+              'user_id': user.id,
+              'still_working': stillWorking,
+            })
+            .select();
+
+        
+      } catch (e) {
+        print("Error storing experience: $e");
+      }
+    } else {
+      print("Please fill all fields.");
+    }
+  }
+
+  
+
 
   @override
   void dispose() {
@@ -277,7 +315,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: _storeExperiencen,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff87e64c),
                         padding: const EdgeInsets.symmetric(vertical: 12),

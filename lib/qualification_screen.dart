@@ -1,7 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'teaching_detail.dart';
 
 class QualificationScreen extends StatelessWidget {
+  final TextEditingController educationLevelController = TextEditingController();
+  final TextEditingController instituteNameController = TextEditingController();
+
+  Future<void> _storeQualification() async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    print("User ID: ${user?.id}");
+    print("Education Level: ${educationLevelController.text}");
+    print("Institute Name: ${instituteNameController.text}");
+
+    if (user != null && 
+        educationLevelController.text.isNotEmpty && 
+        instituteNameController.text.isNotEmpty) {
+      try {
+        final response = await Supabase.instance.client
+            .from('qualification') 
+            .insert({
+              'education_level': educationLevelController.text,
+              'institute_name': instituteNameController.text,
+              'user_id': user.id,
+            })
+            .select();
+
+        
+      } catch (e) {
+        print("Error storing qualification: $e");
+      }
+    } else {
+      print("Please fill all fields.");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,18 +68,19 @@ class QualificationScreen extends StatelessWidget {
 
                   // Education Level label
                   TextField(
+                    controller: educationLevelController,
                     decoration: InputDecoration(
                       labelText: 'Education Level',
                       labelStyle: const TextStyle(color: Colors.grey),
                       hintText: 'Ex. Matric',
-                      hintStyle:const TextStyle(color: Colors.grey),
+                      hintStyle: const TextStyle(color: Colors.grey),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide:const  BorderSide(color: Colors.grey),
+                        borderSide: const BorderSide(color: Colors.grey),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -59,6 +93,7 @@ class QualificationScreen extends StatelessWidget {
 
                   // Institute Name label
                   TextField(
+                    controller: instituteNameController,
                     decoration: InputDecoration(
                       labelText: 'Institute Name',
                       labelStyle: const TextStyle(color: Colors.grey),
@@ -66,7 +101,7 @@ class QualificationScreen extends StatelessWidget {
                       hintStyle: const TextStyle(color: Colors.grey),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide:const  BorderSide(color: Colors.grey),
+                        borderSide: const BorderSide(color: Colors.grey),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -86,13 +121,11 @@ class QualificationScreen extends StatelessWidget {
                     width: 330,
                     height: 210,
                     decoration: BoxDecoration(
-                    
                       border: Border.all(
                         color: Colors.grey,
                         width: 1.0,
                       ),
                       borderRadius: BorderRadius.circular(8.0),
-                      
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,14 +154,13 @@ class QualificationScreen extends StatelessWidget {
                               print('Inner container clicked');
                             },
                             child: Container(
-                              
                               width: double.infinity,
                               height: 130,
                               child: CustomPaint(
                                 painter: DashedBorderPainter(),
-                                child:const  Column(
+                                child: const Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children:  [
+                                  children: [
                                     Icon(
                                       Icons.cloud_upload,
                                       size: 50,
@@ -155,15 +187,12 @@ class QualificationScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 70),
 
-                  // Another Button
+                  // Add Another Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => QualificationScreen()),
-                        );
+                      onPressed: () async {
+                        await _storeQualification();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
@@ -184,7 +213,8 @@ class QualificationScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        await _storeQualification();
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => TeachingDetail()),
@@ -213,6 +243,11 @@ class QualificationScreen extends StatelessWidget {
   }
 }
 
+extension on PostgrestList {
+  get error => null;
+}
+
+// Dashed Border Painter
 class DashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -274,6 +309,3 @@ class DashedBorderPainter extends CustomPainter {
     return false;
   }
 }
-
-
-
