@@ -1,7 +1,114 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'teaching_detail.dart';
 
-class QualificationScreen extends StatelessWidget {
+class QualificationScreen extends StatefulWidget {
+  @override
+  _QualificationScreenState createState() => _QualificationScreenState();
+}
+
+class _QualificationScreenState extends State<QualificationScreen> {
+  final TextEditingController educationLevelController =
+      TextEditingController();
+  final TextEditingController instituteNameController = TextEditingController();
+  String? _qualificationFileName;
+
+  // Function to pick the qualification file (PDF)
+  Future<void> _pickQualificationFile() async {
+    bool isGranted = await _requestStoragePermission();
+
+    if (isGranted) {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+
+      if (result != null) {
+        setState(() {
+          _qualificationFileName = result.files.single.name;
+        });
+      }
+    } else {
+      _showPermissionDeniedDialog();
+    }
+  }
+
+  // Request storage permission
+  Future<bool> _requestStoragePermission() async {
+    if (await Permission.storage.isGranted) {
+      return true; // Access is already granted
+    }
+
+    // Handle for Android 11 and above
+    if (await Permission.manageExternalStorage.isGranted) {
+      return true;
+    }
+
+    // For Android 10 and below
+    if (await Permission.storage.request().isGranted) {
+      return true;
+    }
+
+    // Handle Manage External Storage for Android 11 and above
+    if (await Permission.manageExternalStorage.request().isGranted) {
+      return true;
+    }
+
+    return false; // Permission denied
+  }
+
+  // Show a dialog if permission is denied
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Permission Denied"),
+        content: Text(
+            "Storage permission is required to pick a file. Please enable it in the app settings."),
+        actions: [
+          TextButton(
+            child: Text("Cancel"),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: Text("Open Settings"),
+            onPressed: () {
+              openAppSettings();
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _storeQualification() async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    print("User ID: ${user?.id}");
+    print("Education Level: ${educationLevelController.text}");
+    print("Institute Name: ${instituteNameController.text}");
+
+    if (user != null &&
+        educationLevelController.text.isNotEmpty &&
+        instituteNameController.text.isNotEmpty) {
+      try {
+        final response =
+            await Supabase.instance.client.from('qualification').insert({
+          'education_level': educationLevelController.text,
+          'institute_name': instituteNameController.text,
+          'user_id': user.id,
+        }).select();
+      } catch (e) {
+        print("Error storing qualification: $e");
+      }
+    } else {
+      print("Please fill all fields.");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,20 +142,13 @@ class QualificationScreen extends StatelessWidget {
 
                   // Education Level label
                   TextField(
+                    controller: educationLevelController,
                     decoration: InputDecoration(
                       labelText: 'Education Level',
                       labelStyle: const TextStyle(color: Colors.grey),
                       hintText: 'Ex. Matric',
-                      hintStyle:const TextStyle(color: Colors.grey),
+                      hintStyle: const TextStyle(color: Colors.grey),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide:const  BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
@@ -59,20 +159,13 @@ class QualificationScreen extends StatelessWidget {
 
                   // Institute Name label
                   TextField(
+                    controller: instituteNameController,
                     decoration: InputDecoration(
                       labelText: 'Institute Name',
                       labelStyle: const TextStyle(color: Colors.grey),
                       hintText: 'Ex. IMCB',
                       hintStyle: const TextStyle(color: Colors.grey),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide:const  BorderSide(color: Colors.grey),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
@@ -86,13 +179,11 @@ class QualificationScreen extends StatelessWidget {
                     width: 330,
                     height: 210,
                     decoration: BoxDecoration(
-                    
                       border: Border.all(
                         color: Colors.grey,
                         width: 1.0,
                       ),
                       borderRadius: BorderRadius.circular(8.0),
-                      
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +192,8 @@ class QualificationScreen extends StatelessWidget {
                           padding: EdgeInsets.all(3.0),
                           child: Text(
                             'Upload Proof Of Qualification',
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.bold),
                           ),
                         ),
                         const Padding(
@@ -117,32 +209,32 @@ class QualificationScreen extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: InkWell(
-                            onTap: () {
-                              print('Inner container clicked');
-                            },
+                            onTap: _pickQualificationFile,
                             child: Container(
-                              
                               width: double.infinity,
                               height: 130,
                               child: CustomPaint(
                                 painter: DashedBorderPainter(),
-                                child:const  Column(
+                                child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children:  [
-                                    Icon(
+                                  children: [
+                                    const Icon(
                                       Icons.cloud_upload,
                                       size: 50,
                                       color: Colors.grey,
                                     ),
                                     SizedBox(height: 16),
                                     Text(
-                                      'Tap to upload',
+                                      _qualificationFileName ?? 'Tap to upload',
                                       style: TextStyle(fontSize: 16),
                                     ),
                                     SizedBox(height: 4),
                                     Text(
-                                      '*pdf accepted',
-                                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                                      _qualificationFileName == null
+                                          ? '*pdf accepted'
+                                          : 'Tap to upload another document',
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey),
                                     ),
                                   ],
                                 ),
@@ -159,11 +251,8 @@ class QualificationScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => QualificationScreen()),
-                        );
+                      onPressed: () async {
+                        await _storeQualification();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
@@ -184,10 +273,12 @@ class QualificationScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        await _storeQualification();
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => TeachingDetail()),
+                          MaterialPageRoute(
+                              builder: (context) => TeachingDetail()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -211,6 +302,10 @@ class QualificationScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+extension on PostgrestList {
+  get error => null;
 }
 
 class DashedBorderPainter extends CustomPainter {
@@ -274,6 +369,3 @@ class DashedBorderPainter extends CustomPainter {
     return false;
   }
 }
-
-
-

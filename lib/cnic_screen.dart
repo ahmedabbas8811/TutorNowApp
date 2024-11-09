@@ -1,7 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'qualification_screen.dart';
 
-class CnicScreen extends StatelessWidget {
+class CnicScreen extends StatefulWidget {
+  @override
+  _CnicScreenState createState() => _CnicScreenState();
+}
+
+class _CnicScreenState extends State<CnicScreen> {
+  String? _fileName;
+
+  Future<void> _pickFile() async {
+    // Check and request permissions
+    bool isGranted = await _requestStoragePermission();
+
+    if (isGranted) {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+
+      if (result != null) {
+        setState(() {
+          _fileName = result.files.single.name;
+        });
+      }
+    } else {
+      _showPermissionDeniedDialog();
+    }
+  }
+
+  // Function to handle permission requests
+  Future<bool> _requestStoragePermission() async {
+    if (await Permission.storage.isGranted) {
+      return true; // Access is already granted
+    }
+
+    // Handle for Android 11 and above
+    if (await Permission.manageExternalStorage.isGranted) {
+      return true;
+    }
+
+    // For Android 10 and below
+    if (await Permission.storage.request().isGranted) {
+      return true;
+    }
+
+    // Handle Manage External Storage for Android 11 and above
+    if (await Permission.manageExternalStorage.request().isGranted) {
+      return true;
+    }
+
+    return false; // Permission denied
+  }
+
+  // Show dialog if permission is denied
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Permission Denied"),
+        content: Text(
+            "Storage permission is required to pick a file. Please enable it in the app settings."),
+        actions: [
+          TextButton(
+            child: Text("Cancel"),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: Text("Open Settings"),
+            onPressed: () {
+              openAppSettings();
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +91,7 @@ class CnicScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous screen
+            Navigator.pop(context);
           },
         ),
       ),
@@ -30,44 +108,38 @@ class CnicScreen extends StatelessWidget {
 
             // Clickable Container with a dashed border
             GestureDetector(
-              onTap: () {
-                // Handle tap event here
-                print("Container clicked!");
-                // You can add navigation logic here if needed
-              },
+              onTap: _pickFile,
               child: Material(
-                color: Colors.transparent, // Set background color to transparent
+                color: Colors.transparent,
                 child: InkWell(
-                  onTap: () {
-                    // Handle the tap event for the entire container
-                    print("Container clicked!");
-                    // You can add navigation logic here if needed
-                  },
+                  onTap: _pickFile,
                   child: Container(
-                    width: 350, 
-                    height: 150, 
+                    width: 350,
+                    height: 150,
                     child: CustomPaint(
                       painter: DashedBorderPainter(),
-                      child: const Column(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.upload,
                             size: 40,
                             color: Colors.grey,
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Text(
-                            'Tap to upload',
-                            style: TextStyle(
+                            _fileName ?? 'Tap to upload',
+                            style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
                             ),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Text(
-                            '*pdf accepted',
-                            style: TextStyle(
+                            _fileName == null
+                                ? '*pdf accepted'
+                                : 'Tap to upload another document',
+                            style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 12,
                             ),
@@ -81,21 +153,22 @@ class CnicScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 10),
-            const Spacer(), // Pushes the button to the bottom
+            const Spacer(),
 
             SizedBox(
               width: 330,
               child: ElevatedButton(
                 onPressed: () {
-                  // Navigate to QualificationScreen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => QualificationScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => QualificationScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff87e64c),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -125,7 +198,7 @@ class DashedBorderPainter extends CustomPainter {
     const dashSpace = 4.0;
     double startX = 0.0;
 
-    //  top border
+    // Top border
     while (startX < size.width) {
       canvas.drawLine(
         Offset(startX, 0),
@@ -135,7 +208,6 @@ class DashedBorderPainter extends CustomPainter {
       startX += dashWidth + dashSpace;
     }
 
-    // right border
     double startY = 0.0;
     while (startY < size.height) {
       canvas.drawLine(
@@ -146,7 +218,6 @@ class DashedBorderPainter extends CustomPainter {
       startY += dashWidth + dashSpace;
     }
 
-    // bottom border
     startX = 0.0;
     while (startX < size.width) {
       canvas.drawLine(
@@ -157,7 +228,6 @@ class DashedBorderPainter extends CustomPainter {
       startX += dashWidth + dashSpace;
     }
 
-    // left border
     startY = 0.0;
     while (startY < size.height) {
       canvas.drawLine(

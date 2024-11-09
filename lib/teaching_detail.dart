@@ -1,6 +1,9 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TeachingDetail extends StatefulWidget {
   @override
@@ -8,12 +11,15 @@ class TeachingDetail extends StatefulWidget {
 }
 
 class _TeachingDetailState extends State<TeachingDetail> {
-  bool _switchValue = false;                                       // Checks whether switch is on or off
+  bool _switchValue = false; // Checks whether switch is on or off
   TextEditingController _startDateController = TextEditingController();
   TextEditingController _endDateController = TextEditingController();
+  TextEditingController _educationLevelController = TextEditingController();
+  String? _qualificationFileName;
 
-  // Function to show a date picker and set the selected date in  TextEditingController
-  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+  // Function to show a date picker and set the selected date in TextEditingController
+  Future<void> _selectDate(
+      BuildContext context, TextEditingController controller) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -21,16 +27,112 @@ class _TeachingDetailState extends State<TeachingDetail> {
       lastDate: DateTime(2101),
     );
     if (pickedDate != null) {
-      // ((Format)) the picked date and set it in the controller
+      // Format the picked date and set it in the controller
       setState(() {
-        controller.text = DateFormat('dd/MM/yyyy').format(pickedDate);                       
+        controller.text = DateFormat('dd/MM/yyyy').format(pickedDate);
       });
     }
   }
 
+  Future<void> _storeExperiencen() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    final educationLevel = _educationLevelController.text;
+    final startDate = _startDateController.text;
+    final endDate = _endDateController.text;
+    final stillWorking = _switchValue;
+
+    if (user != null &&
+        _educationLevelController.text.isNotEmpty &&
+        _startDateController.text.isNotEmpty) {
+      try {
+        final response =
+            await Supabase.instance.client.from('experience').insert({
+          'student_education_level': educationLevel,
+          'start_date': startDate,
+          'end_date': endDate.isEmpty ? null : endDate,
+          'user_id': user.id,
+          'still_working': stillWorking,
+        }).select();
+      } catch (e) {
+        print("Error storing experience: $e");
+      }
+    } else {
+      print("Please fill all fields.");
+    }
+  }
+
+  // Function to pick the qualification file (PDF)
+  Future<void> _pickQualificationFile() async {
+    bool isGranted = await _requestStoragePermission();
+
+    if (isGranted) {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+
+      if (result != null) {
+        setState(() {
+          _qualificationFileName = result.files.single.name;
+        });
+      }
+    } else {
+      _showPermissionDeniedDialog();
+    }
+  }
+
+  // Request storage permission
+  Future<bool> _requestStoragePermission() async {
+    if (await Permission.storage.isGranted) {
+      return true; // Access is already granted
+    }
+
+    // Handle for Android 11 and above
+    if (await Permission.manageExternalStorage.isGranted) {
+      return true;
+    }
+
+    // For Android 10 and below
+    if (await Permission.storage.request().isGranted) {
+      return true;
+    }
+
+    // Handle Manage External Storage for Android 11 and above
+    if (await Permission.manageExternalStorage.request().isGranted) {
+      return true;
+    }
+
+    return false; // Permission denied
+  }
+
+  // Show a dialog if permission is denied
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Permission Denied"),
+        content: Text(
+            "Storage permission is required to pick a file. Please enable it in the app settings."),
+        actions: [
+          TextButton(
+            child: Text("Cancel"),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: Text("Open Settings"),
+            onPressed: () {
+              openAppSettings();
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
-    //  TextEditingControllers when this widget is destroyed(DISPOSED)
+    // Dispose TextEditingControllers when this widget is destroyed
     _startDateController.dispose();
     _endDateController.dispose();
     super.dispose();
@@ -65,8 +167,9 @@ class _TeachingDetailState extends State<TeachingDetail> {
                   ),
                   const SizedBox(height: 15),
 
-                  // TextField education level
+                  // TextField for Education level
                   TextField(
+                    controller: _educationLevelController,
                     decoration: InputDecoration(
                       labelText: 'Education Level of Students',
                       labelStyle: const TextStyle(color: Colors.grey),
@@ -76,40 +179,26 @@ class _TeachingDetailState extends State<TeachingDetail> {
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
-                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
                     ),
                     keyboardAppearance: Brightness.light,
                   ),
                   const SizedBox(height: 15),
 
-                  // TextField selecting start date 
+                  // TextField for selecting start date
                   TextField(
                     controller: _startDateController,
-                    readOnly: true, // Read-only to restrict manual typing
+                    readOnly: true,
                     decoration: InputDecoration(
                       labelText: 'Start Date',
                       labelStyle: const TextStyle(color: Colors.grey),
                       hintText: 'Select Start Date',
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.calendar_today, color: Colors.grey),
-                        onPressed: () => _selectDate(context, _startDateController),
+                        icon: const Icon(Icons.calendar_today,
+                            color: Colors.grey),
+                        onPressed: () =>
+                            _selectDate(context, _startDateController),
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
@@ -118,38 +207,36 @@ class _TeachingDetailState extends State<TeachingDetail> {
                   ),
                   const SizedBox(height: 20),
 
-                  // TextField for selecting end date, disabled if "I Still Work Here" is active
+                  // TextField for selecting end date
                   TextField(
                     controller: _endDateController,
-                    readOnly: true, // Read-only to open only the date picker
-                    enabled: !_switchValue, // Disable when "I Still Work Here" is active
+                    readOnly: true,
+                    enabled:
+                        !_switchValue, // Disable when "I Still Work Here" is active
                     decoration: InputDecoration(
                       labelText: 'End Date',
                       labelStyle: const TextStyle(color: Colors.grey),
                       hintText: 'Select End Date',
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.calendar_today, color: Colors.grey),
+                        icon: const Icon(Icons.calendar_today,
+                            color: Colors.grey),
                         onPressed: !_switchValue
                             ? () => _selectDate(context, _endDateController)
                             : null,
                       ),
                       filled: _switchValue,
-                      fillColor: _switchValue ? const Color(0xff87e64c).withOpacity(0.4) : null,
+                      fillColor: _switchValue
+                          ? const Color(0xff87e64c).withOpacity(0.4)
+                          : null,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                        focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
                     ),
                     style: TextStyle(
-                      color: _switchValue ? Colors.grey.withOpacity(0.5) : Colors.black,
+                      color: _switchValue
+                          ? Colors.grey.withOpacity(0.5)
+                          : Colors.black,
                     ),
                     keyboardAppearance: Brightness.light,
                   ),
@@ -160,14 +247,17 @@ class _TeachingDetailState extends State<TeachingDetail> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Text("I Still Work Here",style: TextStyle(fontWeight: FontWeight.bold),),
+                        const Text("I Still Work Here",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                         CupertinoSwitch(
                           value: _switchValue,
                           activeColor: const Color(0xff87e64c),
                           onChanged: (value) {
                             setState(() {
                               _switchValue = value;
-                              if (value) _endDateController.clear(); // Clear end date if switch is on
+                              if (value)
+                                _endDateController
+                                    .clear(); // Clear end date if switch is on
                             });
                           },
                         ),
@@ -181,10 +271,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
                     width: 330,
                     height: 210,
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
+                      border: Border.all(color: Colors.grey, width: 1.0),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: Column(
@@ -194,7 +281,8 @@ class _TeachingDetailState extends State<TeachingDetail> {
                           padding: EdgeInsets.all(3.0),
                           child: Text(
                             'Upload Proof Of Qualification',
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.bold),
                           ),
                         ),
                         const Padding(
@@ -210,15 +298,14 @@ class _TeachingDetailState extends State<TeachingDetail> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: InkWell(
-                            onTap: () {
-                              print('Inner container clicked');
-                            },
+                            onTap: _pickQualificationFile,
                             child: Container(
                               width: double.infinity,
                               height: 130,
                               child: CustomPaint(
-                                painter: DashedBorderPainter(), // Custom painter for dashed border
-                                child: const Column(
+                                painter:
+                                    DashedBorderPainter(), // Custom painter for dashed border
+                                child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
@@ -234,8 +321,14 @@ class _TeachingDetailState extends State<TeachingDetail> {
                                     SizedBox(height: 4),
                                     Text(
                                       '*pdf accepted',
-                                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey),
                                     ),
+                                    if (_qualificationFileName != null)
+                                      Text(_qualificationFileName!,
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.green)),
                                   ],
                                 ),
                               ),
@@ -246,18 +339,16 @@ class _TeachingDetailState extends State<TeachingDetail> {
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  // "Add Another +" button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                          Navigator.push(
+                        Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => TeachingDetail()),
+                          MaterialPageRoute(
+                              builder: (context) => TeachingDetail()),
                         );
                       },
-
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -273,11 +364,11 @@ class _TeachingDetailState extends State<TeachingDetail> {
                   ),
                   const SizedBox(height: 5),
 
-                  // "Submit For Verification" 
+                  // "Submit For Verification"
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: _storeExperiencen,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff87e64c),
                         padding: const EdgeInsets.symmetric(vertical: 12),
