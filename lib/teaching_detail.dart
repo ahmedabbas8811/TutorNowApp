@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
   TextEditingController _endDateController = TextEditingController();
   TextEditingController _educationLevelController = TextEditingController();
   String? _qualificationFileName;
+  File? _teachingDetailFile;
 
   // Function to show a date picker and set the selected date in TextEditingController
   Future<void> _selectDate(
@@ -74,6 +77,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
       if (result != null) {
         setState(() {
           _qualificationFileName = result.files.single.name;
+          _teachingDetailFile = File(result.files.single.path!);
         });
       }
     } else {
@@ -128,6 +132,24 @@ class _TeachingDetailState extends State<TeachingDetail> {
         ],
       ),
     );
+  }
+
+  Future<void> uploadFileToSupabase(File file) async {
+    try {
+      // Upload the file to Supabase storage
+      final response = await Supabase.instance.client.storage
+          .from('experience_docs') // Replace with your actual bucket name
+          .upload('public/${file.path.split('/').last}', file);
+
+      // Get the public URL for the uploaded file
+      final fileUrl = Supabase.instance.client.storage
+          .from('experience_docs')
+          .getPublicUrl('public/${file.path.split('/').last}');
+
+      print("File uploaded successfully: $fileUrl"); // Log the file URL
+    } catch (e) {
+      print("Error uploading file: $e"); // Handle errors
+    }
   }
 
   @override
@@ -368,7 +390,12 @@ class _TeachingDetailState extends State<TeachingDetail> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _storeExperiencen,
+                      // Inside `onPressed` function of 'Submit For Verification' button
+                      onPressed: () async {
+                        await uploadFileToSupabase(_teachingDetailFile!);
+                        _storeExperiencen();
+                      },
+
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff87e64c),
                         padding: const EdgeInsets.symmetric(vertical: 12),

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'qualification_screen.dart';
 
 class CnicScreen extends StatefulWidget {
@@ -10,6 +13,7 @@ class CnicScreen extends StatefulWidget {
 
 class _CnicScreenState extends State<CnicScreen> {
   String? _fileName;
+  File? _cnicFile;
 
   Future<void> _pickFile() async {
     // Check and request permissions
@@ -24,6 +28,7 @@ class _CnicScreenState extends State<CnicScreen> {
       if (result != null) {
         setState(() {
           _fileName = result.files.single.name;
+          _cnicFile = File(result.files.single.path!);
         });
       }
     } else {
@@ -78,6 +83,24 @@ class _CnicScreenState extends State<CnicScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> uploadFileToSupabase(File file) async {
+    try {
+      // Upload the file to Supabase storage
+      final response = await Supabase.instance.client.storage
+          .from('cnic') // Replace with your actual bucket name
+          .upload('public/${file.path.split('/').last}', file);
+
+      // Get the public URL for the uploaded file
+      final fileUrl = Supabase.instance.client.storage
+          .from('cnic')
+          .getPublicUrl('public/${file.path.split('/').last}');
+
+      print("File uploaded successfully: $fileUrl"); // Log the file URL
+    } catch (e) {
+      print("Error uploading file: $e"); // Handle errors
+    }
   }
 
   @override
@@ -158,11 +181,16 @@ class _CnicScreenState extends State<CnicScreen> {
             SizedBox(
               width: 330,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  if (_cnicFile != null) {
+                    await uploadFileToSupabase(
+                        _cnicFile!); // Upload the file if it is selected
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => QualificationScreen()),
+                      builder: (context) => QualificationScreen(),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(

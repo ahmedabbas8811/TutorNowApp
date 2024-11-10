@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -14,6 +16,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
       TextEditingController();
   final TextEditingController instituteNameController = TextEditingController();
   String? _qualificationFileName;
+  File? _qualificationFile;
 
   // Function to pick the qualification file (PDF)
   Future<void> _pickQualificationFile() async {
@@ -28,6 +31,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
       if (result != null) {
         setState(() {
           _qualificationFileName = result.files.single.name;
+          _qualificationFile = File(result.files.single.path!);
         });
       }
     } else {
@@ -106,6 +110,24 @@ class _QualificationScreenState extends State<QualificationScreen> {
       }
     } else {
       print("Please fill all fields.");
+    }
+  }
+
+  Future<void> uploadFileToSupabase(File file) async {
+    try {
+      // Upload the file to Supabase storage
+      final response = await Supabase.instance.client.storage
+          .from('qualification_docs') // Replace with your actual bucket name
+          .upload('public/${file.path.split('/').last}', file);
+
+      // Get the public URL for the uploaded file
+      final fileUrl = Supabase.instance.client.storage
+          .from('qualification_docs')
+          .getPublicUrl('public/${file.path.split('/').last}');
+
+      print("File uploaded successfully: $fileUrl"); // Log the file URL
+    } catch (e) {
+      print("Error uploading file: $e"); // Handle errors
     }
   }
 
@@ -274,11 +296,18 @@ class _QualificationScreenState extends State<QualificationScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        await _storeQualification();
+                        await _storeQualification(); // Store qualification first
+
+                        if (_qualificationFile != null) {
+                          await uploadFileToSupabase(
+                              _qualificationFile!); // Upload the file if it is selected
+                        }
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => TeachingDetail()),
+                            builder: (context) => TeachingDetail(),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
