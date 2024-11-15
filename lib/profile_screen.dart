@@ -158,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         showSelectedLabels: true,
         showUnselectedLabels: true,
         items: [
-          BottomNavigationBarItem(
+        BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
