@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'Profile_Verification_screen.dart';
 class TeachingDetail extends StatefulWidget {
   @override
   _TeachingDetailState createState() => _TeachingDetailState();
@@ -394,8 +394,14 @@ class _TeachingDetailState extends State<TeachingDetail> {
                       onPressed: () async {
                         await uploadFileToSupabase(_teachingDetailFile!);
                         _storeExperiencen();
+                    
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProfileVerificationScreen(),
+                          ),
+                        );
                       },
-
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff87e64c),
                         padding: const EdgeInsets.symmetric(vertical: 12),

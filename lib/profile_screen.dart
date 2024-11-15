@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'location_screen.dart';
 
@@ -18,12 +17,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Navigate to a new page based on the selected index
     switch (index) {
       case 0:
-         Navigator.push(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ProfileScreen()),
         );
         break;
-      
+
       case 1:
         Navigator.push(
           context,
@@ -56,7 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             SizedBox(height: screenHeight * 0.05), // Space at the top
+            SizedBox(height: screenHeight * 0.05), // Space at the top
 
             // Row for Logo and Message Icon
             Row(
@@ -93,7 +92,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: screenHeight * 0.01), // Space below upcoming bookings text
+            SizedBox(
+                height:
+                    screenHeight * 0.01), // Space below upcoming bookings text
 
             // Upcoming Bookings Box
             Container(
@@ -111,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            SizedBox(height: screenHeight * 0.1), 
+            SizedBox(height: screenHeight * 0.1),
 
             // Incomplete Profile Warning
             const Text(
@@ -119,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(color: Colors.black),
               textAlign: TextAlign.start,
             ),
-            SizedBox(height: screenHeight * 0.03), 
+            SizedBox(height: screenHeight * 0.03),
 
             // Complete Profile Button
             Center(
@@ -133,7 +134,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff87e64c),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -145,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-           const Spacer(), 
+            const Spacer(),
           ],
         ),
       ),
@@ -180,9 +182,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 // New screens for BottomNavigationBar items
-
-
-
 
 class AvailabilityScreen extends StatefulWidget {
   @override
@@ -271,7 +270,13 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text('Edit Schedule',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 19),),
+                Text(
+                  'Edit Schedule',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 19),
+                ),
               ],
             ),
             const SizedBox(height: 5),
@@ -286,21 +291,24 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                     title: Text(
                       day,
                       style: TextStyle(
-                        fontWeight: isAvailable ? FontWeight.bold : FontWeight.normal,
+                        fontWeight:
+                            isAvailable ? FontWeight.bold : FontWeight.normal,
                         color: isAvailable ? Colors.black : Colors.grey,
                       ),
                     ),
                     subtitle: Text(
                       _timeSlots[day]!,
                       style: TextStyle(
-                        fontWeight: isAvailable ? FontWeight.bold : FontWeight.normal,
+                        fontWeight:
+                            isAvailable ? FontWeight.bold : FontWeight.normal,
                         color: isAvailable ? Colors.black : Colors.grey,
                       ),
                     ),
                     trailing: Switch(
                       value: isAvailable,
                       activeColor: Colors.black,
-                      activeTrackColor: Color(0xff87e64c), // Inner ball color when ON
+                      activeTrackColor:
+                          Color(0xff87e64c), // Inner ball color when ON
                       inactiveThumbColor: Colors.grey,
                       onChanged: (bool value) {
                         setState(() {
@@ -344,7 +352,6 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
     );
   }
 }
-
 
 class SessionsScreen extends StatefulWidget {
   @override
@@ -542,8 +549,6 @@ class DashedBorderPainter extends CustomPainter {
   }
 }
 
-
-
 class EarningsScreen extends StatefulWidget {
   @override
   _EarningsScreenState createState() => _EarningsScreenState();
@@ -634,7 +639,6 @@ class _EarningsScreenState extends State<EarningsScreen> {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      
                     ],
                   ),
                 ),
@@ -733,4 +737,3 @@ class EarningsScreenS extends CustomPainter {
     return false;
   }
 }
-
