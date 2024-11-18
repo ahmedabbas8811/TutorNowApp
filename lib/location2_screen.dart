@@ -1,18 +1,20 @@
 // import 'package:flutter/material.dart';
 // import 'package:image_picker/image_picker.dart'; // Import the image_picker package
-// import 'package:supabase_flutter/supabase_flutter.dart';
 // import 'cnic_screen.dart'; // Import the CnicScreen
 // import 'dart:io'; // Import for File
+// import 'package:supabase_flutter/supabase_flutter.dart'; // Import Supabase
 
 // // Step 1: Change Location2Screen to a StatefulWidget
 // class Location2Screen extends StatefulWidget {
 //   @override
-//   _Location2ScreenState createState() => _Location2ScreenState(); // Step 2: Create the state class
+//   _Location2ScreenState createState() =>
+//       _Location2ScreenState(); // Step 2: Create the state class
 // }
 
 // // Step 2: Define the state class
 // class _Location2ScreenState extends State<Location2Screen> {
 //   File? _image; // To store the selected image
+//   String? _imageUrl; // change: To store the image URL after uploading
 
 //   // Method to pick an image
 //   Future<void> _pickImage() async {
@@ -24,12 +26,36 @@
 //       setState(() {
 //         _image = File(image.path); // Update the state with the selected image
 //       });
-//       final File file = File(image.path);
-//       final response = await Supabase.instance.client.storage
-//           .from('user_img')
-//           .upload('public/${image.name}',file);
 //     }
+//   }
 
+//   // change: Method to upload image to Supabase storage and get the URL
+//   Future<void> _uploadImage() async {
+//     if (_image == null) return; // No image selected
+
+//     try {
+//       final file = _image!; // The selected image file
+
+//       // Upload the image to Supabase storage
+//       final response = await Supabase.instance.client.storage
+//           .from(
+//               'user_img') // change: Bucket name, replace with your actual bucket
+//           .upload('public/${file.path.split('/').last}', file);
+
+//       // change: Generate the public URL for the uploaded image
+//       final imageUrl = Supabase.instance.client.storage
+//           .from('user_img')
+//           .getPublicUrl('public/${file.path.split('/').last}');
+
+//       setState(() {
+//         _imageUrl = imageUrl; // Save the image URL in state
+//       });
+
+//       print(
+//           "Image uploaded successfully: $_imageUrl"); // For testing, print URL to console
+//     } catch (e) {
+//       print("Error uploading image: $e"); // Handle errors
+//     }
 //   }
 
 //   @override
@@ -60,7 +86,8 @@
 //             Center(
 //               child: InkWell(
 //                 onTap: _pickImage, // Call the image picker on tap
-//                 borderRadius: BorderRadius.circular(100), // For circular ripple effect
+//                 borderRadius:
+//                     BorderRadius.circular(100), // For circular ripple effect
 //                 child: Ink(
 //                   width: 165,
 //                   height: 165,
@@ -87,7 +114,8 @@
 //                               SizedBox(height: 8),
 //                               Text(
 //                                 'Tap to upload',
-//                                 style: TextStyle(color: Colors.grey, fontSize: 14),
+//                                 style:
+//                                     TextStyle(color: Colors.grey, fontSize: 14),
 //                               ),
 //                             ],
 //                           ),
@@ -100,7 +128,11 @@
 //             SizedBox(
 //               width: 330,
 //               child: ElevatedButton(
-//                 onPressed: () {
+//                 onPressed: () async {
+//                   // change: Upload the image when the "Next" button is clicked
+//                   await _uploadImage();
+
+//                   // Navigate to the next screen after uploading
 //                   Navigator.push(
 //                     context,
 //                     MaterialPageRoute(builder: (context) => CnicScreen()),
@@ -108,7 +140,8 @@
 //                 },
 //                 style: ElevatedButton.styleFrom(
 //                   backgroundColor: const Color(0xff87e64c),
-//                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
+//                   padding:
+//                       const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
 //                   shape: RoundedRectangleBorder(
 //                     borderRadius: BorderRadius.circular(10),
 //                   ),
@@ -121,7 +154,8 @@
 //             ),
 //           ],
 //         ),
-//       ),);
+//       ),
+//     );
 //   }
 // }
 
@@ -141,7 +175,7 @@ class Location2Screen extends StatefulWidget {
 // Step 2: Define the state class
 class _Location2ScreenState extends State<Location2Screen> {
   File? _image; // To store the selected image
-  String? _imageUrl; // change: To store the image URL after uploading
+  String? _imageUrl; // To store the image URL after uploading
 
   // Method to pick an image
   Future<void> _pickImage() async {
@@ -156,7 +190,6 @@ class _Location2ScreenState extends State<Location2Screen> {
     }
   }
 
-  // change: Method to upload image to Supabase storage and get the URL
   Future<void> _uploadImage() async {
     if (_image == null) return; // No image selected
 
@@ -165,11 +198,10 @@ class _Location2ScreenState extends State<Location2Screen> {
 
       // Upload the image to Supabase storage
       final response = await Supabase.instance.client.storage
-          .from(
-              'user_img') // change: Bucket name, replace with your actual bucket
+          .from('user_img') // Bucket name, replace with your actual bucket
           .upload('public/${file.path.split('/').last}', file);
 
-      // change: Generate the public URL for the uploaded image
+      // Generate the public URL for the uploaded image
       final imageUrl = Supabase.instance.client.storage
           .from('user_img')
           .getPublicUrl('public/${file.path.split('/').last}');
@@ -180,8 +212,40 @@ class _Location2ScreenState extends State<Location2Screen> {
 
       print(
           "Image uploaded successfully: $_imageUrl"); // For testing, print URL to console
+
+      // Call the method to update the user's image URL in the database
+      await updateUserImageUrl(
+          imageUrl); // Call to update the image URL in the users table
     } catch (e) {
       print("Error uploading image: $e"); // Handle errors
+    }
+  }
+
+  Future<void> updateUserImageUrl(String imageUrl) async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+
+      if (userId == null) {
+        print("User not logged in or user ID is null.");
+        return;
+      }
+
+      final response = await Supabase.instance.client
+          .from('users')
+          .update({
+            'image_url': imageUrl
+          }) // Update 'image_url' column instead of 'cnic_url'
+          .eq('id', userId)
+          .select();
+
+      if (response.isNotEmpty) {
+        print("Image URL updated successfully: $response");
+      } else {
+        print(userId);
+        print("No rows updated. Verify user ID or table setup.");
+      }
+    } catch (e) {
+      print("Error in updating user record: $e");
     }
   }
 
@@ -256,7 +320,7 @@ class _Location2ScreenState extends State<Location2Screen> {
               width: 330,
               child: ElevatedButton(
                 onPressed: () async {
-                  // change: Upload the image when the "Next" button is clicked
+                  // Upload the image when the "Next" button is clicked
                   await _uploadImage();
 
                   // Navigate to the next screen after uploading

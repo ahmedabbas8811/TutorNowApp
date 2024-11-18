@@ -98,40 +98,37 @@ class _CnicScreenState extends State<CnicScreen> {
           .getPublicUrl('public/${file.path.split('/').last}');
 
       print("File uploaded successfully: $fileUrl"); // Log the file URL
-       await updateUserCnicUrl(fileUrl);
+      await updateUserCnicUrl(fileUrl);
     } catch (e) {
       print("Error uploading file: $e"); // Handle errors
     }
   }
 
- Future<void> updateUserCnicUrl(String fileUrl) async {
-  try {
-    final userId = Supabase.instance.client.auth.currentUser?.id;
+  Future<void> updateUserCnicUrl(String fileUrl) async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
 
-    if (userId == null) {
-      print("User not logged in or user ID is null.");
-      return;
+      if (userId == null) {
+        print("User not logged in or user ID is null.");
+        return;
+      }
+
+      final response = await Supabase.instance.client
+          .from('users')
+          .update({'cnic_url': fileUrl})
+          .eq('id', userId)
+          .select();
+
+      if (response.isNotEmpty) {
+        print("CNIC URL updated successfully: $response");
+      } else {
+        print(userId);
+        print("No rows updated. Verify user ID or table setup.");
+      }
+    } catch (e) {
+      print("Error in updating user record: $e");
     }
-
-    final response = await Supabase.instance.client
-        .from('users')
-        .update({'cnic_url': fileUrl})
-        .eq('id', userId)
-        .select();
-
-    if (response.isNotEmpty) {
-      print("CNIC URL updated successfully: $response");
-    } else {
-      print(userId);
-      print("No rows updated. Verify user ID or table setup.");
-    }
-  } catch (e) {
-    print("Error in updating user record: $e");
   }
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {
