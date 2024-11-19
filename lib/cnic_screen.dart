@@ -84,7 +84,7 @@ class _CnicScreenState extends State<CnicScreen> {
       ),
     );
   }
-
+// Function to upload cnic file on supabase
   Future<void> uploadFileToSupabase(File file) async {
     try {
       // Upload the file to Supabase storage
@@ -103,7 +103,7 @@ class _CnicScreenState extends State<CnicScreen> {
       print("Error uploading file: $e"); // Handle errors
     }
   }
-
+// Function to update user cnic url in users table
   Future<void> updateUserCnicUrl(String fileUrl) async {
     try {
       final userId = Supabase.instance.client.auth.currentUser?.id;

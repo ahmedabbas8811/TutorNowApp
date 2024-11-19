@@ -37,7 +37,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
     }
   }
 
-  Future<void> _storeExperiencen() async {
+  Future<int?> _storeExperience() async {
     final user = Supabase.instance.client.auth.currentUser;
     final educationLevel = _educationLevelController.text;
     final startDate = _startDateController.text;
@@ -56,12 +56,20 @@ class _TeachingDetailState extends State<TeachingDetail> {
           'user_id': user.id,
           'still_working': stillWorking,
         }).select();
+
+        // Check if the response is not empty and return the inserted row's ID
+        if (response.isNotEmpty) {
+          final experienceId =
+              response[0]['id']; // Assuming 'id' is the primary key column
+          return experienceId;
+        }
       } catch (e) {
         print("Error storing experience: $e");
       }
     } else {
       print("Please fill all fields.");
     }
+    return null;
   }
 
   // Function to pick the qualification file (PDF)
@@ -134,7 +142,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
     );
   }
 
-  Future<void> uploadFileToSupabase(File file) async {
+  Future<void> uploadFileToSupabase(File file, int experienceId) async {
     try {
       // Upload the file to Supabase storage
       final response = await Supabase.instance.client.storage
@@ -147,8 +155,29 @@ class _TeachingDetailState extends State<TeachingDetail> {
           .getPublicUrl('public/${file.path.split('/').last}');
 
       print("File uploaded successfully: $fileUrl"); // Log the file URL
+      await updateExperienceUrl(fileUrl, experienceId);
     } catch (e) {
       print("Error uploading file: $e"); // Handle errors
+    }
+  }
+
+  Future<void> updateExperienceUrl(String fileUrl, int experienceId) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('experience') // Change table to 'experience'
+          .update({
+            'experience_url': fileUrl, // Update 'experience_url' column
+          })
+          .eq('id', experienceId) // Match the specific row by its ID
+          .select();
+
+      if (response.isNotEmpty) {
+        print("Experience URL updated successfully: $response");
+      } else {
+        print("No rows updated. Verify ID or table setup.");
+      }
+    } catch (e) {
+      print("Error in updating experience record: $e");
     }
   }
 
@@ -364,12 +393,26 @@ class _TeachingDetailState extends State<TeachingDetail> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => TeachingDetail()),
-                        );
+                      onPressed: () async {
+                        // Store the experience data and get the ID of the inserted experience record
+                        final experienceId = await _storeExperience();
+
+                        if (experienceId != null &&
+                            _teachingDetailFile != null) {
+                          // Upload the file to Supabase storage and associate it with the experience
+                          await uploadFileToSupabase(
+                              _teachingDetailFile!, experienceId);
+                        }
+
+                        // Clear the fields after adding the experience
+                        _startDateController.clear();
+                        _endDateController.clear();
+                        _educationLevelController.clear();
+
+                        setState(() {
+                          _qualificationFileName = null;
+                          _teachingDetailFile = null;
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
@@ -384,6 +427,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 5),
 
                   // "Submit For Verification"
@@ -392,8 +436,14 @@ class _TeachingDetailState extends State<TeachingDetail> {
                     child: ElevatedButton(
                       // Inside `onPressed` function of 'Submit For Verification' button
                       onPressed: () async {
-                        await uploadFileToSupabase(_teachingDetailFile!);
-                        _storeExperiencen();
+                        final experienceId =
+                            await _storeExperience(); // Store experience and get the row ID
+
+                        if (experienceId != null &&
+                            _teachingDetailFile != null) {
+                          await uploadFileToSupabase(_teachingDetailFile!,
+                              experienceId); // Upload the file for this specific experience
+                        }
 
                         Navigator.push(
                           context,
@@ -402,6 +452,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
                           ),
                         );
                       },
+
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff87e64c),
                         padding: const EdgeInsets.symmetric(vertical: 12),
