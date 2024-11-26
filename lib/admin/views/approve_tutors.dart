@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/admin/views/personal_information.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'confirmation_screen.dart';
 
@@ -192,7 +193,7 @@ class _ApproveTutorsScreenState extends State<ApproveTutorsScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      ConfirmationTutorsScreen(),
+                                                      ConfirmationScreen()
                                                 ),
                                               );
                                             },
