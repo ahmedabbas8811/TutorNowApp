@@ -7,7 +7,7 @@ import 'experience_information.dart';
 class ConfirmationScreen extends StatelessWidget {
   final String tutorId;
 
-  ConfirmationScreen({super.key, required this.tutorId});
+  const ConfirmationScreen({super.key, required this.tutorId});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class SideMenu extends StatelessWidget {
           Container(
             color: Colors.black,
             child: const ListTile(
-              leading: Icon(Icons.home, color: Colors.white),
+              leading: Icon(Icons.check_circle, color: Colors.white),
               title: Text(
                 'Approve Tutors',
                 style: TextStyle(color: Colors.white),
@@ -79,30 +79,60 @@ class ConfirmationTutorsScreen extends StatefulWidget {
 
 class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
   String tutorName = '';
+  String userMail = '';
+  String userLocation = '';
+  String userCountry = '';
+  String userState = '';
+  String userCity = '';
 
   @override
   void initState() {
     super.initState();
-    fetchTutorName();
+    fetchTutorDetails();
   }
 
-  Future<void> fetchTutorName() async {
+  Future<void> fetchTutorDetails() async {
     try {
       final response = await Supabase.instance.client
           .from('users') // Replace with your actual table name
-          .select('metadata->>name') // Replace 'name' with the actual column name for the tutor's name
+          .select('metadata, email',) // Fetch name and email
           .eq('id', widget.tutorId)
-          .single(); // Fetch only one record
+          .single(); // Ensure only one record is fetched
 
       setState(() {
-        tutorName = response['name'] ?? 'Unknown Tutor';
+        final metadata = response['metadata'] ?? {};
+        tutorName = metadata['name'] ?? 'Unknown Tutor';
+        userMail = response['email'] ?? 'No Email Found';
       });
     } catch (e) {
-      print('Error fetching tutor name: $e');
+      print('Error fetching tutor details: $e');
       setState(() {
         tutorName = 'Error fetching name';
+        userMail = 'Error fetching email';
       });
     }
+     try {
+      final response = await Supabase.instance.client
+          .from('location') // Replace with your actual table name
+          .select('country, state, city',) // Fetch name and email
+          .eq('user_id', widget.tutorId)
+          .single(); // Ensure only one record is fetched
+
+      setState(() {
+        userCountry = response['country'] ?? 'No country Found';
+        userCity = response['city'] ?? 'No country Found';
+        userState = response['state'] ?? 'No country Found';
+        userLocation = '$userCity, $userState, $userCountry';
+      });
+    } catch (e) {
+      print('Error fetching tutor details: $e');
+      setState(() {
+        userCountry= 'Error fetching country';
+        userCity = 'Error fetching city';
+        userState = 'Error fetching state';
+      });
+    }
+  
   }
 
   @override
@@ -131,6 +161,8 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
                     child: PersonalInformation(
                       userId: widget.tutorId,
                       userName: tutorName,
+                      userMail: userMail,
+                      userLocation: userLocation,
                     ),
                   ),
                   const SizedBox(width: 8),

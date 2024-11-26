@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 class PersonalInformation extends StatelessWidget {
   final String userId;
   final String userName;
+  final String userMail;
+  final String userLocation;
   const PersonalInformation(
     {super.key,
     required this.userId,
-    required this.userName
+    required this.userName,
+    required this.userMail,
+    required this.userLocation,
     });
 
   @override
@@ -48,8 +52,8 @@ class PersonalInformation extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _buildInfoRow('Name', userName),
-          _buildInfoRow('Email', 'imrankhan@gmail.com'),
-          _buildInfoRow('Location', 'Rawalpindi, Punjab, Pakistan'),
+          _buildInfoRow('Email', userMail),
+          _buildInfoRow('Location', userLocation),
           const Text(
             'CNIC:',
             style: TextStyle(fontSize: 16),
