@@ -193,7 +193,7 @@ class _ApproveTutorsScreenState extends State<ApproveTutorsScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      ConfirmationScreen()
+                                                      ConfirmationScreen(tutorId: id,)
                                                 ),
                                               );
                                             },

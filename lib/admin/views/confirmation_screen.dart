@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'personal_information.dart';
 import 'qualification_information.dart';
 import 'experience_information.dart';
 
 class ConfirmationScreen extends StatelessWidget {
+  final String tutorId;
+
+  ConfirmationScreen({super.key, required this.tutorId});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -12,8 +17,8 @@ class ConfirmationScreen extends StatelessWidget {
         body: Row(
           children: [
             SideMenu(),
-            const Expanded(
-              child: ConfirmationTutorsScreen(),
+            Expanded(
+              child: ConfirmationTutorsScreen(tutorId: tutorId),
             ),
           ],
         ),
@@ -30,14 +35,12 @@ class SideMenu extends StatelessWidget {
       color: Colors.white,
       child: Column(
         children: [
-          Container(
-            child: ListTile(
-              leading: Image.asset(
-                'assets/ali.png',
-                width: 28,
-                height: 28,
-                fit: BoxFit.contain,
-              ),
+          ListTile(
+            leading: Image.asset(
+              'assets/ali.png',
+              width: 28,
+              height: 28,
+              fit: BoxFit.contain,
             ),
           ),
           const SizedBox(height: 5),
@@ -65,12 +68,46 @@ class SideMenu extends StatelessWidget {
   }
 }
 
-class ConfirmationTutorsScreen extends StatelessWidget {
-  const ConfirmationTutorsScreen({super.key});
+class ConfirmationTutorsScreen extends StatefulWidget {
+  final String tutorId;
+
+  const ConfirmationTutorsScreen({super.key, required this.tutorId});
+
+  @override
+  _ConfirmationTutorsScreenState createState() => _ConfirmationTutorsScreenState();
+}
+
+class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
+  String tutorName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTutorName();
+  }
+
+  Future<void> fetchTutorName() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('users') // Replace with your actual table name
+          .select('metadata->>name') // Replace 'name' with the actual column name for the tutor's name
+          .eq('id', widget.tutorId)
+          .single(); // Fetch only one record
+
+      setState(() {
+        tutorName = response['name'] ?? 'Unknown Tutor';
+      });
+    } catch (e) {
+      print('Error fetching tutor name: $e');
+      setState(() {
+        tutorName = 'Error fetching name';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -89,9 +126,12 @@ class ConfirmationTutorsScreen extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Expanded(
+                  Expanded(
                     flex: 1,
-                    child: PersonalInformation(),
+                    child: PersonalInformation(
+                      userId: widget.tutorId,
+                      userName: tutorName,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   const Expanded(

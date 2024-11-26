@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
 class PersonalInformation extends StatelessWidget {
-  const PersonalInformation({super.key});
+  final String userId;
+  final String userName;
+  const PersonalInformation(
+    {super.key,
+    required this.userId,
+    required this.userName
+    });
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +47,7 @@ class PersonalInformation extends StatelessWidget {
             backgroundImage: AssetImage('assets/Ellipse 1.png'),
           ),
           const SizedBox(height: 16),
-          _buildInfoRow('Name', 'Imran Khan'),
+          _buildInfoRow('Name', userName),
           _buildInfoRow('Email', 'imrankhan@gmail.com'),
           _buildInfoRow('Location', 'Rawalpindi, Punjab, Pakistan'),
           const Text(
