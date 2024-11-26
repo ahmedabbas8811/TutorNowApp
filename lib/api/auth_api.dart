@@ -14,10 +14,11 @@ class AuthApi {
 
   // * Sign up
   Future<AuthResponse> signup(
-      String name, String email, String password) async {
+      String name, String email, String password ) async {
     final AuthResponse response = await supabaseClient.auth
         .signUp(email: email, password: password, data: {"name": name});
 
     return response;
   }
 }
+

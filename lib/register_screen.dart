@@ -3,6 +3,7 @@ import 'package:form_validator/form_validator.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/utils/features/auth/auth_controller.dart';
 import 'package:newifchaly/utils/form_validators.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login_screen.dart'; // Import login screen to navigate
 
 class RegisterScreen extends StatefulWidget {
@@ -10,7 +11,6 @@ class RegisterScreen extends StatefulWidget {
 
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
-  
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
@@ -54,7 +54,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       hintStyle: const TextStyle(color: Colors.grey),
     );
   }
- String? groupValue = 'null';
+
+  String? groupValue = 'null';
   @override
   void dispose() {
     // Dispose controllers and focus nodes when not needed
@@ -90,10 +91,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
 
-               const Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                     Text(
+                    Text(
                       'Register As A Tutor',
                       style: TextStyle(
                         fontSize: 24,
@@ -136,75 +137,84 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 10),
 
 //Code of Register as, As Choosing for Student , Parent or tutor
-const   Text('Register as',style: TextStyle(color: Colors.grey),),
-Theme(
-  data: Theme.of(context).copyWith(
-    radioTheme: RadioThemeData(
-      fillColor: WidgetStateProperty.resolveWith<Color>(
-        (Set<WidgetState> states) {
-          return states.contains(WidgetState.selected) ? Colors.black : Colors.grey;
-        },
-      ),
-      overlayColor: WidgetStateProperty.all(Colors.black),
-      visualDensity: VisualDensity.compact,
-      splashRadius: 15,
-    ),
-  ),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: [
-      Radio<String>(
-        value: 'Student',
-        groupValue: groupValue,
-        onChanged: (value) {
-          setState(() {
-            groupValue = value;
-          });
-        },
-      ),
-      Text(
-        'Student',
-        style: TextStyle(
-          color: groupValue == 'Student' ? Colors.black : Colors.grey,
-        ),
-      ),
+                const Text(
+                  'Register as',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    radioTheme: RadioThemeData(
+                      fillColor: WidgetStateProperty.resolveWith<Color>(
+                        (Set<WidgetState> states) {
+                          return states.contains(WidgetState.selected)
+                              ? Colors.black
+                              : Colors.grey;
+                        },
+                      ),
+                      overlayColor: WidgetStateProperty.all(Colors.black),
+                      visualDensity: VisualDensity.compact,
+                      splashRadius: 15,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Radio<String>(
+                        value: 'Student',
+                        groupValue: groupValue,
+                        onChanged: (value) {
+                          setState(() {
+                            groupValue = value;
+                          });
+                        },
+                      ),
+                      Text(
+                        'Student',
+                        style: TextStyle(
+                          color: groupValue == 'Student'
+                              ? Colors.black
+                              : Colors.grey,
+                        ),
+                      ),
+                      Radio<String>(
+                        value: 'Parent',
+                        groupValue: groupValue,
+                        onChanged: (value) {
+                          setState(() {
+                            groupValue = value;
+                          });
+                        },
+                      ),
+                      Text(
+                        'Parent',
+                        style: TextStyle(
+                          color: groupValue == 'Parent'
+                              ? Colors.black
+                              : Colors.grey,
+                        ),
+                      ),
+                      Radio<String>(
+                        value: 'Tutor',
+                        groupValue: groupValue,
+                        onChanged: (value) {
+                          setState(() {
+                            groupValue = value;
+                          });
+                        },
+                      ),
+                      Text(
+                        'Tutor',
+                        style: TextStyle(
+                          color: groupValue == 'Tutor'
+                              ? Colors.black
+                              : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-      Radio<String>(
-        value: 'Parent',
-        groupValue: groupValue,
-        onChanged: (value) {
-          setState(() {
-            groupValue = value;
-          });
-        },
-      ),
-      Text(
-        'Parent',
-        style: TextStyle(
-          color: groupValue == 'Parent' ? Colors.black : Colors.grey,
-        ),
-      ),
-
-      Radio<String>(
-        value: 'Tutor',
-        groupValue: groupValue,
-        onChanged: (value) {
-          setState(() {
-            groupValue = value;
-          });
-        },
-      ),
-      Text(
-        'Tutor',
-        style: TextStyle(
-          color: groupValue == 'Tutor' ? Colors.black : Colors.grey,
-        ),
-      ),
-    ],
-  ),
-),
-
-                    const SizedBox(height: 10),
+                const SizedBox(height: 10),
                 // Password Field
                 TextFormField(
                   controller: _passwordController,
@@ -291,9 +301,14 @@ Theme(
                 Obx(
                   () => ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState?.validate() ?? controller.signupLoading.value == false) {
+                      if (_formKey.currentState?.validate() ??
+                          controller.signupLoading.value == false) {
                         // Perform registration action
-                        controller.signup(_nameController.text, _emailController.text, _passwordController.text);
+                        controller.signup(
+                          _nameController.text,
+                          _emailController.text,
+                          _passwordController.text,
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
