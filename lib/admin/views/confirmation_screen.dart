@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'personal_information.dart';
 import 'qualification_information.dart';
 import 'experience_information.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ConfirmationScreen extends StatelessWidget {
   final String tutorId;
@@ -80,6 +81,7 @@ class ConfirmationTutorsScreen extends StatefulWidget {
 class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
   String tutorName = '';
   String userMail = '';
+  String userCnicUrl = '';
   String userLocation = '';
   String userCountry = '';
   String userState = '';
@@ -95,7 +97,7 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
     try {
       final response = await Supabase.instance.client
           .from('users') // Replace with your actual table name
-          .select('metadata, email',) // Fetch name and email
+          .select('metadata, email, cnic_url',) // Fetch name and email
           .eq('id', widget.tutorId)
           .single(); // Ensure only one record is fetched
 
@@ -103,6 +105,7 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
         final metadata = response['metadata'] ?? {};
         tutorName = metadata['name'] ?? 'Unknown Tutor';
         userMail = response['email'] ?? 'No Email Found';
+        userCnicUrl = response['cnic_url'] ?? 'No Cnic Found';
       });
     } catch (e) {
       print('Error fetching tutor details: $e');
@@ -113,10 +116,10 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
     }
      try {
       final response = await Supabase.instance.client
-          .from('location') // Replace with your actual table name
-          .select('country, state, city',) // Fetch name and email
+          .from('location') 
+          .select('country, state, city',)  
           .eq('user_id', widget.tutorId)
-          .single(); // Ensure only one record is fetched
+          .single();  
 
       setState(() {
         userCountry = response['country'] ?? 'No country Found';
@@ -133,6 +136,31 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
       });
     }
   
+  }
+
+  Future<void> openCNIC() async {
+    if (userCnicUrl.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('CNIC URL not available')),
+      );
+      return;
+    }
+
+    try {
+      final bucketName = 'cnic'; // Replace with your bucket name
+      final publicUrl = userCnicUrl;
+
+      if (await canLaunchUrl(Uri.parse(publicUrl))) {
+        await launchUrl(Uri.parse(publicUrl), mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch $publicUrl';
+      }
+    } catch (e) {
+      print('Error opening CNIC: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error opening CNIC')),
+      );
+    }
   }
 
   @override
@@ -163,6 +191,7 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
                       userName: tutorName,
                       userMail: userMail,
                       userLocation: userLocation,
+                      onDownloadPressed: openCNIC,
                     ),
                   ),
                   const SizedBox(width: 8),

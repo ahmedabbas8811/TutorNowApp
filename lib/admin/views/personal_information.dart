@@ -5,12 +5,14 @@ class PersonalInformation extends StatelessWidget {
   final String userName;
   final String userMail;
   final String userLocation;
+  final VoidCallback onDownloadPressed;
   const PersonalInformation(
     {super.key,
     required this.userId,
     required this.userName,
     required this.userMail,
     required this.userLocation,
+    required this.onDownloadPressed
     });
 
   @override
@@ -60,7 +62,7 @@ class PersonalInformation extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: onDownloadPressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               shape: const RoundedRectangleBorder(
@@ -68,7 +70,7 @@ class PersonalInformation extends StatelessWidget {
               ),
             ),
             child: const Text(
-              'Download',
+              'View',
               style: TextStyle(color: Colors.white),
             ),
           ),
