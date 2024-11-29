@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ExperienceInformation extends StatelessWidget {
-  const ExperienceInformation({super.key});
+  final String tutorId;
+  const ExperienceInformation({super.key, required this.tutorId});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +49,7 @@ class ExperienceInformation extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('Education Level of Students', 'BS'),
+          _buildInfoRow('Education Level of Students', tutorId),
           const SizedBox(height: 8),
           Row(
             children: [
