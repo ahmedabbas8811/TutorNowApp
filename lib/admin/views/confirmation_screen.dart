@@ -195,9 +195,9 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Expanded(
+                  Expanded(
                     flex: 1,
-                    child: QualificationInformation(),
+                    child: QualificationInformation(tutorId: widget.tutorId),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
