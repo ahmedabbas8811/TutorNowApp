@@ -86,6 +86,7 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
   String userCountry = '';
   String userState = '';
   String userCity = '';
+  String userImg = '';
 
   @override
   void initState() {
@@ -132,7 +133,7 @@ print(rows);
     try {
       final response = await Supabase.instance.client
           .from('users') // Replace with your actual table name
-          .select('metadata, email, cnic_url',) // Fetch name and email
+          .select('metadata, email, cnic_url, image_url',) // Fetch name and email
           .eq('id', widget.tutorId)
           .single(); // Ensure only one record is fetched
 
@@ -141,6 +142,9 @@ print(rows);
         tutorName = metadata['name'] ?? 'Unknown Tutor';
         userMail = response['email'] ?? 'No Email Found';
         userCnicUrl = response['cnic_url'] ?? 'No Cnic Found';
+        userImg = response['image_url'] ?? 'No Img Found';
+        print(userImg);
+
       });
     } catch (e) {
       print('Error fetching tutor details: $e');
@@ -183,7 +187,6 @@ print(rows);
     }
 
     try {
-      final bucketName = 'cnic'; // Replace with your bucket name
       final publicUrl = userCnicUrl;
 
       if (await canLaunchUrl(Uri.parse(publicUrl))) {
@@ -226,10 +229,12 @@ print(rows);
                       userId: widget.tutorId,
                       userName: tutorName,
                       userMail: userMail,
+                      img_Url: userImg ,
                       userLocation: userLocation,
                       onDownloadPressed: openCNIC,
                       onApprovePressed: updateTutorVerification,
                     ),
+                    
                   ),
                   const SizedBox(width: 8),
                   Expanded(

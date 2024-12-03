@@ -5,6 +5,7 @@ class PersonalInformation extends StatelessWidget {
   final String userId;
   final String userName;
   final String userMail;
+  final String img_Url;
   final String userLocation;
   final VoidCallback onDownloadPressed;
   final VoidCallback onApprovePressed;
@@ -13,6 +14,7 @@ class PersonalInformation extends StatelessWidget {
     required this.userId,
     required this.userName,
     required this.userMail,
+    required this.img_Url,
     required this.userLocation,
     required this.onDownloadPressed,
     required this.onApprovePressed,
@@ -56,9 +58,9 @@ class PersonalInformation extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CircleAvatar(
+           CircleAvatar(
             radius: 40,
-            backgroundImage: AssetImage('assets/Ellipse 1.png'),
+            backgroundImage: NetworkImage(img_Url),
           ),
           const SizedBox(height: 16),
           _buildInfoRow('Name', userName),

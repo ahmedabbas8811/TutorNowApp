@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class QualificationInformation extends StatefulWidget {
+  
   final String tutorId; // Pass tutorId from parent widget
+  
 
   const QualificationInformation({super.key, required this.tutorId});
 
@@ -12,6 +16,7 @@ class QualificationInformation extends StatefulWidget {
 }
 
 class _QualificationInformationState extends State<QualificationInformation> {
+  
   List<Map<String, dynamic>> qualificationList = [];
   bool isLoading = true;
 
@@ -20,7 +25,31 @@ class _QualificationInformationState extends State<QualificationInformation> {
     super.initState();
     fetchQualificationDetails(); // Fetch qualification data when the widget is initialized
   }
+  
+  
+ void openDoc(String proofUrl) async {
+    if (proofUrl.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('CNIC URL not available')),
+      );
+      return;
+    }
 
+    try {
+      final publicUrl = proofUrl ;
+
+      if (await canLaunchUrl(Uri.parse(publicUrl))) {
+        await launchUrl(Uri.parse(publicUrl), mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch $publicUrl';
+      }
+    } catch (e) {
+      print('Error opening CNIC: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error opening CNIC')),
+      );
+    }
+  }
   // Function to fetch qualification details from the Supabase qualification table
   Future<void> fetchQualificationDetails() async {
     try {
@@ -42,6 +71,12 @@ class _QualificationInformationState extends State<QualificationInformation> {
       });
     }
   }
+
+ 
+  
+
+  
+  
 
   // Widget to display the qualification details dynamically
   @override
@@ -79,6 +114,7 @@ class _QualificationInformationState extends State<QualificationInformation> {
     return Column(
       children: [
         for (var qualification in qualificationList) 
+          
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0), // Original spacing between cards
             child: Container(
@@ -99,8 +135,15 @@ class _QualificationInformationState extends State<QualificationInformation> {
                   const SizedBox(height: 8), // Original spacing before the button
                   ElevatedButton(
                     onPressed: () {
-                      // Add logic to open proof URL or handle download
-                    },
+                    // Store the URL from the qualification record
+                    String proofUrl = qualification['qualification_url'] ?? ''; // Store the URL
+                    if (proofUrl.isNotEmpty) {
+                      // You can use the proofUrl variable to download or view the document
+                      openDoc(proofUrl);
+                    } else {
+                      print('No URL available for this qualification');
+                    }
+                  },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       shape: const RoundedRectangleBorder(
