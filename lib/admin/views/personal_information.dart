@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PersonalInformation extends StatelessWidget {
   final String userId;
@@ -6,22 +7,29 @@ class PersonalInformation extends StatelessWidget {
   final String userMail;
   final String userLocation;
   final VoidCallback onDownloadPressed;
+  final VoidCallback onApprovePressed;
   const PersonalInformation(
     {super.key,
     required this.userId,
     required this.userName,
     required this.userMail,
     required this.userLocation,
-    required this.onDownloadPressed
+    required this.onDownloadPressed,
+    required this.onApprovePressed,
     });
 
   @override
   Widget build(BuildContext context) {
     return _buildSectionContainer(
       title: 'Personal Information',
-      child: _buildPersonalInfo(),
+      child: _buildPersonalInfo(context),
     );
   }
+
+
+
+
+  
 
   Widget _buildSectionContainer({required String title, required Widget child}) {
     return Column(
@@ -40,7 +48,7 @@ class PersonalInformation extends StatelessWidget {
     );
   }
 
-  Widget _buildPersonalInfo() {
+  Widget _buildPersonalInfo(BuildContext context) {
     return Container(
       width: 350,
       padding: const EdgeInsets.all(16),
@@ -107,7 +115,7 @@ class PersonalInformation extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ElevatedButton.icon(
-          onPressed: () {},
+          onPressed: onApprovePressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xff87e64c),
             shape: const RoundedRectangleBorder(
@@ -125,7 +133,7 @@ class PersonalInformation extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         ElevatedButton.icon(
-          onPressed: () {},
+          onPressed: (){},
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
             shape: const RoundedRectangleBorder(

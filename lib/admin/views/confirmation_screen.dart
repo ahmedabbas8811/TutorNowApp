@@ -93,6 +93,41 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
     fetchTutorDetails();
   }
 
+Future<void> updateTutorVerification() async {
+  final rows = await Supabase.instance.client
+    .from('users')
+    .select('*')
+    .eq('id', widget.tutorId);
+print(rows);
+
+  try {
+    // Perform the update operation and fetch updated rows
+    final response = await Supabase.instance.client
+        .from('users') // Replace with your table name
+        .update({'is_verified': true})
+        .eq('id', widget.tutorId)
+        .select(); // Fetch updated rows (if needed)
+
+    // Check if the response is non-empty (indicating success)
+    if (response.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tutor successfully verified!')),
+      );
+    } else {
+      // Handle case where no rows were updated
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No matching tutor found.')),
+      );
+    }
+  } catch (e) {
+    // Handle any unexpected errors
+    print('Error updating tutor verification: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Error verifying tutor.')),
+    );
+  }
+}
+
   Future<void> fetchTutorDetails() async {
     try {
       final response = await Supabase.instance.client
@@ -137,6 +172,7 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
     }
   
   }
+
 
   Future<void> openCNIC() async {
     if (userCnicUrl.isEmpty) {
@@ -192,6 +228,7 @@ class _ConfirmationTutorsScreenState extends State<ConfirmationTutorsScreen> {
                       userMail: userMail,
                       userLocation: userLocation,
                       onDownloadPressed: openCNIC,
+                      onApprovePressed: updateTutorVerification,
                     ),
                   ),
                   const SizedBox(width: 8),

@@ -88,8 +88,9 @@ class _QualificationInformationState extends State<QualificationInformation> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildInfoRow('Education Level', widget.tutorId), // Display tutor ID
                   _buildInfoRow('Institute Name', qualification['institute_name'] ?? 'Unknown institute'),
+                  _buildInfoRow('Education Level', qualification['education_level'] ?? 'Unknown institute'),
+
                   const SizedBox(height: 8), // Original spacing inside the card
                   const Text(
                     'Proof of Qualification:',

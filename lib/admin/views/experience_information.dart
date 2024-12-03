@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 class ExperienceInformation extends StatefulWidget {
   final String tutorId; // Pass tutorId from parent widget
+  
+  
 
   const ExperienceInformation(
-      {super.key, required this.tutorId}); // Update constructor
+      {super.key, 
+      required this.tutorId,
+      }); // Update constructor
 
   @override
   _ExperienceInformationState createState() => _ExperienceInformationState();
@@ -82,6 +86,7 @@ class _ExperienceInformationState extends State<ExperienceInformation> {
 
   // Build the experience details cards
   Widget _buildExperienceDetails() {
+    
     return ListView.builder(
       shrinkWrap: true,
       physics:
@@ -91,10 +96,39 @@ class _ExperienceInformationState extends State<ExperienceInformation> {
       itemBuilder: (context, index) {
         final experience = experienceList[index];
         final educationLevel =
-            experience['education_level'] ?? 'Not provided'; // Example field
+            experience['student_education_level'] ?? 'Not provided'; // Example field
         final startDate = experience['start_date'] ?? 'Unknown start date';
         final endDate = experience['end_date'] ?? 'Unknown end date';
-        final proofUrl = experience['proof_url']; // Example field
+        final stillWorking = experience['still_working'] == true
+            ? 'User is still working here'
+            : 'User is not working here';
+        final proofUrl = experience['experience_url']; // Example field
+       
+       
+        void openDoc() async {
+    if (proofUrl.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('CNIC URL not available')),
+      );
+      return;
+    }
+
+    try {
+      final publicUrl = proofUrl ;
+
+      if (await canLaunchUrl(Uri.parse(publicUrl))) {
+        await launchUrl(Uri.parse(publicUrl), mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch $publicUrl';
+      }
+    } catch (e) {
+      print('Error opening CNIC: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error opening CNIC')),
+      );
+    }
+  }
+
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -105,7 +139,9 @@ class _ExperienceInformationState extends State<ExperienceInformation> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfoRow('Education Level of Students', widget.tutorId),
+                _buildInfoRow('Education Level of Students', educationLevel),
+                _buildInfoRow('Status', stillWorking),
+
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -121,9 +157,7 @@ class _ExperienceInformationState extends State<ExperienceInformation> {
                 ),
                 const SizedBox(height: 8),
                 ElevatedButton(
-                  onPressed: () {
-                    // Add logic to open proof URL or handle download
-                  },
+                  onPressed: openDoc,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     shape: const RoundedRectangleBorder(
@@ -179,4 +213,5 @@ class _ExperienceInformationState extends State<ExperienceInformation> {
       ],
     );
   }
-}
+
+  }

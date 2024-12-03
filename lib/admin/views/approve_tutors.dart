@@ -26,8 +26,8 @@ class _ApproveTutorsScreenState extends State<ApproveTutorsScreen> {
       // Query to fetch tutors with user_type 'Tutor' and extract id and metadata
       final response = await supabase
           .from('users')
-          .select('id, metadata')
-          .eq('user_type', 'Tutor');
+          .select('id, metadata, is_verified')
+          .match({'user_type': 'Tutor', 'is_verified': false});
 
       if (response != null) {
         setState(() {
