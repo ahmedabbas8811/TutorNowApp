@@ -65,12 +65,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   'assets/ali.png',
                   height: screenHeight * 0.05, // Responsive height for logo
                 ),
-                IconButton(
-                  icon: const Icon(Icons.message_outlined, color: Colors.black),
-                  onPressed: () {
-                    // Handle message icon press
-                  },
-                ),
+               IconButton(
+  icon: const Icon(Icons.message_outlined, color: Colors.black),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MessageScreen()),
+    );
+  },
+),
               ],
             ),
 
@@ -157,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         unselectedItemColor: Colors.black,
         showSelectedLabels: true,
         showUnselectedLabels: true,
-        items: [
+        items:const [
         BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -177,6 +180,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
         onTap: _onItemTapped,
       ),
+    );
+  }
+}
+
+
+class MessageScreen extends StatelessWidget {
+  const MessageScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+      leading: IconButton(
+  icon: Transform.scale(
+    scale: 1.5, // Adjust the scale for a bolder look
+    child: const Icon(Icons.arrow_back, color: Colors.black),
+    
+  ),
+  
+  onPressed: () {
+    Navigator.pop(context); // Navigates back to the previous screen
+  },
+),
+ backgroundColor: Colors.white,
+        elevation: 0, // Removes shadow
+      
+      ),
+      body: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Your chats will appear here',
+            style: TextStyle(fontSize: 18, color: Colors.grey),
+          ),
+        ],
+      ),
+      backgroundColor: Colors.white, // Matches the background color
     );
   }
 }
@@ -267,7 +307,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
               'Sessions that are already booked are not affected by changing availability',
               style: TextStyle(color: Colors.grey),
             ),
-            Row(
+          const  Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
@@ -308,7 +348,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                       value: isAvailable,
                       activeColor: Colors.black,
                       activeTrackColor:
-                          Color(0xff87e64c), // Inner ball color when ON
+                         const Color(0xff87e64c), // Inner ball color when ON
                       inactiveThumbColor: Colors.grey,
                       onChanged: (bool value) {
                         setState(() {
@@ -329,7 +369,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
         unselectedItemColor: Colors.black,
         showSelectedLabels: true,
         showUnselectedLabels: true,
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -431,19 +471,19 @@ class _SessionsScreenState extends State<SessionsScreen> {
                 height: 150,
                 child: CustomPaint(
                   painter: DashedBorderPainter(),
-                  child: Column(
+                  child: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 10),
-                      const Text(
+                      SizedBox(height: 10),
+                       Text(
                         'You can manage all your sessions here,',
                         style: TextStyle(
                           color: Colors.grey,
                           fontSize: 16,
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      const Text(
+                       SizedBox(height: 5),
+                     Text(
                         'once they are started',
                         style: TextStyle(
                           color: Colors.grey,
@@ -627,18 +667,18 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 height: 150,
                 child: CustomPaint(
                   painter: DashedBorderPainter(),
-                  child: Column(
+                  child: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 10),
-                      const Text(
+                       SizedBox(height: 10),
+                       Text(
                         'Your earnings reports will be shown here',
                         style: TextStyle(
                           color: Colors.grey,
                           fontSize: 16,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      SizedBox(height: 5),
                     ],
                   ),
                 ),
