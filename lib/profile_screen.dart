@@ -185,7 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             label: 'Earnings',
           ),
            BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
+            icon: Icon(Icons.person),
             label: 'Profile',
           ),
         ],
@@ -404,7 +404,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
             label: 'Earnings',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
+            icon: Icon(Icons.person),
             label: 'Profile',
           ),
         ],
@@ -551,7 +551,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
             label: 'Earnings',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
+            icon: Icon(Icons.person),
             label: 'Profile',
           ),
         ],
@@ -750,7 +750,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
             label: 'Earnings',
           ),
            BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
+            icon: Icon(Icons.person),
             label: 'Profile',
           ),
         ],
