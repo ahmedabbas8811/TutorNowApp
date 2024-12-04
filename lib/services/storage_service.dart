@@ -6,6 +6,7 @@ class StorageService {
 
   // * To get the user session
   static dynamic get getUserSession {
-    return box.read(StorageConstants.authKey); // This should match how you're storing the session
+    return box.read(StorageConstants
+        .authKey); // This should match how you're storing the session
   }
 }
