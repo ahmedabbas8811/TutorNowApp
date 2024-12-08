@@ -1,41 +1,44 @@
-// controllers/profile_controller.dart
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/earningscreen.dart';
+import 'package:newifchaly/personscreen.dart';
+import 'package:newifchaly/profile_screen.dart';
+import 'package:newifchaly/sessionscreen.dart';
 import '../models/profile_model.dart';
 
 class ProfileController extends GetxController {
-  // State variables
   var selectedIndex = 0.obs;
 
-  // Profile data (Simulated for now)
+  // Simulate profile data
   var profile = ProfileModel(
     name: "Bilal",
     isProfileComplete: false,
     upcomingBookings: [],
   ).obs;
 
-  // Update the selected index
   void updateSelectedIndex(int index) {
     selectedIndex.value = index;
   }
 
-  // Navigate to pages
-  void navigateToPage(int index) {
+  void navigateToPage(BuildContext context, int index) {
     updateSelectedIndex(index);
+
     switch (index) {
       case 0:
-        Get.toNamed('/home');
+        Get.to(() => ProfileScreen());
         break;
       case 1:
-        Get.toNamed('/availability');
+        Get.to(() => AvailabilityScreen());
         break;
       case 2:
-        Get.toNamed('/sessions');
+        Get.to(() => SessionsScreen());
         break;
       case 3:
-        Get.toNamed('/earnings');
+        Get.to(() => EarningsScreen());
         break;
       case 4:
-        Get.toNamed('/profile');
+        Get.to(() => PersonScreen());
         break;
     }
   }
