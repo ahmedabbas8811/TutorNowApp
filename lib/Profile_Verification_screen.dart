@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:newifchaly/profile_screen.dart';
+
 
 class ProfileVerificationScreen extends StatelessWidget {
   @override
@@ -72,7 +74,7 @@ class ProfileVerificationScreen extends StatelessWidget {
                      Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AvailabilityScreen(),
+                            builder: (context) => AvailabilityScreen() ,
                           ),
                         );
                   },
