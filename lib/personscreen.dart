@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/supabase_service.dart';
+import 'package:newifchaly/sessionscreen.dart';
 
 class PersonScreen extends StatefulWidget {
   @override

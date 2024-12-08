@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
+import 'package:newifchaly/sessionscreen.dart';
 
 class EarningsScreen extends StatefulWidget {
   @override

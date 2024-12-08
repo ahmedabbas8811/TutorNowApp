@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/earningscreen.dart';
+import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 
 class SessionsScreen extends StatefulWidget {

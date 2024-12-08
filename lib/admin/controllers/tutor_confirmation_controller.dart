@@ -29,6 +29,7 @@ class TutorConfirmationController extends GetxController {
 
     // Update the reactive tutor variable
     tutor.value = fetchedTutor;
+    
   } catch (e) {
     Get.snackbar('Error', e.toString());
   } finally {
