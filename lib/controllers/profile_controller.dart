@@ -5,6 +5,7 @@ import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile_model.dart';
 
 class ProfileController extends GetxController {
@@ -12,10 +13,41 @@ class ProfileController extends GetxController {
 
   // Simulate profile data
   var profile = ProfileModel(
-    name: "Bilal",
+    name: "",
     isProfileComplete: false,
     upcomingBookings: [],
   ).obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchUserName(); // Fetch the user's name during initialization
+  }
+
+  // Fetch the user's name from the database
+  Future<void> fetchUserName() async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user != null) {
+      try {
+        final response = await Supabase.instance.client
+            .from('users')
+            .select('metadata->>name') // Fetch the name from metadata
+            .eq('id', user.id)
+            .maybeSingle();
+
+        if (response != null && response['name'] != null) {
+          profile.update((p) {
+            p?.name = response['name']; // Update the profile model
+          });
+        } else {
+          print("Name not found in metadata.");
+        }
+      } catch (e) {
+        print("Error fetching user name: $e");
+      }
+    }
+  }
 
   void updateSelectedIndex(int index) {
     selectedIndex.value = index;

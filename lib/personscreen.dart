@@ -81,16 +81,21 @@ class _PersonScreenState extends State<PersonScreen> {
               Get.find<SupabaseService>().logout();
             },
             style: ElevatedButton.styleFrom(
+
+              
               padding: const EdgeInsets.symmetric(
                 horizontal: 150,
                 vertical: 15,
               ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18)
+              ),
               textStyle: const TextStyle(
                 fontSize: 16,
               ),
-              backgroundColor: Colors.red, // Button color
+              backgroundColor:const  Color(0xffe64b4b), // Button color
             ),
-            child: const Text('Logout'),
+            child: const Text('Logout',style: TextStyle(color: Colors.white),),
           ),
         ],
       ),

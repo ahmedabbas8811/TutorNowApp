@@ -2,10 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/profile_controller.dart';
-import 'availabilityscreen.dart';
-import 'sessionscreen.dart';
-import 'earningscreen.dart';
-import 'personscreen.dart';
 import 'location_screen.dart';
 import 'messagescreen.dart';
 

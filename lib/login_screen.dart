@@ -176,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Text(
                       controller.loginLoading.value ? "Loading..." : "Login",
-                      style: const TextStyle(fontSize: 18, color: Colors.white),
+                      style: const TextStyle(fontSize: 18, color: Colors.black),
                     ),
                   ),
                 ),

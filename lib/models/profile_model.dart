@@ -1,5 +1,5 @@
 class ProfileModel {
-  final String name;
+  String name;
   final bool isProfileComplete;
   final List<String> upcomingBookings;
 
@@ -9,3 +9,7 @@ class ProfileModel {
     required this.upcomingBookings,
   });
 }
+
+
+
+

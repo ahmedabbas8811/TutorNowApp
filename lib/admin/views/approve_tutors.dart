@@ -103,8 +103,7 @@ class ApproveTutorsScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final tutor = controller.tutors[index];
                           return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 8.0),
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Row(
                               children: [
                                 Expanded(
@@ -121,8 +120,7 @@ class ApproveTutorsScreen extends StatelessWidget {
                                 ),
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color(0xff87e64c),
+                                    backgroundColor: const Color(0xff87e64c),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 25, vertical: 10),
                                     shape: const RoundedRectangleBorder(
