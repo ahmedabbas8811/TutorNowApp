@@ -55,7 +55,8 @@ class ProfileScreen extends StatelessWidget {
                     child: Text(
                       controller.profile.value.upcomingBookings.isEmpty
                           ? 'Your upcoming sessions will be shown\nhere, once booked'
-                          : controller.profile.value.upcomingBookings.join("\n"),
+                          : controller.profile.value.upcomingBookings
+                              .join("\n"),
                       textAlign: TextAlign.center,
                       style: const TextStyle(color: Colors.grey),
                     ),
@@ -68,6 +69,10 @@ class ProfileScreen extends StatelessWidget {
                       : 'Your profile is not complete; incomplete profiles are not visible to students',
                   style: const TextStyle(color: Colors.black),
                   textAlign: TextAlign.start,
+                )),
+            Obx(() => Text(
+                  '${controller.profile.value.stepscount} Steps Remaining',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 )),
             SizedBox(height: screenHeight * 0.03),
             Obx(() {
@@ -83,7 +88,7 @@ class ProfileScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Complete Profile',
                       style: TextStyle(fontSize: 15, color: Colors.black),
                     ),

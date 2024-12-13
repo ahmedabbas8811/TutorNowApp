@@ -33,8 +33,12 @@ class ProfileCompletionHelper {
         .toList();
   }
 
+  static int getIncompleteStepsCount(Map<String, bool> steps) {
+  return steps.entries.where((entry) => entry.value == false).length;
+}
   static void navigateToNextScreen(
       BuildContext context, List<String> incompleteSteps) {
+        
     print(incompleteSteps);
     if (incompleteSteps.isEmpty) {
       print("All steps completed!");

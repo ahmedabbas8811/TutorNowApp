@@ -5,6 +5,7 @@ import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
+import 'package:newifchaly/utils/profile_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile_model.dart';
 
@@ -16,12 +17,14 @@ class ProfileController extends GetxController {
     name: "",
     isProfileComplete: false,
     upcomingBookings: [],
+    stepscount: 2,
   ).obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchUserName(); // Fetch the user's name during initialization
+    fetchProfileCompletionData();
   }
 
   // Fetch the user's name from the database
@@ -72,6 +75,28 @@ class ProfileController extends GetxController {
       case 4:
         Get.to(() => PersonScreen());
         break;
+    }
+  }
+
+  Future<void> fetchProfileCompletionData() async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user != null) {
+      try {
+        final completionData =
+            await ProfileCompletionHelper.fetchCompletionData();
+
+        // Get the count of incomplete steps using ProfileCompletionHelper
+        final incompleteStepsCount =
+            ProfileCompletionHelper.getIncompleteStepsCount(completionData);
+
+        // Update the steps count in the profile model
+        profile.update((p) {
+          p?.stepscount = incompleteStepsCount;
+        });
+      } catch (e) {
+        print("Error fetching profile completion data: $e");
+      }
     }
   }
 }
