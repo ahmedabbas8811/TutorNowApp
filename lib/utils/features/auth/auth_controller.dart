@@ -89,27 +89,38 @@ class AuthController extends GetxController {
     log("Login error: $e");
   }
 }
-  // * signup method
-  void signup(String name, email, String password) async {
+  void signup(String name, String email, String password, String groupValue) async {
     signupLoading.value = true;
 
     try {
+      // Create the user in Supabase Auth
       final AuthResponse response = await authApi.signup(name, email, password);
-      signupLoading.value = false;
 
       if (response.user != null) {
-        log("The Sign Up response is ${response.user?.toJson()}");
+        // Add user type to the "users" table
+        final userId = response.user!.id;
+        await SupabaseService.supabase
+            .from('users')
+            .upsert({
+              'id': userId,
+              'email': email, 
+              'user_type': groupValue, // Add groupValue as user type
+            });
 
-        // Optionally, navigate to ProfileScreen or login screen after signup
-        // For example:
+        log("User type successfully added for user: \${response.user?.toJson()}");
+
+        signupLoading.value = false;
+
+        // Optionally navigate to a different screen after successful signup
+        Get.snackbar("Signup Success", "Account created successfully.");
         // Get.offAll(() => ProfileScreen());
       } else {
+        signupLoading.value = false;
         Get.snackbar("Signup Failed", "Could not create account.");
       }
     } catch (e) {
       signupLoading.value = false;
       Get.snackbar("Signup Error", "An error occurred during signup.");
       log("Signup error: $e");
-    }
-  }
+    }}
 }

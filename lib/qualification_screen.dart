@@ -449,6 +449,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:newifchaly/utils/profile_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'teaching_detail.dart';
@@ -661,6 +662,27 @@ class _QualificationScreenState extends State<QualificationScreen> {
     } catch (e) {
       print("Error updating profile completion steps: $e");
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Check if location step is already completed and restrict access
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (await _isQualificationStepCompleted()) {
+        // Navigate to the next screen if the step is already completed
+//        Navigator.pushReplacement(
+        //        context,
+        //      MaterialPageRoute(builder: (context) => Location2Screen()),
+        //  );
+        final completionData =
+            await ProfileCompletionHelper.fetchCompletionData();
+        final incompleteSteps =
+            ProfileCompletionHelper.getIncompleteSteps(completionData);
+        ProfileCompletionHelper.navigateToNextScreen(context, incompleteSteps);
+      }
+    });
   }
 
   @override

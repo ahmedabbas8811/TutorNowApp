@@ -13,7 +13,7 @@ class ProfileCompletionHelper {
       try {
         final response = await Supabase.instance.client
             .from('profile_completion_steps')
-            .select('location,image,cnic')
+            .select('location,image,cnic,qualification,exp')
             .eq('user_id', user.id)
             .maybeSingle();
         return response != null ? Map<String, bool>.from(response) : {};

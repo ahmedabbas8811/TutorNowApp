@@ -545,6 +545,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:newifchaly/Profile_Verification_screen.dart';
+import 'package:newifchaly/utils/profile_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -729,12 +730,12 @@ class _TeachingDetailState extends State<TeachingDetail> {
       if (user != null) {
         final response = await Supabase.instance.client
             .from('profile_steps')
-            .select('teaching_details_completed')
+            .select('exp')
             .eq('user_id', user.id)
             .maybeSingle();
 
         return response != null &&
-            response['teaching_details_completed'] == true;
+            response['exp'] == true;
       }
     } catch (e) {
       print("Error checking teaching step completion: $e");
@@ -747,7 +748,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
         await Supabase.instance.client.from('profile_steps').update({
-          'teaching_details_completed': true,
+          'exp': true,
         }).eq('user_id', user.id);
         print("Profile steps updated successfully.");
       }
@@ -762,6 +763,27 @@ class _TeachingDetailState extends State<TeachingDetail> {
     _startDateController.dispose();
     _endDateController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Check if location step is already completed and restrict access
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (await _isTeachingStepCompleted()) {
+        // Navigate to the next screen if the step is already completed
+//        Navigator.pushReplacement(
+        //        context,
+        //      MaterialPageRoute(builder: (context) => Location2Screen()),
+        //  );
+        final completionData =
+            await ProfileCompletionHelper.fetchCompletionData();
+        final incompleteSteps =
+            ProfileCompletionHelper.getIncompleteSteps(completionData);
+        ProfileCompletionHelper.navigateToNextScreen(context, incompleteSteps);
+      }
+    });
   }
 
   @override
