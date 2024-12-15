@@ -591,7 +591,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
         _startDateController.text.isNotEmpty) {
       try {
         final response =
-            await Supabase.instance.client.from('teaching_experience').insert({
+            await Supabase.instance.client.from('experience').insert({
           'student_education_level': educationLevel,
           'start_date': startDate,
           'end_date': endDate.isEmpty ? null : endDate,
@@ -688,7 +688,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
     try {
       // Upload the file to Supabase storage
       final response = await Supabase.instance.client.storage
-          .from('teaching_docs') // Replace with your actual bucket name
+          .from('experience_docs') // Replace with your actual bucket name
           .upload('public/${file.path.split('/').last}', file);
 
       // Get the public URL for the uploaded file
@@ -707,9 +707,9 @@ class _TeachingDetailState extends State<TeachingDetail> {
       String fileUrl, int teachingId) async {
     try {
       final response = await Supabase.instance.client
-          .from('teaching_experience') // Change table to 'teaching_experience'
+          .from('experience') // Change table to 'experience'
           .update({
-            'teaching_url': fileUrl, // Update 'teaching_url' column
+            'experience_url': fileUrl, // Update 'teaching_url' column
           })
           .eq('id', teachingId) // Match the specific row by its ID
           .select();
@@ -729,13 +729,12 @@ class _TeachingDetailState extends State<TeachingDetail> {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
         final response = await Supabase.instance.client
-            .from('profile_steps')
+            .from('profile_completion_steps')
             .select('exp')
             .eq('user_id', user.id)
             .maybeSingle();
 
-        return response != null &&
-            response['exp'] == true;
+        return response != null && response['exp'] == true;
       }
     } catch (e) {
       print("Error checking teaching step completion: $e");
@@ -747,7 +746,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
-        await Supabase.instance.client.from('profile_steps').update({
+        await Supabase.instance.client.from('profile_completion_steps').update({
           'exp': true,
         }).eq('user_id', user.id);
         print("Profile steps updated successfully.");
