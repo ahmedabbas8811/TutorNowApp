@@ -3,6 +3,7 @@ import 'package:newifchaly/Profile_Verification_screen.dart';
 import 'package:newifchaly/cnic_screen.dart';
 import 'package:newifchaly/location2_screen.dart';
 import 'package:newifchaly/location_screen.dart';
+import 'package:newifchaly/teaching_detail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileCompletionHelper {
@@ -64,6 +65,11 @@ class ProfileCompletionHelper {
       case "cnic":
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => CnicScreen()));
+        break;
+      
+        case "exp":
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => TeachingDetail()));
         break;
 
       default:
