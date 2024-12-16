@@ -119,6 +119,8 @@ class _SessionsScreenState extends State<SessionsScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
+        type: BottomNavigationBarType.fixed, // Fixed type ensures white background
+          backgroundColor: Colors.white,
         selectedItemColor: const Color(0xff87e64c),
         unselectedItemColor: Colors.black,
         showSelectedLabels: true,

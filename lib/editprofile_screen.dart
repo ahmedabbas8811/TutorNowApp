@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/changepassword_screen.dart';
+import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/earningscreen.dart';
+import 'package:newifchaly/personscreen.dart';
+import 'package:newifchaly/profile_screen.dart';
+import 'package:newifchaly/sessionscreen.dart';
 
 class EditProfileScreen extends StatefulWidget {
   @override
@@ -32,35 +38,64 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _fullNameFocusNode.dispose();
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
+  void _onBottomNavTap(int index) {
+  switch (index) {
+    case 0:
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfileScreen()), // Replace with actual HomeScreen widget
+      );
+      break;
+    case 1:
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AvailabilityScreen()), // Replace with actual AvailabilityScreen widget
+      );
+      break;
+    case 2:
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SessionsScreen()), // Replace with actual SessionsScreen widget
+      );
+      break;
+    case 3:
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => EarningsScreen()), // Your existing EarningsScreen widget
+      );
+      break;
+    case 4:
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PersonScreen()), // Profile screen (current screen)
+      );
+      break;
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        
-        title: const Text(
-          'Edit Profile',
-          style: TextStyle(
-              fontSize: 30, color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 20),
+              // Add "Edit Profile" text here
+            const  Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: const Text(
+                  'Edit Profile',
+                  style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ),
               const SizedBox(height: 20),
               Column(
                 children: [
@@ -69,43 +104,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     backgroundImage: AssetImage('assets/profile.jpg'),
                   ),
                   const SizedBox(height: 10),
-                  // Centered Row for edit and delete buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Edit button with rounded container
                       Container(
                         width: 30,
                         height: 30,
                         padding: EdgeInsets.all(0),
                         decoration: BoxDecoration(
                           color: const Color(0xff87e64c),
-                          borderRadius: BorderRadius.circular(5), // Rounded corners
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         child: IconButton(
-                          onPressed: () {
-                            // Action for edit button
-                          },
+                          onPressed: () {},
                           icon: const Icon(Icons.edit, color: Colors.black),
-                          iconSize: 18, // Smaller icon size
+                          iconSize: 18,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      // Delete button with rounded container
+                      const SizedBox(width: 7),
                       Container(
                         width: 30,
                         height: 30,
                         padding: EdgeInsets.all(0),
                         decoration: BoxDecoration(
                           color: Colors.red,
-                          borderRadius: BorderRadius.circular(5), // Rounded corners
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         child: IconButton(
-                          onPressed: () {
-                            // Action for delete button
-                          },
+                          onPressed: () {},
                           icon: const Icon(Icons.delete, color: Colors.white),
-                          iconSize: 18, // Smaller icon size
+                          iconSize: 18,
                         ),
                       ),
                     ],
@@ -113,17 +141,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              // Full Name Field
+            
               TextField(
                 controller: _fullNameController,
                 focusNode: _fullNameFocusNode,
+                cursorColor: Colors.grey,
                 decoration: InputDecoration(
                   labelText: 'Full Name',
                   hintText: 'Aliyan Rizvi',
+                  labelStyle: TextStyle(
+                    color: _fullNameController.text.isNotEmpty
+                        ? Colors.grey
+                        : (_fullNameFocusNode.hasFocus
+                            ? Colors.grey
+                            : Colors.black),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                     borderSide: BorderSide(
-                        color: Colors.grey), // Always gray for border
+                      color: _fullNameController.text.isNotEmpty
+                          ? Colors.grey
+                          : (_fullNameFocusNode.hasFocus
+                              ? Colors.grey
+                              : Colors.grey),
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -132,17 +173,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Email Field
+              
               TextField(
                 controller: _emailController,
                 focusNode: _emailFocusNode,
+                cursorColor: Colors.grey,
                 decoration: InputDecoration(
                   labelText: 'Email',
                   hintText: 'aliyanrizvi@gmail.com',
+                  labelStyle: TextStyle(
+                    color: _emailController.text.isNotEmpty
+                        ? Colors.grey
+                        : (_emailFocusNode.hasFocus
+                            ? Colors.grey
+                            : Colors.black),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                     borderSide: BorderSide(
-                        color: Colors.grey), // Always gray for border
+                      color: _emailController.text.isNotEmpty
+                          ? Colors.grey
+                          : (_emailFocusNode.hasFocus
+                              ? Colors.grey
+                              : Colors.grey),
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -156,13 +210,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 controller: _passwordController,
                 focusNode: _passwordFocusNode,
                 obscureText: !_isPasswordVisible,
+                cursorColor: Colors.grey,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   hintText: 'AliyanRizvi123.',
+                  labelStyle: TextStyle(
+                    color: _passwordController.text.isNotEmpty
+                        ? Colors.grey
+                        : (_passwordFocusNode.hasFocus
+                            ? Colors.grey
+                            : Colors.black),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                     borderSide: BorderSide(
-                        color: Colors.grey), // Always gray for border
+                      color: _passwordController.text.isNotEmpty
+                          ? Colors.grey
+                          : (_passwordFocusNode.hasFocus
+                              ? Colors.grey
+                              : Colors.grey),
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -184,16 +251,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               const SizedBox(height: 10),
               GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _isChangePasswordClicked = !_isChangePasswordClicked;
-                  });
-                },
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
+    );
+  },
                 child: const Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    'Change Password',style: TextStyle(fontWeight: FontWeight.bold),
-                    
+                    'Change Password',
+                    style: TextStyle(fontWeight: FontWeight.bold,decoration:TextDecoration.underline),
                   ),
                 ),
               ),
@@ -203,21 +271,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
   bottomNavigationBar: BottomNavigationBar(
-  backgroundColor: Colors.white,  // This sets the background color to white
+  type: BottomNavigationBarType.fixed,
+  backgroundColor: Colors.white,
   selectedItemColor: const Color(0xff87e64c),
   unselectedItemColor: Colors.black,
   showUnselectedLabels: true,
-  currentIndex: 4,
+  currentIndex: 4, // Current active index
+  onTap: _onBottomNavTap, // Handle tap
   items: const [
     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-    BottomNavigationBarItem(
-        icon: Icon(Icons.calendar_today), label: 'Availability'),
+    BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Availability'),
     BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Sessions'),
-    BottomNavigationBarItem(
-        icon: Icon(Icons.attach_money), label: 'Earnings'),
+    BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Earnings'),
     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
   ],
-)
+),
 
     );
   }

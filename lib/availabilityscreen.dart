@@ -79,18 +79,21 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Set Availability',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-      ),
+      backgroundColor: Colors.white,
+     
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+           const Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Text(
+                        'Set Availability',
+                        style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),
+                      ),
+            ),
+            SizedBox(height: 2,),
             const Text(
               'Sessions that are already booked are not affected by changing availability',
               style: TextStyle(color: Colors.grey),
@@ -153,6 +156,8 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
+          type: BottomNavigationBarType.fixed, // Fixed type ensures white background
+          backgroundColor: Colors.white,
         selectedItemColor: const Color(0xff87e64c),
         unselectedItemColor: Colors.black,
         showSelectedLabels: true,

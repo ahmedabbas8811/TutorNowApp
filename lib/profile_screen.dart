@@ -13,6 +13,7 @@ class ProfileScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
@@ -103,6 +104,8 @@ class ProfileScreen extends StatelessWidget {
       ),
       bottomNavigationBar: Obx(() => BottomNavigationBar(
             currentIndex: controller.selectedIndex.value,
+              type: BottomNavigationBarType.fixed, // Fixed type ensures white background
+          backgroundColor: Colors.white,
             selectedItemColor: const Color(0xff87e64c),
             unselectedItemColor: Colors.black,
             showSelectedLabels: true,

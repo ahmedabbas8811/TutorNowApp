@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:newifchaly/admin/views/editprofile_screen.dart';
+import 'package:newifchaly/editprofile_screen.dart';
+import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/supabase_service.dart';
+import 'package:newifchaly/sessionscreen.dart';
 import 'earningscreen.dart';
-
 
 class PersonScreen extends StatefulWidget {
   @override
@@ -17,6 +19,40 @@ class _PersonScreenState extends State<PersonScreen> {
     setState(() {
       _selectedIndex = index;
     });
+
+    // Navigate to the appropriate screen based on the index
+    switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ProfileScreen()), // Replace with actual HomeScreen widget
+        );
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AvailabilityScreen()), // Replace with actual AvailabilityScreen widget
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SessionsScreen()), // Replace with actual SessionsScreen widget
+        );
+        break;
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => EarningsScreen()), // Your existing EarningsScreen widget
+        );
+        break;
+      case 4:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PersonScreen()), // Profile screen (current screen)
+        );
+        break;
+    }
   }
 
   @override
@@ -41,7 +77,7 @@ class _PersonScreenState extends State<PersonScreen> {
               ),
               child: const Text(
                 'Logout',
-                style: TextStyle(color: Colors.white,fontSize: 17),
+                style: TextStyle(color: Colors.white, fontSize: 17),
               ),
             ),
           ),
@@ -91,9 +127,9 @@ class _PersonScreenState extends State<PersonScreen> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => EditProfileScreen()),
-                  ); // Action for Edit Profile
+                        context,
+                        MaterialPageRoute(builder: (context) => EditProfileScreen()), // Action for Edit Profile
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff87e64c),
@@ -105,7 +141,7 @@ class _PersonScreenState extends State<PersonScreen> {
                     ),
                     child: const Text(
                       'Edit Profile',
-                      style: TextStyle(color: Colors.black,fontSize: 15),
+                      style: TextStyle(color: Colors.black, fontSize: 15),
                     ),
                   ),
                 ],
@@ -115,6 +151,8 @@ class _PersonScreenState extends State<PersonScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed, // Fixed type ensures white background
+          backgroundColor: Colors.white,
         currentIndex: _selectedIndex,
         selectedItemColor: const Color(0xff87e64c),
         unselectedItemColor: Colors.black,
