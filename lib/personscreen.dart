@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:newifchaly/availabilityscreen.dart';
-import 'package:newifchaly/earningscreen.dart';
-import 'package:newifchaly/profile_screen.dart';
+import 'package:newifchaly/admin/views/editprofile_screen.dart';
 import 'package:newifchaly/services/supabase_service.dart';
-import 'package:newifchaly/sessionscreen.dart';
+import 'earningscreen.dart';
+
 
 class PersonScreen extends StatefulWidget {
   @override
@@ -19,40 +17,6 @@ class _PersonScreenState extends State<PersonScreen> {
     setState(() {
       _selectedIndex = index;
     });
-
-    // Navigate to different screens based on index
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ProfileScreen()),
-        );
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AvailabilityScreen()),
-        );
-        break;
-      case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SessionsScreen()),
-        );
-        break;
-      case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => EarningsScreen()),
-        );
-        break;
-      case 4:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PersonScreen()),
-        );
-        break;
-    }
   }
 
   @override
@@ -60,44 +24,95 @@ class _PersonScreenState extends State<PersonScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
-          'My Profile',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              // Call the logout method from SupabaseService
-              Get.find<SupabaseService>().logout();
-            },
-            style: ElevatedButton.styleFrom(
-
-              
-              padding: const EdgeInsets.symmetric(
-                horizontal: 150,
-                vertical: 15,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 15.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Get.find<SupabaseService>().logout();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xffe64b4b),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18)
+              child: const Text(
+                'Logout',
+                style: TextStyle(color: Colors.white,fontSize: 17),
               ),
-              textStyle: const TextStyle(
-                fontSize: 16,
-              ),
-              backgroundColor:const  Color(0xffe64b4b), // Button color
             ),
-            child: const Text('Logout',style: TextStyle(color: Colors.white),),
           ),
         ],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile Image
+              const SizedBox(height: 10),
+              const CircleAvatar(
+                radius: 60,
+                backgroundImage: AssetImage('assets/profile.jpg'),
+              ),
+              const SizedBox(height: 10),
+              // Profile Name
+              const Text(
+                'Aliyan Rizvi',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 5), // Reduced space
+              // Profile Incomplete Tag
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4), // Inner padding
+                color: Colors.yellow,
+                child: const Text(
+                  '⚠ Profile is incomplete',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 15),
+              // Edit Profile Button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => EditProfileScreen()),
+                  ); // Action for Edit Profile
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff87e64c),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18, vertical: 10),
+                    ),
+                    child: const Text(
+                      'Edit Profile',
+                      style: TextStyle(color: Colors.black,fontSize: 15),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

@@ -71,6 +71,7 @@ flutter:
   assets:
     - assets/ali.png
     - assets/Ellipse 1.png
+    - assets/profile.jpg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
