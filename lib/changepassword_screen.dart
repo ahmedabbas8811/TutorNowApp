@@ -24,7 +24,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool _isNewPasswordVisible = false;
   bool _isRetypePasswordVisible = false;
 
-  int _selectedIndex = 0;
+  int _selectedIndex = 4;  // Set default to 'Profile' tab (index 4)
+  
+  var _onItemTapped;
 
   @override
   void dispose() {
@@ -41,6 +43,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    
     switch (index) {
       case 0:
         Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
@@ -220,23 +223,22 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xff87e64c),
-        unselectedItemColor: Colors.black,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.event_available), label: 'Availability'),
-          BottomNavigationBarItem(icon: Icon(Icons.video_camera_front), label: 'Sessions'),
-          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Earnings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-        onTap: _onBottomNavTap,
-      ),
+       bottomNavigationBar: BottomNavigationBar(
+  type: BottomNavigationBarType.fixed,
+  backgroundColor: Colors.white,
+  selectedItemColor: const Color(0xff87e64c),
+  unselectedItemColor: Colors.black,
+  showUnselectedLabels: true,
+  currentIndex: 4, // Current active index
+  onTap: _onBottomNavTap, // Handle tap
+  items: const [
+    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+    BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Availability'),
+    BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Sessions'),
+    BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Earnings'),
+    BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+  ],
+),
     );
   }
 }

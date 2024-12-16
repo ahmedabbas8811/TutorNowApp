@@ -32,15 +32,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final FocusNode _passwordFocusNode = FocusNode();
   final FocusNode _confirmPasswordFocusNode = FocusNode();
 
+  // To track whether the user has entered text
+  bool _isNameFilled = false;
+  bool _isEmailFilled = false;
+  bool _isPasswordFilled = false;
+  bool _isConfirmPasswordFilled = false;
+
   // Method to style text field with dynamic border color and label animation
   InputDecoration _inputDecoration(
       String label, FocusNode focusNode, TextEditingController controller) {
     return InputDecoration(
       labelText: label,
       labelStyle: TextStyle(
-        color: focusNode.hasFocus || controller.text.isNotEmpty
-            ? Colors.grey[650]
-            : Colors.grey,
+        color: Colors.grey, // Keep the label text always grey
       ),
       enabledBorder: OutlineInputBorder(
         borderSide: const BorderSide(color: Colors.grey),
@@ -52,6 +56,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       hintStyle: const TextStyle(color: Colors.grey),
+      // Set text color to grey for all text inside the text field
+      hintText: label,
     );
   }
 
@@ -90,53 +96,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      'Register As A Tutor',
+                      'Register',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-
-                // Full Name Field
-                TextFormField(
-                  controller: _nameController,
-                  focusNode: _nameFocusNode,
-                  decoration: _inputDecoration(
-                      'Your Full Name', _nameFocusNode, _nameController),
-                  validator: ValidationBuilder()
-                      .minLength(
-                          2, 'Full Name must be at least 2 characters long')
-                      .maxLength(50, 'Full Name can’t exceed 50 characters')
-                      .build(),
-                  onChanged: (text) {
-                    setState(() {});
-                  },
-                ),
                 const SizedBox(height: 10),
-
-                // Email Field
-                TextFormField(
-                  controller: _emailController,
-                  focusNode: _emailFocusNode,
-                  decoration: _inputDecoration(
-                      'youremail@gmail.com', _emailFocusNode, _emailController),
-                  validator: ValidationBuilder().email().build(),
-                  onChanged: (text) {
-                    setState(() {});
-                  },
-                ),
-                const SizedBox(height: 10),
-
-//Code of Register as, As Choosing for Student , Parent or tutor
                 const Text(
                   'Register as',
                   style: TextStyle(color: Colors.grey),
@@ -213,19 +186,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 10),
+                // Full Name Field
+                TextFormField(
+                  controller: _nameController,
+                  focusNode: _nameFocusNode,
+                  cursorColor: Colors.grey,
+                  style: TextStyle(
+                      color: _isNameFilled ? Colors.black : Colors.grey), // Text color changes dynamically
+                  decoration: _inputDecoration('Your Full Name', _nameFocusNode, _nameController),
+                  validator: ValidationBuilder()
+                      .minLength(2, 'Full Name must be at least 2 characters long')
+                      .maxLength(50, 'Full Name can’t exceed 50 characters')
+                      .build(),
+                  onChanged: (text) {
+                    setState(() {
+                      _isNameFilled = text.isNotEmpty;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                // Email Field
+                TextFormField(
+                  controller: _emailController,
+                  focusNode: _emailFocusNode,
+                  cursorColor: Colors.grey,
+                  style: TextStyle(
+                      color: _isEmailFilled ? Colors.black : Colors.grey), // Text color changes dynamically
+                  decoration: _inputDecoration('youremail@gmail.com', _emailFocusNode, _emailController),
+                  validator: ValidationBuilder().email().build(),
+                  onChanged: (text) {
+                    setState(() {
+                      _isEmailFilled = text.isNotEmpty;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+
                 // Password Field
                 TextFormField(
                   controller: _passwordController,
                   focusNode: _passwordFocusNode,
-                  decoration: _inputDecoration('Choose A Strong Password',
-                          _passwordFocusNode, _passwordController)
-                      .copyWith(
+                  cursorColor: Colors.grey,
+                  style: TextStyle(
+                      color: _isPasswordFilled ? Colors.black : Colors.grey), // Text color changes dynamically
+                  decoration: _inputDecoration('Choose A Strong Password', _passwordFocusNode, _passwordController).copyWith(
                     suffixIcon: IconButton(
-                      icon: Icon(_showPassword
-                          ? Icons.visibility
-                          : Icons.visibility_off),
+                      icon: Icon(_showPassword ? Icons.visibility : Icons.visibility_off),
                       onPressed: () {
                         setState(() {
                           _showPassword = !_showPassword;
@@ -236,7 +244,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscureText: !_showPassword,
                   validator: validatePassword,
                   onChanged: (text) {
-                    setState(() {});
+                    setState(() {
+                      _isPasswordFilled = text.isNotEmpty;
+                    });
                   },
                 ),
                 const SizedBox(height: 10),
@@ -245,13 +255,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _confirmPasswordController,
                   focusNode: _confirmPasswordFocusNode,
-                  decoration: _inputDecoration('Confirm Your Password',
-                          _confirmPasswordFocusNode, _confirmPasswordController)
-                      .copyWith(
+                  cursorColor: Colors.grey,
+                  style: TextStyle(
+                      color: _isConfirmPasswordFilled ? Colors.black : Colors.grey), // Text color changes dynamically
+                  decoration: _inputDecoration('Confirm Your Password', _confirmPasswordFocusNode, _confirmPasswordController).copyWith(
                     suffixIcon: IconButton(
-                      icon: Icon(_showConfirmPassword
-                          ? Icons.visibility
-                          : Icons.visibility_off),
+                      icon: Icon(_showConfirmPassword ? Icons.visibility : Icons.visibility_off),
                       onPressed: () {
                         setState(() {
                           _showConfirmPassword = !_showConfirmPassword;
@@ -267,7 +276,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                   onChanged: (text) {
-                    setState(() {});
+                    setState(() {
+                      _isConfirmPasswordFilled = text.isNotEmpty;
+                    });
                   },
                 ),
                 const SizedBox(height: 10),
@@ -281,8 +292,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('Already have an account?',
-                        style: TextStyle(color: Colors.grey[650])),
+                    Text('Already have an account?', style: TextStyle(color: Colors.grey[650])),
                     TextButton(
                       onPressed: () {
                         Navigator.push(
@@ -290,8 +300,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             MaterialPageRoute(
                                 builder: (context) => LoginScreen()));
                       },
-                      child: const Text('Login',
-                          style: TextStyle(color: Colors.black)),
+                      child: const Text('Login', style: TextStyle(color: Colors.black)),
                     ),
                   ],
                 ),
@@ -301,8 +310,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Obx(
                   () => ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState?.validate() ??
-                          controller.signupLoading.value == false) {
+                      if (_formKey.currentState?.validate() ?? false) {
                         // Perform registration action
                         controller.signup(
                           _nameController.text,
@@ -320,11 +328,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     child: Text(
-                        controller.signupLoading.value
-                            ? "Loading..."
-                            : "Signup",
-                        style:
-                            const TextStyle(fontSize: 18, color: Colors.white)),
+                        controller.signupLoading.value ? "Loading..." : "Signup",
+                        style: const TextStyle(fontSize: 18, color: Colors.white)),
                   ),
                 ),
               ],

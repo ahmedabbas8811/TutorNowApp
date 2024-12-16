@@ -1,11 +1,61 @@
-// views/profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/earningscreen.dart';
+import 'package:newifchaly/personscreen.dart';
+import 'package:newifchaly/sessionscreen.dart';
 import '../controllers/profile_controller.dart';
 import 'location_screen.dart';
 import 'messagescreen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  int _selectedIndex = 0; // Set initial selected index to Home (0)
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    // Navigate to a new page based on the selected index
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ProfileScreen()),
+        );
+        break;
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => AvailabilityScreen()),
+        );
+        break;
+      case 2:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SessionsScreen()),
+        );
+        break;
+      case 3:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => EarningsScreen()),
+        );
+        break;
+      case 4:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => PersonScreen()),
+        );
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ProfileController controller = Get.put(ProfileController());
@@ -29,7 +79,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.message_outlined, color: Colors.black),
-                  onPressed: () => Get.to(() => MessageScreen()),
+                  onPressed: () => Get.to(() => const MessageScreen()),
                 ),
               ],
             ),
@@ -73,7 +123,7 @@ class ProfileScreen extends StatelessWidget {
                 )),
             Obx(() => Text(
                   '${controller.profile.value.stepscount} Steps Remaining',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style:const  TextStyle(fontWeight: FontWeight.bold),
                 )),
             SizedBox(height: screenHeight * 0.03),
             Obx(() {
@@ -89,51 +139,51 @@ class ProfileScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Complete Profile',
                       style: TextStyle(fontSize: 15, color: Colors.black),
                     ),
                   ),
                 );
               }
-              return SizedBox.shrink();
+              return const SizedBox.shrink();
             }),
             const Spacer(),
           ],
         ),
       ),
-      bottomNavigationBar: Obx(() => BottomNavigationBar(
-            currentIndex: controller.selectedIndex.value,
-              type: BottomNavigationBarType.fixed, // Fixed type ensures white background
-          backgroundColor: Colors.white,
-            selectedItemColor: const Color(0xff87e64c),
-            unselectedItemColor: Colors.black,
-            showSelectedLabels: true,
-            showUnselectedLabels: true,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.event_available),
-                label: 'Availability',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.video_camera_front),
-                label: 'Sessions',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.attach_money),
-                label: 'Earnings',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
-            onTap: (index) => controller.navigateToPage(context, index),
-          )),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex, // The selected index now starts at 0 (Home)
+        type: BottomNavigationBarType.fixed, // Fixed type ensures white background
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xff87e64c),
+        unselectedItemColor: Colors.black,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.event_available),
+            label: 'Availability',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.video_camera_front),
+            label: 'Sessions',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attach_money),
+            label: 'Earnings',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+        onTap: _onItemTapped,
+      ),
     );
   }
 }

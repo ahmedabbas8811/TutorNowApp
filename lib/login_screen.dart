@@ -59,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Email TextField
                 TextFormField(
                   controller: _emailController,
+                  cursorColor: Colors.grey,
                   decoration: InputDecoration(
                     labelText: 'Email',
                     labelStyle: const TextStyle(color: Colors.grey),
@@ -83,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Password TextField
                 TextFormField(
                   controller: _passwordController,
+                  cursorColor: Colors.grey,
                   decoration: InputDecoration(
                     labelText: 'Password',
                     labelStyle: const TextStyle(color: Colors.grey),
