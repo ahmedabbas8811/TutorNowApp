@@ -4,6 +4,7 @@ import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 
+import 'package:newifchaly/utils/editavailability_screen.dart'; 
 
 class AvailabilityScreen extends StatefulWidget {
   @override
@@ -80,37 +81,43 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-     
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-           const Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Text(
-                        'Set Availability',
-                        style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),
-                      ),
+            const SizedBox(height: 40), // Adjusted spacing here
+            const Text(
+              'Set Availability',
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 2,),
+            const SizedBox(height: 4), // Less space between texts
             const Text(
               'Sessions that are already booked are not affected by changing availability',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
+            const SizedBox(height: 4), // Less space before "Edit Schedule"
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: () {
+                  // Navigate to EditAvailabilityScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EditAvailabilityScreen()),
+                  );
+                },
+                child: const Text(
                   'Edit Schedule',
                   style: TextStyle(
+                      decoration: TextDecoration.underline,
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
-                      fontSize: 19),
+                      fontSize: 17),
                 ),
-              ],
+              ),
             ),
-            const SizedBox(height: 5),
             Expanded(
               child: ListView.builder(
                 itemCount: _availability.length,
@@ -138,8 +145,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                     trailing: Switch(
                       value: isAvailable,
                       activeColor: Colors.black,
-                      activeTrackColor:
-                          const Color(0xff87e64c), // Inner ball color when ON
+                      activeTrackColor: const Color(0xff87e64c),
                       inactiveThumbColor: Colors.grey,
                       onChanged: (bool value) {
                         setState(() {
@@ -156,8 +162,8 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-          type: BottomNavigationBarType.fixed, // Fixed type ensures white background
-          backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
         selectedItemColor: const Color(0xff87e64c),
         unselectedItemColor: Colors.black,
         showSelectedLabels: true,
@@ -188,4 +194,5 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       ),
     );
   }
+  
 }
