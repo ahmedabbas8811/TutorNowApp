@@ -20,5 +20,26 @@ class AuthApi {
 
     return response;
   }
+
+  // * Change Password
+  Future<void> changePassword(String currentPassword, String newPassword) async {
+    // Re-authenticate the user using their current password
+    final email = supabaseClient.auth.currentUser?.email;
+
+    if (email == null) throw Exception("User not logged in");
+
+    await supabaseClient.auth.signInWithPassword(
+      email: email,
+      password: currentPassword,
+    );
+
+    // Update the password after successful re-authentication
+    await supabaseClient.auth.updateUser(
+      UserAttributes(password: newPassword),
+    );
+  }
 }
+
+
+
 

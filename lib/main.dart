@@ -6,6 +6,7 @@ import 'package:newifchaly/login_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/storage_service.dart';
 import 'package:newifchaly/services/supabase_service.dart';
+import 'package:newifchaly/utils/features/auth/auth_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +16,9 @@ void main() async {
 
   // * Supabase service initialize
   await Get.putAsync<SupabaseService>(() async => SupabaseService());
+
+  // * AuthController initialization
+  Get.put(AuthController());  // Initialize the AuthController
 
   // Debugging: Print the session value
   print("User session: ${StorageService.getUserSession}");
@@ -35,7 +39,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginScreen(),
         '/home': (context) => ProfileScreen(),
-        '/ApproveTutorsScreen': (context) => ApproveTutorsScreen(), 
+        '/ApproveTutorsScreen': (context) => ApproveTutorsScreen(),
       },
     );
   }

@@ -123,4 +123,14 @@ class AuthController extends GetxController {
       Get.snackbar("Signup Error", "An error occurred during signup.");
       log("Signup error: $e");
     }}
+
+    // Change password
+  Future<void> changePassword(String currentPassword, String newPassword) async {
+    try {
+      await authApi.changePassword(currentPassword, newPassword);
+    } catch (e) {
+      throw Exception("Error changing password: $e");
+    }
+  }
 }
+
