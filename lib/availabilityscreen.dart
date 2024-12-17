@@ -14,7 +14,7 @@ class AvailabilityScreen extends StatefulWidget {
 class _AvailabilityScreenState extends State<AvailabilityScreen> {
   int _selectedIndex = 1; // Set default index to "Availability"
 
-  // Track the switch states for each day
+  // Track the availability for each day
   final Map<String, bool> _availability = {
     'Monday': false,
     'Tuesday': false,
@@ -128,30 +128,17 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                     contentPadding: const EdgeInsets.symmetric(vertical: 3.0),
                     title: Text(
                       day,
-                      style: TextStyle(
-                        fontWeight:
-                            isAvailable ? FontWeight.bold : FontWeight.normal,
-                        color: isAvailable ? Colors.black : Colors.grey,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black, // Set text color to black
                       ),
                     ),
                     subtitle: Text(
                       _timeSlots[day]!,
-                      style: TextStyle(
-                        fontWeight:
-                            isAvailable ? FontWeight.bold : FontWeight.normal,
-                        color: isAvailable ? Colors.black : Colors.grey,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black, // Set text color to black
                       ),
-                    ),
-                    trailing: Switch(
-                      value: isAvailable,
-                      activeColor: Colors.black,
-                      activeTrackColor: const Color(0xff87e64c),
-                      inactiveThumbColor: Colors.grey,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _availability[day] = value;
-                        });
-                      },
                     ),
                   );
                 },
@@ -194,5 +181,4 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       ),
     );
   }
-  
 }

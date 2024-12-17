@@ -93,7 +93,7 @@ class _PersonScreenState extends State<PersonScreen> {
               const SizedBox(height: 10),
               const CircleAvatar(
                 radius: 60,
-                backgroundImage: AssetImage('assets/profile.jpg'),
+                backgroundImage: AssetImage('assets/Ellipse 1.png'),
               ),
               const SizedBox(height: 10),
               // Profile Name

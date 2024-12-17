@@ -11,9 +11,16 @@ class EditAvailabilityScreen extends StatefulWidget {
 }
 
 class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
-  final List<String> _days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  final List<String> _days = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday'
+  ];
 
-  // Map to control switch states for each day
   final Map<String, bool> _availability = {
     'Monday': true,
     'Tuesday': true,
@@ -24,35 +31,58 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
     'Sunday': true,
   };
 
-  // Time slots for each day
-  final Map<String, List<TimeOfDay>> _timeSlots = {
-    'Monday': [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 8, minute: 0)],
-    'Tuesday': [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 8, minute: 0)],
-    'Wednesday': [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 8, minute: 0)],
-    'Thursday': [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 8, minute: 0)],
-    'Friday': [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 8, minute: 0)],
-    'Saturday': [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 8, minute: 0)],
-    'Sunday': [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 8, minute: 0)],
+  // Store multiple time slots per day
+  final Map<String, List<List<TimeOfDay>>> _timeSlots = {
+    'Monday': [
+     const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
+    ],
+    'Tuesday': [
+      const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
+    ],
+    'Wednesday': [
+     const  [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
+    ],
+    'Thursday': [
+      const[TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
+    ],
+    'Friday': [
+     const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
+    ],
+    'Saturday': [
+     const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
+    ],
+    'Sunday': [
+      const[TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
+    ],
   };
 
-  int _selectedIndex = 1; // Set initial index to the Availability tab
+  int _selectedIndex = 1;
 
-  Future<void> _selectTime(BuildContext context, int slotIndex, String day) async {
+  // Handle time picker logic
+  Future<void> _selectTime(BuildContext context, String day, int slotIndex, int timeIndex) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialTime: _timeSlots[day]![slotIndex],
+      initialTime: _timeSlots[day]![slotIndex][timeIndex],
     );
 
     if (pickedTime != null) {
       setState(() {
-        _timeSlots[day]![slotIndex] = pickedTime;
+        _timeSlots[day]![slotIndex][timeIndex] = pickedTime;
       });
     }
   }
 
- 
+  // Add new time slot
+  void _addTimeSlot(String day) {
+    setState(() {
+      _timeSlots[day]!.add([
+       const  TimeOfDay(hour: 8, minute: 0),
+       const  TimeOfDay(hour: 10, minute: 0),
+      ]);
+    });
+  }
+
   void _onItemTapped(int index) {
-  if (_selectedIndex != index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -91,35 +121,21 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
         break;
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 50),
-            Text(
-              'Edit Availability',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 25,
-              ),
-            ),
-             const SizedBox(height: 10),
-
             const Text(
-              'Sessions that are already booked are not affected by changing availability',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
+              'Edit Availability',
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25),
             ),
-            const SizedBox(height: 0),
             Expanded(
               child: ListView.builder(
                 itemCount: _days.length,
@@ -128,30 +144,24 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
                   bool isAvailable = _availability[day]!;
 
                   return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Day Name
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              day,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight:
-                                    isAvailable ? FontWeight.bold : FontWeight.normal,
-                                color: isAvailable ? Colors.black : Colors.grey,
-                              ),
+                          Text(
+                            day,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: isAvailable ? FontWeight.bold : FontWeight.normal,
+                              color: isAvailable ? Colors.black : Colors.grey,
                             ),
                           ),
-                          // Switch
                           Switch(
                             value: isAvailable,
                             activeColor: Colors.black,
                             activeTrackColor: const Color(0xff87e64c),
-                            inactiveThumbColor: Colors.grey,
-                            onChanged: (bool value) {
+                            onChanged: (value) {
                               setState(() {
                                 _availability[day] = value;
                               });
@@ -159,56 +169,98 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
                           ),
                         ],
                       ),
-                      // Time Slots
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: isAvailable ? () => _selectTime(context, 0, day) : null,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: isAvailable ? Colors.black : Colors.grey), // Set border color based on availability
-                                borderRadius: BorderRadius.circular(4),
-                                color: Colors.white, // Keep container white
-                              ),
-                              child: Text(
-                                _timeSlots[day]![0].format(context),
-                                style: TextStyle(
-                                  fontSize: 14, 
-                                  fontWeight: FontWeight.bold,
-                                  color: isAvailable ? Colors.black : Colors.grey, // Change text color
+                      // Render multiple time slots dynamically
+                      Column(
+                        children: List.generate(_timeSlots[day]!.length, (slotIndex) {
+                          return Row(
+                            children: [
+                              GestureDetector(
+                                onTap: isAvailable
+                                    ? () => _selectTime(context, day, slotIndex, 0)
+                                    : null,
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: isAvailable ? Colors.black : Colors.grey),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    _timeSlots[day]![slotIndex][0].format(context),
+                                    style: TextStyle(
+                                      color: isAvailable ? Colors.black : Colors.grey,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('-'),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: isAvailable ? () => _selectTime(context, 1, day) : null,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: isAvailable ? Colors.black : Colors.grey), // Set border color based on availability
-                                borderRadius: BorderRadius.circular(4),
-                                color: Colors.white, // Keep container white
-                              ),
-                              child: Text(
-                                _timeSlots[day]![1].format(context),
-                                style: TextStyle(
-                                  fontSize: 14, 
-                                  fontWeight: FontWeight.bold,
-                                  color: isAvailable ? Colors.black : Colors.grey, // Change text color
+                              const SizedBox(width: 8),
+                              const Text('-'),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: isAvailable
+                                    ? () => _selectTime(context, day, slotIndex, 1)
+                                    : null,
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: isAvailable ? Colors.black : Colors.grey),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    _timeSlots[day]![slotIndex][1].format(context),
+                                    style: TextStyle(
+                                      color: isAvailable ? Colors.black : Colors.grey,
+                                    ),
+                                  ),
                                 ),
                               ),
+                            ],
+                          );
+                        }),
+                      ),
+                      const SizedBox(height: 8),
+                      // Align the "Add Availability +" button here
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
+                          onPressed: isAvailable
+                              ? () {
+                                  _addTimeSlot(day);
+                                }
+                              : null, // Disable button if the day is not available
+                          child: Text(
+                            'Add Availability +',
+                            style: TextStyle(
+                              color: isAvailable ? Colors.black : Colors.grey, // Dull color when off
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ],
+                        ),
                       ),
                       const SizedBox(height: 12),
                     ],
                   );
                 },
+              ),
+            ),
+            // Update Button
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Update logic
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff87e64c),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text(
+                  'Update',
+                  style: TextStyle(fontSize: 20,color: Colors.black, ),
+                ),
               ),
             ),
           ],

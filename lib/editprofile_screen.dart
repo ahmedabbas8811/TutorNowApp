@@ -87,8 +87,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(height: 20),
               // Add "Edit Profile" text here
             const  Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: const Text(
+                padding:  EdgeInsets.all(18.0),
+                child:  Text(
                   'Edit Profile',
                   style: TextStyle(
                       fontSize: 30,
@@ -101,7 +101,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 children: [
                   const CircleAvatar(
                     radius: 60,
-                    backgroundImage: AssetImage('assets/profile.jpg'),
+                    backgroundImage: AssetImage('assets/Ellipse 1.png'),
                   ),
                   const SizedBox(height: 10),
                   Row(
@@ -110,7 +110,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Container(
                         width: 30,
                         height: 30,
-                        padding: EdgeInsets.all(0),
+                        padding: const EdgeInsets.all(0),
                         decoration: BoxDecoration(
                           color: const Color(0xff87e64c),
                           borderRadius: BorderRadius.circular(5),
@@ -125,7 +125,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Container(
                         width: 30,
                         height: 30,
-                        padding: EdgeInsets.all(0),
+                        padding: const EdgeInsets.all(0),
                         decoration: BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.circular(5),
