@@ -81,13 +81,10 @@ class ProfileCompletionHelper {
             context, MaterialPageRoute(builder: (_) => QualificationScreen()));
         break;
       
-        case "exp":
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => TeachingDetail()));
-        break;
 
       default:
-        print("Unknown step: $nextStep");
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => TeachingDetail()));
     }
   }
 }

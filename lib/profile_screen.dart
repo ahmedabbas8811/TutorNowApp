@@ -191,6 +191,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/bio_screen.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/sessionscreen.dart';
@@ -342,7 +343,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // Complete Profile Button
                     Center(
                       child: ElevatedButton(
-                        onPressed: () => Get.to(() => LocationScreen()),
+                        onPressed: () => Get.to(() => BioScreen()),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff87e64c),
                           padding: const EdgeInsets.symmetric(
