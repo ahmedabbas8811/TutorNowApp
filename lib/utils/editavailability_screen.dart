@@ -22,43 +22,35 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
   ];
 
   final Map<String, bool> _availability = {
-    'Monday': true,
-    'Tuesday': true,
-    'Wednesday': true,
-    'Thursday': true,
-    'Friday': true,
-    'Saturday': true,
-    'Sunday': true,
+    for (var day in [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ])
+      day: true,
   };
 
-  // Store multiple time slots per day
   final Map<String, List<List<TimeOfDay>>> _timeSlots = {
-    'Monday': [
-      const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
-    ],
-    'Tuesday': [
-      const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
-    ],
-    'Wednesday': [
-      const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
-    ],
-    'Thursday': [
-      const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
-    ],
-    'Friday': [
-      const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
-    ],
-    'Saturday': [
-      const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
-    ],
-    'Sunday': [
-      const [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
-    ],
+    for (var day in [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ])
+      day: [
+        [TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)],
+      ],
   };
 
   int _selectedIndex = 1;
 
-  // Handle time picker logic
   Future<void> _selectTime(BuildContext context, String day, int slotIndex, int timeIndex) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -72,10 +64,9 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
     }
   }
 
-  // Add new time slot
   void _addTimeSlot(String day) {
     setState(() {
-      _timeSlots[day]!.add([const TimeOfDay(hour: 8, minute: 0), const TimeOfDay(hour: 10, minute: 0)]);
+      _timeSlots[day]!.add([TimeOfDay(hour: 8, minute: 0), TimeOfDay(hour: 10, minute: 0)]);
     });
   }
 
@@ -84,37 +75,21 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
       _selectedIndex = index;
     });
 
-    // Navigate to a new page based on the selected index
     switch (index) {
       case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ProfileScreen()),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
         break;
       case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AvailabilityScreen()),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (context) => AvailabilityScreen()));
         break;
       case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SessionsScreen()),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (context) => SessionsScreen()));
         break;
       case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => EarningsScreen()),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (context) => EarningsScreen()));
         break;
       case 4:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PersonScreen()),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (context) => PersonScreen()));
         break;
     }
   }
@@ -143,7 +118,6 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Row for Day and Switch
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -167,83 +141,75 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
                           ),
                         ],
                       ),
-                      // Render multiple time slots dynamically
-                      Column(
-                        children: List.generate(_timeSlots[day]!.length, (slotIndex) {
-                          return Column(
-                            children: [
-                              Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: isAvailable ? () => _selectTime(context, day, slotIndex, 0) : null,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: isAvailable ? Colors.black : Colors.grey),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        _timeSlots[day]![slotIndex][0].format(context),
-                                        style: TextStyle(
-                                          color: isAvailable ? Colors.black : Colors.grey,
+                      if (isAvailable)
+                        Column(
+                          children: List.generate(_timeSlots[day]!.length, (slotIndex) {
+                            return Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () => _selectTime(context, day, slotIndex, 0),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(color: Colors.black),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          _timeSlots[day]![slotIndex][0].format(context),
+                                          style: const TextStyle(color: Colors.black),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Text('-'),
-                                  const SizedBox(width: 8),
-                                  GestureDetector(
-                                    onTap: isAvailable ? () => _selectTime(context, day, slotIndex, 1) : null,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: isAvailable ? Colors.black : Colors.grey),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        _timeSlots[day]![slotIndex][1].format(context),
-                                        style: TextStyle(
-                                          color: isAvailable ? Colors.black : Colors.grey,
+                                    const SizedBox(width: 8),
+                                    const Text('-'),
+                                    const SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: () => _selectTime(context, day, slotIndex, 1),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(color: Colors.black),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          _timeSlots[day]![slotIndex][1].format(context),
+                                          style: const TextStyle(color: Colors.black),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-                          );
-                        }),
-                      ),
-                      const SizedBox(height: 8),
-                      // Add Time Slot Button
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton(
-                          onPressed: isAvailable ? () => _addTimeSlot(day) : null,
-                          child: Text(
-                            'Add Availability +',
-                            style: TextStyle(
-                              color: isAvailable ? Colors.black : Colors.grey,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                              ],
+                            );
+                          }),
+                        ),
+                      if (isAvailable)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton(
+                            onPressed: () => _addTimeSlot(day),
+                            child: const Text(
+                              'Add Availability +',
+                              style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
-                      ),
                       const SizedBox(height: 12),
                     ],
                   );
                 },
               ),
             ),
-            // Update Button
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Update logic
+                  // Add update logic here
+                  print("Updated Availability: $_availability");
+                  print("Updated Time Slots: $_timeSlots");
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff87e64c),
