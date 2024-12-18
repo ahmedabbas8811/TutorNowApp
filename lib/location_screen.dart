@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:newifchaly/province_city_dropdown.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'location2_screen.dart';
@@ -42,11 +43,10 @@ class _LocationScreenState extends State<LocationScreen> {
 
   Future<void> _storeLocation() async {
     final user = Supabase.instance.client.auth.currentUser;
-    if (user != null && _country != null && _state != null && _city != null) {
+    if (user != null && _state != null && _city != null) {
       try {
         // Store location in the location table
         await Supabase.instance.client.from('location').insert({
-          'country': _country,
           'state': _state,
           'city': _city,
           'user_id': user.id,
@@ -127,25 +127,19 @@ class _LocationScreenState extends State<LocationScreen> {
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            // CSCPicker(
-            //   layout: Layout.vertical,
-            //   flagState: CountryFlag.DISABLE,
-            //   onCountryChanged: (country) {
-            //     setState(() {
-            //       _country = country;
-            //     });
-            //   },
-            //   onStateChanged: (state) {
-            //     setState(() {
-            //       _state = state;
-            //     });
-            //   },
-            //   onCityChanged: (city) {
-            //     setState(() {
-            //       _city = city;
-            //     });
-            //   },
-            // ),
+                        // Province and City Dropdown
+            ProvinceCityDropdown(
+              onProvinceSelected: (province) {
+                setState(() {
+                  _state = province;
+                });
+              },
+              onCitySelected: (city) {
+                setState(() {
+                  _city = city;
+                });
+              },
+            ),
             const SizedBox(height: 15),
             const SizedBox(height: 10),
             const Spacer(),
@@ -153,7 +147,7 @@ class _LocationScreenState extends State<LocationScreen> {
               width: 330,
               child: ElevatedButton(
                 onPressed: () async {
-                  if (_country != null && _state != null && _city != null) {
+                  if ( _state != null && _city != null) {
                     await _storeLocation(); // Store location and update status
                     Navigator.push(
                       context,

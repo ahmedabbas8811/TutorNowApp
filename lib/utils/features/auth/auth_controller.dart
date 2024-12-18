@@ -106,14 +106,19 @@ class AuthController extends GetxController {
               'email': email, 
               'user_type': groupValue, // Add groupValue as user type
             });
+        
+        await SupabaseService.supabase
+        .from('profile_completion_steps')
+        .insert({
+        'user_id': userId,
+      });
 
-        log("User type successfully added for user: \${response.user?.toJson()}");
+        log("User type successfully added for user: ${response.user?.toJson()}");
 
         signupLoading.value = false;
 
-        // Optionally navigate to a different screen after successful signup
         Get.snackbar("Signup Success", "Account created successfully.");
-        // Get.offAll(() => ProfileScreen());
+        
       } else {
         signupLoading.value = false;
         Get.snackbar("Signup Failed", "Could not create account.");
