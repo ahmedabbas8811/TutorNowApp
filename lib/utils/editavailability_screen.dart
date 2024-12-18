@@ -125,7 +125,7 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
                             day,
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: isAvailable ? FontWeight.bold : FontWeight.normal,
+                              fontWeight: FontWeight.bold,
                               color: isAvailable ? Colors.black : Colors.grey,
                             ),
                           ),
@@ -141,62 +141,68 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
                           ),
                         ],
                       ),
-                      if (isAvailable)
-                        Column(
-                          children: List.generate(_timeSlots[day]!.length, (slotIndex) {
-                            return Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () => _selectTime(context, day, slotIndex, 0),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.black),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          _timeSlots[day]![slotIndex][0].format(context),
-                                          style: const TextStyle(color: Colors.black),
-                                        ),
+                      Column(
+                        children: List.generate(_timeSlots[day]!.length, (slotIndex) {
+                          return Column(
+                            children: [
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: isAvailable
+                                        ? () => _selectTime(context, day, slotIndex, 0)
+                                        : null,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: isAvailable ? Colors.black : Colors.grey),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        _timeSlots[day]![slotIndex][0].format(context),
+                                        style: TextStyle(color: isAvailable ? Colors.black : Colors.grey),
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
-                                    const Text('-'),
-                                    const SizedBox(width: 8),
-                                    GestureDetector(
-                                      onTap: () => _selectTime(context, day, slotIndex, 1),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.black),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          _timeSlots[day]![slotIndex][1].format(context),
-                                          style: const TextStyle(color: Colors.black),
-                                        ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text('-'),
+                                  const SizedBox(width: 8),
+                                  GestureDetector(
+                                    onTap: isAvailable
+                                        ? () => _selectTime(context, day, slotIndex, 1)
+                                        : null,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: isAvailable ? Colors.black : Colors.grey),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        _timeSlots[day]![slotIndex][1].format(context),
+                                        style: TextStyle(color: isAvailable ? Colors.black : Colors.grey),
                                       ),
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                              ],
-                            );
-                          }),
-                        ),
-                      if (isAvailable)
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextButton(
-                            onPressed: () => _addTimeSlot(day),
-                            child: const Text(
-                              'Add Availability +',
-                              style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                          );
+                        }),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
+                          onPressed: isAvailable ? () => _addTimeSlot(day) : null,
+                          child: Text(
+                            'Add Availability +',
+                            style: TextStyle(
+                              color: isAvailable ? Colors.black : Colors.grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
+                      ),
                       const SizedBox(height: 12),
                     ],
                   );
@@ -207,7 +213,6 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
               padding: const EdgeInsets.only(bottom: 8.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Add update logic here
                   print("Updated Availability: $_availability");
                   print("Updated Time Slots: $_timeSlots");
                 },
