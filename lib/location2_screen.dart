@@ -244,6 +244,7 @@ class _Location2ScreenState extends State<Location2Screen> {
 
   // Method to upload image and update database
   Future<void> _uploadImage() async {
+    
     if (_image == null) return;
 
     try {
@@ -253,14 +254,17 @@ class _Location2ScreenState extends State<Location2Screen> {
         print("User not logged in.");
         return;
       }
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filename = '$timestamp-${file.path.split('/').last}'; 
+      final id = user.id;
 
       final storageResponse = await Supabase.instance.client.storage
           .from('user_img')
-          .upload('public/${file.path.split('/').last}', file);
+          .upload('$id/$filename', file);
 
       final imageUrl = Supabase.instance.client.storage
           .from('user_img')
-          .getPublicUrl('public/${file.path.split('/').last}');
+          .getPublicUrl('$id/$filename');
 
       setState(() {
         _imageUrl = imageUrl;

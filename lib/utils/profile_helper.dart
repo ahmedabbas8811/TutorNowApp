@@ -62,7 +62,7 @@ class ProfileCompletionHelper {
             context, MaterialPageRoute(builder: (_) => BioScreen()));
         break;
 
-          case "img":
+          case "image":
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => Location2Screen()));
         break;
