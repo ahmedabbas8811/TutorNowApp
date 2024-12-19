@@ -57,18 +57,18 @@ class ProfileCompletionHelper {
     switch (nextStep) {
     
 
-       case "location":
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => LocationScreen()));
-        break;
-
-          case "bios":
+       case "bios":
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => BioScreen()));
         break;
-      case "image":
+
+          case "img":
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => Location2Screen()));
+        break;
+      case "location":
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => LocationScreen()));
         break;
 
       case "cnic":

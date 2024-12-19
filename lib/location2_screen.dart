@@ -191,6 +191,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:newifchaly/location_screen.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -421,7 +422,7 @@ class _Location2ScreenState extends State<Location2Screen> {
                   await _uploadImage();
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CnicScreen()),
+                    MaterialPageRoute(builder: (context) => LocationScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/location2_screen.dart';
 import 'package:newifchaly/location_screen.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -87,7 +88,7 @@ class _BioScreenState extends State<BioScreen> {
               .update({'bios': true}).eq('user_id', currentUser.id);
           print("Bio step updated successfully.");
           Navigator.push(
-            context, MaterialPageRoute(builder: (_) => LocationScreen()));
+            context, MaterialPageRoute(builder: (_) => Location2Screen()));
 
       setState(() {
         _message = 'Bio saved successfully!';

@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:newifchaly/cnic_screen.dart';
 import 'package:newifchaly/province_city_dropdown.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -152,7 +153,7 @@ class _LocationScreenState extends State<LocationScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => Location2Screen()),
+                          builder: (context) => CnicScreen()),
                     );
                   }
                 },
