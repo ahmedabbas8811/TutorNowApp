@@ -115,55 +115,68 @@ class _BioScreenState extends State<BioScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-       appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+  backgroundColor: Colors.white,
+  appBar: AppBar(
+    centerTitle: true,
+    backgroundColor: Colors.white,
+    elevation: 0,
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back, color: Colors.black),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    ),
+  ),
+  body: Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Add Bio',
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Add Bio',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        SizedBox(height: 16),
+        TextField(
+          controller: _bioController,
+          cursorColor: Colors.grey,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10), // Rounded corners
+              borderSide: BorderSide(color: Colors.grey), // Purple border
             ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _bioController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Explain yourself in 2-3 lines...',
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey, width: 2), // Purple border on focus
+            ),
+            hintText: 'Explain yourself in 2-3 lines...',
+          ),
+        ),
+        SizedBox(height: 30), // Space between TextField and Next button
+        Center(
+          child: SizedBox(
+            width: 360, // Custom button width
+            height: 50, // Custom button height
+            child: ElevatedButton(
+              onPressed: _saveBio,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xff87e64c),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), // Rounded corners
+                ),
+              ),
+              child: const Text(
+                'Next',
+                style: TextStyle(fontSize: 18, color: Colors.black),
               ),
             ),
-            ElevatedButton(
-                onPressed: _saveBio,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff87e64c),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text(
-                  'Next',
-                  style: TextStyle(fontSize: 18, color: Colors.black),
-                ),
-              ),
-          ],
+          ),
         ),
-      ),
-    );
+      ],
+    ),
+  ),
+);
   }
 }
-
-
