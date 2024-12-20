@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/location2_screen.dart';
+import 'package:newifchaly/location_screen.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,6 +16,27 @@ class _BioScreenState extends State<BioScreen> {
   bool _isLoading = false;
   String _message = '';
 
+   @override
+  void initState() {
+    super.initState();
+
+    // Check if location step is already completed and restrict access
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (await _isBioCompleted()) {
+        // Navigate to the next screen if the step is already completed
+//        Navigator.pushReplacement(
+        //        context,
+        //      MaterialPageRoute(builder: (context) => Location2Screen()),
+        //  );
+        final completionData =
+            await ProfileCompletionHelper.fetchCompletionData();
+        final incompleteSteps =
+            ProfileCompletionHelper.getIncompleteSteps(completionData);
+        ProfileCompletionHelper.navigateToNextScreen(context, incompleteSteps);
+      }
+    });
+  }
+
    Future<bool> _isBioCompleted() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user != null) {
@@ -24,8 +47,10 @@ class _BioScreenState extends State<BioScreen> {
             .select('bios')
             .eq('user_id', user.id)
             .maybeSingle();
+            print("Response: $response");
 
-        if (response != null && response['location'] == true) {
+
+        if (response != null && response['bios'] == true) {
           print("Bio step is already completed.");
           return true; // Step is already completed
         } else {
@@ -60,8 +85,10 @@ class _BioScreenState extends State<BioScreen> {
 
        await Supabase.instance.client
               .from('profile_completion_steps')
-              .update({'bio': true}).eq('user_id', currentUser.id);
+              .update({'bios': true}).eq('user_id', currentUser.id);
           print("Bio step updated successfully.");
+          Navigator.push(
+            context, MaterialPageRoute(builder: (_) => Location2Screen()));
 
       setState(() {
         _message = 'Bio saved successfully!';
@@ -77,22 +104,6 @@ class _BioScreenState extends State<BioScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    // Check if location step is already completed and restrict access
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (await _isBioCompleted()) {
-       
-        final completionData =
-            await ProfileCompletionHelper.fetchCompletionData();
-        final incompleteSteps =
-            ProfileCompletionHelper.getIncompleteSteps(completionData);
-        ProfileCompletionHelper.navigateToNextScreen(context, incompleteSteps);
-      }
-    });
-  }
 
 
   @override

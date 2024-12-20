@@ -191,6 +191,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:newifchaly/location_screen.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -243,6 +244,7 @@ class _Location2ScreenState extends State<Location2Screen> {
 
   // Method to upload image and update database
   Future<void> _uploadImage() async {
+    
     if (_image == null) return;
 
     try {
@@ -252,14 +254,17 @@ class _Location2ScreenState extends State<Location2Screen> {
         print("User not logged in.");
         return;
       }
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filename = '$timestamp-${file.path.split('/').last}'; 
+      final id = user.id;
 
       final storageResponse = await Supabase.instance.client.storage
           .from('user_img')
-          .upload('public/${file.path.split('/').last}', file);
+          .upload('$id/$filename', file);
 
       final imageUrl = Supabase.instance.client.storage
           .from('user_img')
-          .getPublicUrl('public/${file.path.split('/').last}');
+          .getPublicUrl('$id/$filename');
 
       setState(() {
         _imageUrl = imageUrl;
@@ -421,7 +426,7 @@ class _Location2ScreenState extends State<Location2Screen> {
                   await _uploadImage();
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CnicScreen()),
+                    MaterialPageRoute(builder: (context) => LocationScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(

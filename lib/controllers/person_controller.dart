@@ -1,37 +1,63 @@
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/availabilityscreen.dart';
-import 'package:newifchaly/controllers/person_controller.dart';
 import 'package:newifchaly/earningscreen.dart';
+import 'package:newifchaly/models/person_model.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
-import 'package:newifchaly/utils/profile_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/profile_model.dart';
+import '../services/supabase_service.dart';
 
-class ProfileController extends GetxController {
-  var selectedIndex = 0.obs;
-
-  // Simulate profile data
-  var profile = ProfileModel(
+class PersonController extends GetxController {
+    var profile = PersonModel(
     name: "",
     isProfileComplete: false,
-    upcomingBookings: [],
-    stepscount: 2,
+    profileImage: "assets/Ellipse 1.png",
     isVerified: false
   ).obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchUserName(); 
+    fetchUserName(); // Load profile data when the controller initializes
     updateVerificationStatus();
+    fetchUserImg();
     updateProfileStatus();
-    fetchProfileCompletionData();
-    
   }
- 
+
+  Future<void> updateVerificationStatus() async {
+  // Reference to your Supabase client
+  final supabase = Supabase.instance.client;
+  final user = Supabase.instance.client.auth.currentUser;
+
+  try {
+    // Query the profile table
+    final response = await supabase
+        .from('users') // Replace with your actual table name
+        .select('is_verified') // Add other columns if necessary
+        .eq('id', user!.id) // Filter by the user's ID or your condition
+        .single(); // Fetch a single record
+
+    if (response == null) {
+      throw Exception("Profile not found");
+    }
+
+    // Check if all columns are true
+    
+    if (response != null && response['is_verified']==true){
+       profile.update((p) {
+            p?.isVerified= true;
+          });
+
+    }
+  } catch (error) {
+    print("Error checking columns: $error");
+   
+  }
+}
+
+
+
 Future<void> updateProfileStatus() async {
   // Reference to your Supabase client
   final supabase = Supabase.instance.client;
@@ -65,45 +91,9 @@ Future<void> updateProfileStatus() async {
 }
 
 
-Future<void> updateVerificationStatus() async {
-  // Reference to your Supabase client
-  final supabase = Supabase.instance.client;
-  final user = Supabase.instance.client.auth.currentUser;
-
-  try {
-    // Query the profile table
-    final response = await supabase
-        .from('users') // Replace with your actual table name
-        .select('is_verified') // Add other columns if necessary
-        .eq('id', user!.id) // Filter by the user's ID or your condition
-        .single(); // Fetch a single record
-
-    if (response == null) {
-      throw Exception("Profile not found");
-    }
-
-    // Check if all columns are true
-    
-    if (response != null && response['is_verified']==true){
-       profile.update((p) {
-            p?.isVerified= true;
-          });
-
-    }
-  } catch (error) {
-    print("Error checking columns: $error");
-   
-  }
-}
-
-
-
-
-
-
-  // Fetch the user's name from the database
   Future<void> fetchUserName() async {
     final user = Supabase.instance.client.auth.currentUser;
+    
 
     if (user != null) {
       try {
@@ -125,14 +115,39 @@ Future<void> updateVerificationStatus() async {
       }
     }
   }
+ 
+   Future<void> fetchUserImg() async {
+    final user = Supabase.instance.client.auth.currentUser;
 
-  void updateSelectedIndex(int index) {
-    selectedIndex.value = index;
+    if (user != null) {
+      try {
+        final response = await Supabase.instance.client
+            .from('users')
+            .select('image_url') // Fetch the name from metadata
+            .eq('id', user.id)
+            .maybeSingle();
+
+        if (response != null && response['image_url'] != null) {
+          profile.update((p) {
+            p?.profileImage = response['image_url']; // Update the profile model
+          });
+        } else {
+          print("Image url not found");
+        }
+      } catch (e) {
+        print("Error fetching img url: $e");
+      }
+    }
+  }
+ 
+
+  // Logout the user
+  void logout() {
+    Get.find<SupabaseService>().logout();
   }
 
-  void navigateToPage(BuildContext context, int index) {
-    updateSelectedIndex(index);
-
+  // Navigate to another screen
+  void navigateTo(int index) {
     switch (index) {
       case 0:
         Get.to(() => ProfileScreen());
@@ -149,28 +164,6 @@ Future<void> updateVerificationStatus() async {
       case 4:
         Get.to(() => PersonScreen());
         break;
-    }
-  }
-
-  Future<void> fetchProfileCompletionData() async {
-    final user = Supabase.instance.client.auth.currentUser;
-
-    if (user != null) {
-      try {
-        final completionData =
-            await ProfileCompletionHelper.fetchCompletionData();
-
-        // Get the count of incomplete steps using ProfileCompletionHelper
-        final incompleteStepsCount =
-            ProfileCompletionHelper.getIncompleteStepsCount(completionData);
-
-        // Update the steps count in the profile model
-        profile.update((p) {
-          p?.stepscount = incompleteStepsCount;
-        });
-      } catch (e) {
-        print("Error fetching profile completion data: $e");
-      }
     }
   }
 }

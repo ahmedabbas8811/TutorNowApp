@@ -57,18 +57,18 @@ class ProfileCompletionHelper {
     switch (nextStep) {
     
 
-       case "location":
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => LocationScreen()));
-        break;
-
-          case "bios":
+       case "bios":
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => BioScreen()));
         break;
-      case "image":
+
+          case "image":
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => Location2Screen()));
+        break;
+      case "location":
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => LocationScreen()));
         break;
 
       case "cnic":
@@ -81,13 +81,10 @@ class ProfileCompletionHelper {
             context, MaterialPageRoute(builder: (_) => QualificationScreen()));
         break;
       
-        case "exp":
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => TeachingDetail()));
-        break;
 
       default:
-        print("Unknown step: $nextStep");
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => TeachingDetail()));
     }
   }
 }

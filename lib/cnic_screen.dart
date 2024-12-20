@@ -454,6 +454,48 @@ class _CnicScreenState extends State<CnicScreen> {
     }
   }
 
+  // Function to check if the location step is already completed
+  Future<bool> _isCnicCompleted() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user != null) {
+      try {
+        final response = await Supabase.instance.client
+            .from('profile_completion_steps')
+            .select('cnic')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+        if (response != null && response['cnic'] == true) {
+          print("Cnic step is already completed.");
+          return true; // Step is already completed
+        } else {
+          print("Cnic step is not completed.");
+        }
+      } catch (e) {
+        print("Error checking cnic status: $e");
+      }
+    }
+    return false; // Step is not completed
+  }
+
+
+    @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (await _isCnicCompleted()) {
+       
+        final completionData =
+            await ProfileCompletionHelper.fetchCompletionData();
+        final incompleteSteps =
+            ProfileCompletionHelper.getIncompleteSteps(completionData);
+        ProfileCompletionHelper.navigateToNextScreen(context, incompleteSteps);
+      }
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -532,19 +574,13 @@ class _CnicScreenState extends State<CnicScreen> {
               child: ElevatedButton(
                 onPressed: () async {
                   await _uploadFile(); // Upload file if it is selected
-                  final completionData =
-                      await ProfileCompletionHelper.fetchCompletionData();
-                  final incompleteSteps =
-                      ProfileCompletionHelper.getIncompleteSteps(
-                          completionData);
-                  ProfileCompletionHelper.navigateToNextScreen(
-                      context, incompleteSteps);
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => QualificationScreen(),
-                  //   ),
-                  // );
+                
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QualificationScreen(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff87e64c),

@@ -1,11 +1,9 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/editprofile_screen.dart';
-import 'package:newifchaly/availabilityscreen.dart';
-import 'package:newifchaly/profile_screen.dart';
-import 'package:newifchaly/services/supabase_service.dart';
-import 'package:newifchaly/sessionscreen.dart';
-import 'earningscreen.dart';
+import '../controllers/person_controller.dart';
 
 class PersonScreen extends StatefulWidget {
   @override
@@ -13,46 +11,14 @@ class PersonScreen extends StatefulWidget {
 }
 
 class _PersonScreenState extends State<PersonScreen> {
-  int _selectedIndex = 4; // Profile tab selected by default
+  final PersonController controller = Get.put(PersonController()); // Inject controller
+  int _selectedIndex = 4; // Default tab is Profile
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-
-    // Navigate to the appropriate screen based on the index
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ProfileScreen()), // Replace with actual HomeScreen widget
-        );
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AvailabilityScreen()), // Replace with actual AvailabilityScreen widget
-        );
-        break;
-      case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SessionsScreen()), // Replace with actual SessionsScreen widget
-        );
-        break;
-      case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => EarningsScreen()), // Your existing EarningsScreen widget
-        );
-        break;
-      case 4:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PersonScreen()), // Profile screen (current screen)
-        );
-        break;
-    }
+    controller.navigateTo(index); // Use controller for navigation
   }
 
   @override
@@ -66,9 +32,7 @@ class _PersonScreenState extends State<PersonScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 15.0),
             child: ElevatedButton(
-              onPressed: () {
-                Get.find<SupabaseService>().logout();
-              },
+              onPressed: controller.logout, // Logout using controller
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xffe64b4b),
                 shape: RoundedRectangleBorder(
@@ -86,73 +50,88 @@ class _PersonScreenState extends State<PersonScreen> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Image
-              const SizedBox(height: 10),
-              const CircleAvatar(
-                radius: 60,
-                backgroundImage: AssetImage('assets/Ellipse 1.png'),
-              ),
-              const SizedBox(height: 10),
-              // Profile Name
-              const Text(
-                'Aliyan Rizvi',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+          child: Obx(() {
+            // Observe changes in profile data
+            final profile = controller.profile.value;
+            if (profile == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                CircleAvatar(
+                  radius: 60,
+                  backgroundImage: NetworkImage(profile.profileImage),
                 ),
-              ),
-              const SizedBox(height: 5), // Reduced space
-              // Profile Incomplete Tag
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 4), // Inner padding
-                color: Colors.yellow,
-                child: const Text(
-                  '⚠ Profile is incomplete',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 45),
-              // Edit Profile Button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => EditProfileScreen()), // Action for Edit Profile
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff87e64c),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Text(
+                      profile.name,
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 130, vertical: 10),
                     ),
-                    child: const Text(
-                      'Edit Profile',
-                      style: TextStyle(color: Colors.black, fontSize: 15),
+                  if(profile.isVerified)
+                  Row(
+                    children: [
+                      SizedBox(width: 8,),
+                      SvgPicture.asset('assets/verified.svg',
+                      height: 28,
+                      width: 28,),
+                    ],
+                  )
+                  ],
+                ),
+                const SizedBox(height: 5),
+                if (!profile.isVerified)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    color: profile.isProfileComplete ? const Color(0xfff2f2f2) : Colors.yellow,
+                    child: Text(
+                      profile.isProfileComplete
+                          ? 'Profile is under verification'
+                          : '⚠ Profile is incomplete',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                const SizedBox(height: 35),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Get.to(() => EditProfileScreen());
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff87e64c),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 130, vertical: 10),
+                      ),
+                      child: const Text(
+                        'Edit Profile',
+                        style: TextStyle(color: Colors.black, fontSize: 15),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed, // Fixed type ensures white background
-          backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed, // Fixed layout for white background
+        backgroundColor: Colors.white,
         currentIndex: _selectedIndex,
         selectedItemColor: const Color(0xff87e64c),
         unselectedItemColor: Colors.black,
@@ -184,11 +163,4 @@ class _PersonScreenState extends State<PersonScreen> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: PersonScreen(),
-  ));
 }

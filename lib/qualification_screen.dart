@@ -671,11 +671,6 @@ class _QualificationScreenState extends State<QualificationScreen> {
     // Check if location step is already completed and restrict access
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (await _isQualificationStepCompleted()) {
-        // Navigate to the next screen if the step is already completed
-//        Navigator.pushReplacement(
-        //        context,
-        //      MaterialPageRoute(builder: (context) => Location2Screen()),
-        //  );
         final completionData =
             await ProfileCompletionHelper.fetchCompletionData();
         final incompleteSteps =
@@ -881,6 +876,7 @@ const SizedBox(height: 40),
                           _qualificationFileName = null;
                           _qualificationFile = null;
                         });
+                        
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
