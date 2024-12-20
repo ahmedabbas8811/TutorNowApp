@@ -788,18 +788,9 @@ class _TeachingDetailState extends State<TeachingDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // Go back to the previous screen
-          },
-        ),
-      ),
+    
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
@@ -808,6 +799,13 @@ class _TeachingDetailState extends State<TeachingDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 25,),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () {
+                      Navigator.pop(context); // Go back to the previous screen
+                    },
+                  ),
                   const Text(
                     'Add Teaching Experience',
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
@@ -815,79 +813,105 @@ class _TeachingDetailState extends State<TeachingDetail> {
                   const SizedBox(height: 15),
 
                   // TextField for Education level
-                  TextField(
-                    controller: _educationLevelController,
-                    decoration: InputDecoration(
-                      labelText: 'Education Level of Students',
-                      labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: 'Ex. Matric',
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                    ),
-                    keyboardAppearance: Brightness.light,
-                  ),
-                  const SizedBox(height: 15),
+                 TextField(
+  controller: _educationLevelController,
+  cursorColor: Colors.grey,
+  decoration: InputDecoration(
+    labelText: 'Education Level of Students',
+    labelStyle: const TextStyle(color: Colors.grey),
+    hintText: 'Ex. Matric',
+    hintStyle: const TextStyle(color: Colors.grey),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),  // Set the border color to grey
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),  // Set the border color to grey when focused
+    ),
+  ),
+  keyboardAppearance: Brightness.light,
+),
+const SizedBox(height: 15),
+
 
                   // TextField for selecting start date
-                  TextField(
-                    controller: _startDateController,
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      labelText: 'Start Date',
-                      labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: 'Select Start Date',
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.calendar_today,
-                            color: Colors.grey),
-                        onPressed: () =>
-                            _selectDate(context, _startDateController),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                    ),
-                    keyboardAppearance: Brightness.light,
-                  ),
-                  const SizedBox(height: 20),
+                TextField(
+  controller: _startDateController,
+  readOnly: true,
+  decoration: InputDecoration(
+    labelText: 'Start Date',
+    labelStyle: const TextStyle(color: Colors.grey),
+    hintText: 'Select Start Date',
+    suffixIcon: IconButton(
+      icon: const Icon(Icons.calendar_today, color: Colors.grey),
+      onPressed: () => _selectDate(context, _startDateController),
+    ),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),  // Grey border when enabled
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),  // Grey border when focused
+    ),
+  ),
+  keyboardAppearance: Brightness.light,
+),
+const SizedBox(height: 20),
+
 
                   // TextField for selecting end date
-                  TextField(
-                    controller: _endDateController,
-                    readOnly: true,
-                    enabled:
-                        !_switchValue, // Disable when "I Still Work Here" is active
-                    decoration: InputDecoration(
-                      labelText: 'End Date',
-                      labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: 'Select End Date',
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.calendar_today,
-                            color: Colors.grey),
-                        onPressed: !_switchValue
-                            ? () => _selectDate(context, _endDateController)
-                            : null,
-                      ),
-                      filled: _switchValue,
-                      fillColor: _switchValue
-                          ? const Color(0xff87e64c).withOpacity(0.4)
-                          : null,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: _switchValue
-                          ? Colors.grey.withOpacity(0.5)
-                          : Colors.black,
-                    ),
-                    keyboardAppearance: Brightness.light,
-                  ),
-                  const SizedBox(height: 5),
+                TextField(
+  controller: _endDateController,
+  readOnly: true,
+  enabled: !_switchValue, // Disable when "I Still Work Here" is active
+  decoration: InputDecoration(
+    labelText: 'End Date',
+    labelStyle: const TextStyle(color: Colors.grey),
+    hintText: 'Select End Date',
+    suffixIcon: IconButton(
+      icon: const Icon(Icons.calendar_today, color: Colors.grey),
+      onPressed: !_switchValue
+          ? () => _selectDate(context, _endDateController)
+          : null,
+    ),
+    filled: _switchValue,
+    fillColor: _switchValue
+        // ignore: deprecated_member_use
+        ? const Color(0xff87e64c).withOpacity(0.4)
+        : null,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey), // Grey border when enabled
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey), // Grey border when focused
+    ),
+  ),
+  style: TextStyle(
+    color: _switchValue
+        // ignore: deprecated_member_use
+        ? Colors.grey.withOpacity(0.5)
+        : Colors.black,
+  ),
+  keyboardAppearance: Brightness.light,
+),
+const SizedBox(height: 5),
+
 
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -985,6 +1009,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
                       ],
                     ),
                   ),
+                  SizedBox(height: 10),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(

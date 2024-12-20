@@ -119,7 +119,7 @@ class _PersonScreenState extends State<PersonScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 45),
               // Edit Profile Button
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -137,7 +137,7 @@ class _PersonScreenState extends State<PersonScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 18, vertical: 10),
+                          horizontal: 130, vertical: 10),
                     ),
                     child: const Text(
                       'Edit Profile',

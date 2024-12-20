@@ -689,17 +689,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
+    
       body: LayoutBuilder(
         builder: (context, constraints) {
           double screenWidth = constraints.maxWidth;
@@ -710,45 +700,70 @@ class _QualificationScreenState extends State<QualificationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 30,),
+                  IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
                   const Text(
                     'Add Qualification',
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
+//Education Label Name
+               TextField(
+  controller: educationLevelController,
+  cursorColor: Colors.grey,
+  decoration: InputDecoration(
+    labelText: 'Education Level',
+    labelStyle: const TextStyle(color: Colors.grey),
+    hintText: 'Ex. Matric',
+    hintStyle: const TextStyle(color: Colors.grey),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),  // Grey border when enabled
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),  // Grey border when focused
+    ),
+  ),
+  keyboardAppearance: Brightness.light,
+),
+const SizedBox(height: 15),
 
-                  // Education Level label
-                  TextField(
-                    controller: educationLevelController,
-                    decoration: InputDecoration(
-                      labelText: 'Education Level',
-                      labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: 'Ex. Matric',
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                    ),
-                    keyboardAppearance: Brightness.light,
-                  ),
-                  const SizedBox(height: 15),
 
                   // Institute Name label
-                  TextField(
-                    controller: instituteNameController,
-                    decoration: InputDecoration(
-                      labelText: 'Institute Name',
-                      labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: 'Ex. IMCB',
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                    ),
-                    keyboardAppearance: Brightness.light,
-                  ),
-                  const SizedBox(height: 40),
+                TextField(
+  controller: instituteNameController,
+  cursorColor: Colors.grey,
+  decoration: InputDecoration(
+    labelText: 'Institute Name',
+    labelStyle: const TextStyle(color: Colors.grey),
+    hintText: 'Ex. IMCB',
+    hintStyle: const TextStyle(color: Colors.grey),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),  // Default grey border
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),  // Grey border when enabled
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.grey),  // Grey border when focused
+    ),
+  ),
+  keyboardAppearance: Brightness.light,
+),
+const SizedBox(height: 40),
 
                   // Upload Proof Of Qualification Section
                   Container(
