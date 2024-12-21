@@ -13,7 +13,6 @@ import '../models/profile_model.dart';
 class ProfileController extends GetxController {
   var selectedIndex = 0.obs;
 
-  // Simulate profile data
   var profile = ProfileModel(
     name: "",
     isProfileComplete: false,

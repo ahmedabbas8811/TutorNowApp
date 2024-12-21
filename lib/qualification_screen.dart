@@ -445,232 +445,27 @@
 //     return false;
 //   }
 // }
-
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:get/get.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../controllers/qualification_controller.dart';
 import 'teaching_detail.dart';
 
 class QualificationScreen extends StatefulWidget {
   @override
-  _QualificationScreenState createState() => _QualificationScreenState();
+  State<QualificationScreen> createState() => _QualificationScreenState();
 }
 
 class _QualificationScreenState extends State<QualificationScreen> {
-  final TextEditingController educationLevelController =
-      TextEditingController();
-  final TextEditingController instituteNameController = TextEditingController();
-  String? _qualificationFileName;
-  File? _qualificationFile;
-
-  // Function to pick the qualification file (PDF)
-  Future<void> _pickQualificationFile() async {
-    bool isGranted = await _requestStoragePermission();
-
-    if (isGranted) {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-      );
-
-      if (result != null) {
-        setState(() {
-          _qualificationFileName = result.files.single.name;
-          _qualificationFile = File(result.files.single.path!);
-        });
-      }
-    } else {
-      _showPermissionDeniedDialog();
-    }
-  }
-
-  // Request storage permission
-  Future<bool> _requestStoragePermission() async {
-    if (await Permission.storage.isGranted) {
-      return true; // Access is already granted
-    }
-
-    // Handle for Android 11 and above
-    if (await Permission.manageExternalStorage.isGranted) {
-      return true;
-    }
-
-    // For Android 10 and below
-    if (await Permission.storage.request().isGranted) {
-      return true;
-    }
-
-    // Handle Manage External Storage for Android 11 and above
-    if (await Permission.manageExternalStorage.request().isGranted) {
-      return true;
-    }
-
-    return false; // Permission denied
-  }
-
-  // Show a dialog if permission is denied
-  void _showPermissionDeniedDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Permission Denied"),
-        content: Text(
-            "Storage permission is required to pick a file. Please enable it in the app settings."),
-        actions: [
-          TextButton(
-            child: Text("Cancel"),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: Text("Open Settings"),
-            onPressed: () {
-              openAppSettings();
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Function to check if the qualification step is already completed
-  Future<bool> _isQualificationStepCompleted() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user != null) {
-      try {
-        final response = await Supabase.instance.client
-            .from('profile_completion_steps')
-            .select('qualification')
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-        if (response != null && response['qualification'] == true) {
-          print("Qualification step is already completed.");
-          return true;
-        } else {
-          print("Qualification step is not completed.");
-        }
-      } catch (e) {
-        print("Error checking qualification step status: $e");
-      }
-    }
-    return false;
-  }
-
-  // Store the qualification details in Supabase
-  Future<int?> _storeQualification() async {
-    final user = Supabase.instance.client.auth.currentUser;
-
-    print("User ID: ${user?.id}");
-    print("Education Level: ${educationLevelController.text}");
-    print("Institute Name: ${instituteNameController.text}");
-
-    if (user != null &&
-        educationLevelController.text.isNotEmpty &&
-        instituteNameController.text.isNotEmpty) {
-      try {
-        final response =
-            await Supabase.instance.client.from('qualification').insert({
-          'education_level': educationLevelController.text,
-          'institute_name': instituteNameController.text,
-          'user_id': user.id,
-        }).select(); // Use `select` to fetch the inserted row's data.
-
-        if (response.isNotEmpty) {
-          // Return the ID of the inserted row
-          return response.first['id'] as int;
-        }
-      } catch (e) {
-        print("Error storing qualification: $e");
-      }
-    } else {
-      print("Please fill all fields.");
-    }
-    return null; // Return null if there's an error or missing fields
-  }
-
-  // Upload the qualification document to Supabase
-  Future<void> uploadFileToSupabase(File file, int qualificationId) async {
-    try {
-      // Upload the file to Supabase storage
-      final response = await Supabase.instance.client.storage
-          .from('qualification_docs') // Replace with your actual bucket name
-          .upload('public/${file.path.split('/').last}', file);
-
-      // Get the public URL for the uploaded file
-      final fileUrl = Supabase.instance.client.storage
-          .from('qualification_docs')
-          .getPublicUrl('public/${file.path.split('/').last}');
-
-      print("File uploaded successfully: $fileUrl"); // Log the file URL
-      await updateQualificationUrl(fileUrl, qualificationId);
-    } catch (e) {
-      print("Error uploading file: $e"); // Handle errors
-    }
-  }
-
-  // Update the qualification URL in the Supabase qualification table
-  Future<void> updateQualificationUrl(
-      String fileUrl, int qualificationId) async {
-    try {
-      final response = await Supabase.instance.client
-          .from('qualification') // Change table to 'qualification'
-          .update({
-            'qualification_url': fileUrl
-          }) // Update 'qualification_url' column
-          .eq('id', qualificationId) // Match the specific row by its ID
-          .select();
-
-      if (response.isNotEmpty) {
-        print("Qualification URL updated successfully: $response");
-      } else {
-        print("No rows updated. Verify ID or table setup.");
-      }
-    } catch (e) {
-      print("Error in updating qualification record: $e");
-    }
-  }
-
-  // Update profile completion steps to mark qualification step as completed
-  Future<void> _updateProfileCompletionSteps(String userId) async {
-    try {
-      // Check if a row already exists for the user
-      final response = await Supabase.instance.client
-          .from('profile_completion_steps')
-          .select()
-          .eq('user_id', userId)
-          .maybeSingle(); // Fetch a single row if it exists
-
-      if (response != null) {
-        // Update the existing row
-        await Supabase.instance.client.from('profile_completion_steps').update({
-          'qualification': true
-        }) // Mark the qualification column as true
-            .eq('user_id', userId);
-        print("Qualification step updated successfully for existing row.");
-      } else {
-        // Insert a new row if it doesn't exist
-        await Supabase.instance.client.from('profile_completion_steps').insert({
-          'user_id': userId,
-          'qualification': true, // Mark qualification as completed
-        });
-        print("New row created with qualification step completed.");
-      }
-    } catch (e) {
-      print("Error updating profile completion steps: $e");
-    }
-  }
+  // Access the QualificationController
+  final QualificationController controller = Get.put(QualificationController());
 
   @override
   void initState() {
     super.initState();
 
-    // Check if location step is already completed and restrict access
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (await _isQualificationStepCompleted()) {
+      if (await controller.isQualificationCompleted()) {
         final completionData =
             await ProfileCompletionHelper.fetchCompletionData();
         final incompleteSteps =
@@ -690,9 +485,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: LayoutBuilder(
@@ -705,15 +498,46 @@ class _QualificationScreenState extends State<QualificationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Add Qualification',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  Row(
+                    children: [
+                      const Text(
+                        'Add Qualification',
+                        style: TextStyle(
+                            fontSize: 28, fontWeight: FontWeight.bold),
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TeachingDetail(),
+                              ),
+                            );
+                          },
+                          style: ButtonStyle(
+                            overlayColor:
+                                WidgetStateProperty.resolveWith<Color?>(
+                              (Set<WidgetState> states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return Colors.green.shade100;
+                                }
+                                return null; // Default behavior
+                              },
+                            ),
+                          ),
+                          child: const Text(
+                            "Skip For Now",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                //  decorationStyle: TextDecorationStyle.solid,
+                                decoration: TextDecoration.underline),
+                          ))
+                    ],
                   ),
                   const SizedBox(height: 20),
 
-                  // Education Level label
+                  // Education Level Input
                   TextField(
-                    controller: educationLevelController,
                     decoration: InputDecoration(
                       labelText: 'Education Level',
                       labelStyle: const TextStyle(color: Colors.grey),
@@ -725,12 +549,13 @@ class _QualificationScreenState extends State<QualificationScreen> {
                       ),
                     ),
                     keyboardAppearance: Brightness.light,
+                    onChanged: (value) =>
+                        controller.qualification.educationLevel.value = value,
                   ),
                   const SizedBox(height: 15),
 
-                  // Institute Name label
+                  // Institute Name Input
                   TextField(
-                    controller: instituteNameController,
                     decoration: InputDecoration(
                       labelText: 'Institute Name',
                       labelStyle: const TextStyle(color: Colors.grey),
@@ -742,13 +567,15 @@ class _QualificationScreenState extends State<QualificationScreen> {
                       ),
                     ),
                     keyboardAppearance: Brightness.light,
+                    onChanged: (value) =>
+                        controller.qualification.instituteName.value = value,
                   ),
                   const SizedBox(height: 40),
 
                   // Upload Proof Of Qualification Section
                   Container(
                     width: 330,
-                    height: 210,
+                    height: 220,
                     decoration: BoxDecoration(
                       border: Border.all(
                         color: Colors.grey,
@@ -776,39 +603,51 @@ class _QualificationScreenState extends State<QualificationScreen> {
                         ),
                         const SizedBox(height: 7),
 
-                        // Inside container
+                        // File Picker Section
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: InkWell(
-                            onTap: _pickQualificationFile,
+                            onTap: () => controller.pickQualificationFile(),
                             child: Container(
                               width: double.infinity,
-                              height: 130,
+                              height: 140,
                               child: CustomPaint(
                                 painter: DashedBorderPainter(),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.cloud_upload,
-                                      size: 50,
-                                      color: Colors.grey,
-                                    ),
-                                    SizedBox(height: 16),
-                                    Text(
-                                      _qualificationFileName ?? 'Tap to upload',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      _qualificationFileName == null
-                                          ? '*pdf accepted'
-                                          : 'Tap to upload another document',
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.grey),
-                                    ),
-                                  ],
-                                ),
+                                child: Obx(() => Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.cloud_upload,
+                                          size: 50,
+                                          color: Colors.grey,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          controller
+                                                  .qualification
+                                                  .qualificationFileName
+                                                  .value
+                                                  .isEmpty
+                                              ? 'Tap to upload'
+                                              : controller.qualification
+                                                  .qualificationFileName.value,
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          controller
+                                                      .qualification
+                                                      .qualificationFileName
+                                                      .value ==
+                                                  null
+                                              ? '*pdf accepted'
+                                              : 'Tap to upload another document',
+                                          style: const TextStyle(
+                                              fontSize: 12, color: Colors.grey),
+                                        ),
+                                      ],
+                                    )),
                               ),
                             ),
                           ),
@@ -818,50 +657,27 @@ class _QualificationScreenState extends State<QualificationScreen> {
                   ),
                   const SizedBox(height: 70),
 
-                  // Another Button
                   SizedBox(
                     width: double.infinity,
+                    // Add Another Qualification Button
                     child: ElevatedButton(
                       onPressed: () async {
-                        // Store the qualification data and get the ID of the inserted qualification record
-                        final qualificationId = await _storeQualification();
-
+                        final qualificationId =
+                            await controller.storeQualification(context);
                         if (qualificationId != null &&
-                            _qualificationFile != null) {
-                          // Upload the file to Supabase storage and get the URL
-                          await uploadFileToSupabase(
-                              _qualificationFile!, qualificationId);
-
-                          final userId =
-                              Supabase.instance.client.auth.currentUser?.id;
-
-                          if (userId != null) {
-                            // Update profile completion steps for this user
-                            await _updateProfileCompletionSteps(userId);
-
-                            // Check if the qualification step is marked as complete for the user
-                            final isQualificationCompleted =
-                                await _isQualificationStepCompleted();
-
-                            if (isQualificationCompleted) {
-                              // Qualification is completed, you can show a confirmation or just keep adding
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text(
-                                        "Qualification added successfully.")),
-                              );
-                            }
-                          }
+                            controller.qualification.qualificationFile.value !=
+                                null) {
+                          await controller.uploadFileToSupabase(
+                              controller.qualification.qualificationFile.value!,
+                              qualificationId);
                         }
 
-                        // Clear the fields after adding the qualification
-                        educationLevelController.clear();
-                        instituteNameController.clear();
-                        setState(() {
-                          _qualificationFileName = null;
-                          _qualificationFile = null;
-                        });
-                        
+                        // Clear fields
+                        controller.qualification.educationLevel.value = '';
+                        controller.qualification.instituteName.value = '';
+                        controller.qualification.qualificationFileName.value =
+                            '';
+                        controller.qualification.qualificationFile.value = null;
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
@@ -874,45 +690,32 @@ class _QualificationScreenState extends State<QualificationScreen> {
                         'Add Another +',
                         style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
-                    ),
+                    ), //Add another button end
                   ),
 
                   const SizedBox(height: 10),
+
                   SizedBox(
                     width: double.infinity,
+                    //Next button
                     child: ElevatedButton(
                       onPressed: () async {
-                        final qualificationId =
-                            await _storeQualification(); // Store qualification and get the row ID
-
+                        final qualificationId = await controller.storeQualification(context);
                         if (qualificationId != null &&
-                            _qualificationFile != null) {
-                          // Upload the file for this specific qualification
-                          await uploadFileToSupabase(
-                              _qualificationFile!, qualificationId);
-
-                          final userId =
-                              Supabase.instance.client.auth.currentUser?.id;
-
-                          if (userId != null) {
-                            // Only update profile completion steps when the user explicitly presses the button
-                            await _updateProfileCompletionSteps(userId);
-
-                            // Ensure that the qualification step is completed before navigating
-                            final isQualificationCompleted =
-                                await _isQualificationStepCompleted();
-
-                            // Check if the qualification step is truly completed, and navigate if so
-                            if (isQualificationCompleted) {
-                              // Navigate to the next screen after updating the profile
+                            controller.qualification.qualificationFile.value !=
+                                null) {
+                          await controller.uploadFileToSupabase(
+                              controller.qualification.qualificationFile.value!,
+                              qualificationId);
                               Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TeachingDetail()),
-                              );
-                            }
-                          }
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TeachingDetail(),
+                          ),
+                        );
                         }
+
+                        
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff87e64c),
@@ -925,7 +728,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
                         'Next',
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
-                    ),
+                    ), //Next button end
                   ),
                 ],
               ),
@@ -935,10 +738,6 @@ class _QualificationScreenState extends State<QualificationScreen> {
       ),
     );
   }
-}
-
-extension on PostgrestList {
-  get error => null;
 }
 
 class DashedBorderPainter extends CustomPainter {
