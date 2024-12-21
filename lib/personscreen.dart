@@ -102,7 +102,7 @@ class _PersonScreenState extends State<PersonScreen> {
                       ),
                     ),
                   ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 35),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -115,7 +115,7 @@ class _PersonScreenState extends State<PersonScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 130, vertical: 10),
                       ),
                       child: const Text(
                         'Edit Profile',
