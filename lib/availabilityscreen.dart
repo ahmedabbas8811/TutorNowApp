@@ -3,8 +3,9 @@ import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
-
-import 'package:newifchaly/utils/editavailability_screen.dart'; 
+import 'package:newifchaly/editavailability_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart';
 
 class AvailabilityScreen extends StatefulWidget {
   @override
@@ -12,29 +13,34 @@ class AvailabilityScreen extends StatefulWidget {
 }
 
 class _AvailabilityScreenState extends State<AvailabilityScreen> {
-  int _selectedIndex = 1; // Set default index to "Availability"
+  int _selectedIndex = 1; // Default index for "Availability"
 
-  // Track the availability for each day
-  final Map<String, bool> _availability = {
-    'Monday': false,
-    'Tuesday': false,
-    'Wednesday': false,
-    'Thursday': true,
-    'Friday': true,
-    'Saturday': true,
-    'Sunday': false,
-  };
+  // Fetch availability data where is_available is true
+  Future<List<Map<String, dynamic>>> _fetchAvailabilityData() async {
+    try {
+      // Fetch only the rows where `is_available` is true
+      final List<dynamic> data = await Supabase.instance.client
+          .from('availability')
+          .select('day, slots')
+          .eq('is_available', true); // Filter rows where is_available is true
 
-  // Corresponding time slots for each day
-  final Map<String, String> _timeSlots = {
-    'Monday': '08:00 - 12:00',
-    'Tuesday': '12:00 - 16:00',
-    'Wednesday': '16:00 - 20:00',
-    'Thursday': '20:00 - 00:00',
-    'Friday': '00:00 - 04:00',
-    'Saturday': '04:00 - 08:00',
-    'Sunday': '08:00 - 12:00',
-  };
+      return data.map((e) => e as Map<String, dynamic>).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch availability: $e');
+    }
+  }
+
+  // Convert time from 24-hour to 12-hour format
+  String _convertTo12HourFormat(String timeRange) {
+    final times = timeRange.split('-'); // Split start and end times
+    final start = DateFormat("HH:mm").parse(times[0].trim());
+    final end = DateFormat("HH:mm").parse(times[1].trim());
+
+    final formattedStart = DateFormat("hh:mm a").format(start);
+    final formattedEnd = DateFormat("hh:mm a").format(end);
+
+    return '$formattedStart - $formattedEnd';
+  }
 
   // Handle bottom navigation bar tap
   void _onItemTapped(int index) {
@@ -42,7 +48,6 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       _selectedIndex = index;
     });
 
-    // Navigate to a new page based on the selected index
     switch (index) {
       case 0:
         Navigator.push(
@@ -86,17 +91,17 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 40), // Adjusted spacing here
+            const SizedBox(height: 40),
             const Text(
               'Set Availability',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 4), // Less space between texts
+            const SizedBox(height: 4),
             const Text(
               'Sessions that are already booked are not affected by changing availability',
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
-            const SizedBox(height: 4), // Less space before "Edit Schedule"
+            const SizedBox(height: 4),
             Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
@@ -105,41 +110,85 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => EditAvailabilityScreen()),
+                      builder: (context) => EditAvailabilityScreen(),
+                    ),
                   );
                 },
                 child: const Text(
                   'Edit Schedule',
                   style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 17),
+                    decoration: TextDecoration.underline,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                  ),
                 ),
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: _availability.length,
-                itemBuilder: (context, index) {
-                  String day = _availability.keys.elementAt(index);
-                  bool isAvailable = _availability[day]!;
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 3.0),
-                    title: Text(
-                      day,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black, // Set text color to black
-                      ),
-                    ),
-                    subtitle: Text(
-                      _timeSlots[day]!,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black, // Set text color to black
-                      ),
-                    ),
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _fetchAvailabilityData(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Error: ${snapshot.error}'),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text('No availability data found'),
+                    );
+                  }
+
+                  final availabilityData = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: availabilityData.length,
+                    itemBuilder: (context, index) {
+                      final dayData = availabilityData[index];
+                      final day = dayData['day'] as String;
+                      final slots = dayData['slots'] as List<dynamic>;
+
+                      return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(vertical: 3.0),
+                        title: Text(
+                          day,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: slots.map((slot) {
+                            if (slot is Map<String, dynamic>) {
+                              final startTime = slot['start'] ?? '';
+                              final endTime = slot['end'] ?? '';
+                              return Text(
+                                _convertTo12HourFormat('$startTime-$endTime'),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              );
+                            } else if (slot is String) {
+                              return Text(
+                                _convertTo12HourFormat(slot),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              );
+                            } else {
+                              return const Text(
+                                'Invalid slot format',
+                                style: TextStyle(color: Colors.red),
+                              );
+                            }
+                          }).toList(),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -156,26 +205,13 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
         showSelectedLabels: true,
         showUnselectedLabels: true,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+              icon: Icon(Icons.event_available), label: 'Availability'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event_available),
-            label: 'Availability',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.video_camera_front),
-            label: 'Sessions',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Earnings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+              icon: Icon(Icons.video_camera_front), label: 'Sessions'),
+          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Earnings'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         onTap: _onItemTapped,
       ),
