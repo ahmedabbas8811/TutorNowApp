@@ -545,6 +545,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:newifchaly/Profile_Verification_screen.dart';
+import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
 import 'package:newifchaly/views/widgets/snackbar.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -834,9 +835,43 @@ class _TeachingDetailState extends State<TeachingDetail> {
                       Navigator.pop(context); // Go back to the previous screen
                     },
                   ),
-                  const Text(
-                    'Add Teaching Experience',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: const Text(
+                          'Add Teaching Experience',
+                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfileScreen(),
+                              ),
+                            );
+                          },
+                          style: ButtonStyle(
+                            overlayColor:
+                                WidgetStateProperty.resolveWith<Color?>(
+                              (Set<WidgetState> states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return Colors.green.shade100;
+                                }
+                                return null; // Default behavior
+                              },
+                            ),
+                          ),
+                          child: const Text(
+                            "Skip For Now",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                //  decorationStyle: TextDecorationStyle.solid,
+                                decoration: TextDecoration.underline),
+                          ))
+                    ],
+                    
                   ),
                   const SizedBox(height: 15),
 
