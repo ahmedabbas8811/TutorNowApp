@@ -9,6 +9,7 @@ class ApproveTutorsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey,
       body: Row(
         children: [
           // Sidebar

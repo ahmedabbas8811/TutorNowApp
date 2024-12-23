@@ -3,7 +3,6 @@ import 'package:form_validator/form_validator.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/utils/features/auth/auth_controller.dart';
 import 'package:newifchaly/utils/form_validators.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login_screen.dart'; // Import login screen to navigate
 
 class RegisterScreen extends StatefulWidget {
@@ -62,6 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   String? groupValue = 'null';
+
   @override
   void dispose() {
     // Dispose controllers and focus nodes when not needed
@@ -193,10 +193,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   focusNode: _nameFocusNode,
                   cursorColor: Colors.grey,
                   style: TextStyle(
-                      color: _isNameFilled ? Colors.black : Colors.grey), // Text color changes dynamically
-                  decoration: _inputDecoration('Your Full Name', _nameFocusNode, _nameController),
+                      color: _isNameFilled
+                          ? Colors.black
+                          : Colors.grey), // Text color changes dynamically
+                  decoration: _inputDecoration(
+                      'Your Full Name', _nameFocusNode, _nameController),
                   validator: ValidationBuilder()
-                      .minLength(2, 'Full Name must be at least 2 characters long')
+                      .minLength(
+                          2, 'Full Name must be at least 2 characters long')
                       .maxLength(50, 'Full Name can’t exceed 50 characters')
                       .build(),
                   onChanged: (text) {
@@ -213,8 +217,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   focusNode: _emailFocusNode,
                   cursorColor: Colors.grey,
                   style: TextStyle(
-                      color: _isEmailFilled ? Colors.black : Colors.grey), // Text color changes dynamically
-                  decoration: _inputDecoration('youremail@gmail.com', _emailFocusNode, _emailController),
+                      color: _isEmailFilled
+                          ? Colors.black
+                          : Colors.grey), // Text color changes dynamically
+                  decoration: _inputDecoration(
+                      'youremail@gmail.com', _emailFocusNode, _emailController),
                   validator: ValidationBuilder().email().build(),
                   onChanged: (text) {
                     setState(() {
@@ -230,10 +237,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   focusNode: _passwordFocusNode,
                   cursorColor: Colors.grey,
                   style: TextStyle(
-                      color: _isPasswordFilled ? Colors.black : Colors.grey), // Text color changes dynamically
-                  decoration: _inputDecoration('Choose A Strong Password', _passwordFocusNode, _passwordController).copyWith(
+                      color: _isPasswordFilled
+                          ? Colors.black
+                          : Colors.grey), // Text color changes dynamically
+                  decoration: _inputDecoration('Choose A Strong Password',
+                          _passwordFocusNode, _passwordController)
+                      .copyWith(
                     suffixIcon: IconButton(
-                      icon: Icon(_showPassword ? Icons.visibility : Icons.visibility_off),
+                      icon: Icon(_showPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off),
                       onPressed: () {
                         setState(() {
                           _showPassword = !_showPassword;
@@ -257,10 +270,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   focusNode: _confirmPasswordFocusNode,
                   cursorColor: Colors.grey,
                   style: TextStyle(
-                      color: _isConfirmPasswordFilled ? Colors.black : Colors.grey), // Text color changes dynamically
-                  decoration: _inputDecoration('Confirm Your Password', _confirmPasswordFocusNode, _confirmPasswordController).copyWith(
+                      color: _isConfirmPasswordFilled
+                          ? Colors.black
+                          : Colors.grey), // Text color changes dynamically
+                  decoration: _inputDecoration('Confirm Your Password',
+                          _confirmPasswordFocusNode, _confirmPasswordController)
+                      .copyWith(
                     suffixIcon: IconButton(
-                      icon: Icon(_showConfirmPassword ? Icons.visibility : Icons.visibility_off),
+                      icon: Icon(_showConfirmPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off),
                       onPressed: () {
                         setState(() {
                           _showConfirmPassword = !_showConfirmPassword;
@@ -292,7 +311,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('Already have an account?', style: TextStyle(color: Colors.grey[650])),
+                    Text('Already have an account?',
+                        style: TextStyle(color: Colors.grey[650])),
                     TextButton(
                       onPressed: () {
                         Navigator.push(
@@ -300,7 +320,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             MaterialPageRoute(
                                 builder: (context) => LoginScreen()));
                       },
-                      child: const Text('Login', style: TextStyle(color: Colors.black)),
+                      child: const Text('Login',
+                          style: TextStyle(color: Colors.black)),
                     ),
                   ],
                 ),
@@ -328,8 +349,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     child: Text(
-                        controller.signupLoading.value ? "Loading..." : "Signup",
-                        style: const TextStyle(fontSize: 18, color: Colors.white)),
+                        controller.signupLoading.value
+                            ? "Loading..."
+                            : "Signup",
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.white)),
                   ),
                 ),
               ],
