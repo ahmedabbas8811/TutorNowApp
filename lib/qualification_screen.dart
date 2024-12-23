@@ -537,21 +537,68 @@ class _QualificationScreenState extends State<QualificationScreen> {
                   const SizedBox(height: 20),
 
                   // Education Level Input
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Education Level',
-                      labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: 'Ex. Matric',
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8)
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          labelText: 'Education Level',
+                          labelStyle: const TextStyle(color: Colors.grey),
+                          hintText: 'Ex. Matric',
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8)
+                        ),
+                        ),
+                        dropdownColor: Colors.grey[100],
+                        
+                        value:
+                            controller.qualification.educationLevel.value.isNotEmpty
+                                ? controller.qualification.educationLevel.value
+                                : null, // Current value or null
+                        items: [
+                          'Matric',
+                          'Intermediate',
+                          'Bachelors',
+                          'Masters',
+                          'PhD'
+                        ].map((level) {
+                          return DropdownMenuItem<String>(
+                            value: level,
+                            child: Text(level),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            controller.qualification.educationLevel.value = value;
+                          }
+                        },
                       ),
                     ),
-                    keyboardAppearance: Brightness.light,
-                    onChanged: (value) =>
-                        controller.qualification.educationLevel.value = value,
                   ),
+
+                  // TextField(
+                  //   decoration: InputDecoration(
+                  //     labelText: 'Education Level',
+                  //     labelStyle: const TextStyle(color: Colors.grey),
+                  //     hintText: 'Ex. Matric',
+                  //     hintStyle: const TextStyle(color: Colors.grey),
+                  //     border: OutlineInputBorder(
+                  //       borderRadius: BorderRadius.circular(8),
+                  //       borderSide: const BorderSide(color: Colors.grey),
+                  //     ),
+                  //   ),
+                  //   keyboardAppearance: Brightness.light,
+                  //   onChanged: (value) =>
+                  //       controller.qualification.educationLevel.value = value,
+                  // ),
                   const SizedBox(height: 15),
 
                   // Institute Name Input
@@ -607,7 +654,8 @@ class _QualificationScreenState extends State<QualificationScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: InkWell(
-                            onTap: () => controller.pickQualificationFile(context),
+                            onTap: () =>
+                                controller.pickQualificationFile(context),
                             child: Container(
                               width: double.infinity,
                               height: 140,
@@ -700,22 +748,21 @@ class _QualificationScreenState extends State<QualificationScreen> {
                     //Next button
                     child: ElevatedButton(
                       onPressed: () async {
-                        final qualificationId = await controller.storeQualification(context);
+                        final qualificationId =
+                            await controller.storeQualification(context);
                         if (qualificationId != null &&
                             controller.qualification.qualificationFile.value !=
                                 null) {
                           await controller.uploadFileToSupabase(
                               controller.qualification.qualificationFile.value!,
                               qualificationId);
-                              Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TeachingDetail(),
-                          ),
-                        );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TeachingDetail(),
+                            ),
+                          );
                         }
-
-                        
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff87e64c),

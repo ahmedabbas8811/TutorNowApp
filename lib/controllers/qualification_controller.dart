@@ -8,15 +8,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/qualification_model.dart';
 
 class QualificationController extends GetxController {
-  // Instance of QualificationModel
-  final QualificationModel qualification = QualificationModel();
+  final QualificationModel qualification = QualificationModel(); //instance of model
+  final user = Supabase.instance.client.auth.currentUser;
 
-  // Function to check if the location step is already completed
+  //function to check if the location step is already completed
   Future<bool> isQualificationCompleted() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user != null) {
       try {
-        // Check if location is marked true in the profile_completion_steps table
+        //check if location is marked true in the completion steps table
         final response = await Supabase.instance.client
             .from('profile_completion_steps')
             .select('qualification')
@@ -25,7 +25,7 @@ class QualificationController extends GetxController {
 
         if (response != null && response['qualification'] == true) {
           print("Qualification step is already completed.");
-          return true; // Step is already completed
+          return true; //Step is already completed
         } else {
           print("Qualification step is not completed.");
         }
@@ -33,10 +33,10 @@ class QualificationController extends GetxController {
         print("Error checking location status: $e");
       }
     }
-    return false; // Step is not completed
+    return false; //Step is not completed
   }
 
-  // Function to pick the qualification file (PDF)
+  //Function to pick the file
   Future<void> pickQualificationFile(BuildContext context) async {
     bool isGranted = await _requestStoragePermission();
 
@@ -69,25 +69,25 @@ class QualificationController extends GetxController {
   // Request storage permission
   Future<bool> _requestStoragePermission() async {
     if (await Permission.storage.isGranted) {
-      return true; // Access is already granted
+      return true; //access is granted
     }
 
     if (await Permission.manageExternalStorage.isGranted) {
-      return true; // For Android 11 and above
+      return true; //for android 11 and above
     }
 
     if (await Permission.storage.request().isGranted) {
-      return true; // For Android 10 and below
+      return true; //for android 10 and below
     }
 
     if (await Permission.manageExternalStorage.request().isGranted) {
-      return true; // Manage External Storage for Android 11 and above
+      return true; //for android 11 and above
     }
 
     return false; // Permission denied
   }
 
-  // Show a dialog if permission is denied
+  //show dialog if permission is denied
   void showPermissionDeniedDialog() {
     Get.dialog(
       AlertDialog(
@@ -111,7 +111,7 @@ class QualificationController extends GetxController {
     );
   }
 
-  // Function to store qualification in Supabase
+  //sore qualification in Supabase
   Future<int?> storeQualification(BuildContext context) async {
     final user = Supabase.instance.client.auth.currentUser;
 
@@ -149,30 +149,33 @@ class QualificationController extends GetxController {
       print("Please fill all fields.");
       showCustomSnackBar( context, "Please Fill All Feilds");
     }
-    return null; // Return null if there's an error or missing fields
+    return null; 
   }
 
-  // Function to upload the file to Supabase storage
+  //upload the file to Supabase storage
   Future<void> uploadFileToSupabase(File file, int qualificationId) async {
     try {
-      // Upload the file to Supabase storage
+       final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filename = '$timestamp-${file.path.split('/').last}';
+      final id = user!.id;
+      
       final response = await Supabase.instance.client.storage
-          .from('qualification_docs') // Replace with your actual bucket name
-          .upload('public/${file.path.split('/').last}', file);
+          .from('qualification_docs')
+          .upload('$id/$filename', file);
 
-      // Get the public URL for the uploaded file
+      //get url for the uploaded file
       final fileUrl = Supabase.instance.client.storage
           .from('qualification_docs')
-          .getPublicUrl('public/${file.path.split('/').last}');
+          .getPublicUrl('$id/$filename');
 
-      print("File uploaded successfully: $fileUrl"); // Log the file URL
+      print("File uploaded successfully: $fileUrl"); 
       await updateQualificationUrl(fileUrl, qualificationId);
     } catch (e) {
-      print("Error uploading file: $e"); // Handle errors
+      print("Error uploading file: $e"); 
     }
   }
 
-  // Function to update the qualification URL in the database
+  //update the qualification url
   Future<void> updateQualificationUrl(
       String fileUrl, int qualificationId) async {
     try {
