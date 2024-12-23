@@ -607,7 +607,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: InkWell(
-                            onTap: () => controller.pickQualificationFile(),
+                            onTap: () => controller.pickQualificationFile(context),
                             child: Container(
                               width: double.infinity,
                               height: 140,

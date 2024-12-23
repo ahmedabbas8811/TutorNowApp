@@ -37,16 +37,27 @@ class QualificationController extends GetxController {
   }
 
   // Function to pick the qualification file (PDF)
-  Future<void> pickQualificationFile() async {
+  Future<void> pickQualificationFile(BuildContext context) async {
     bool isGranted = await _requestStoragePermission();
 
     if (isGranted) {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
+        
       );
-
+     
       if (result != null) {
+        final fileSize = result!.files.single.size ;
+    const maxFileSize = 5242880;
+        if(fileSize>maxFileSize){
+          
+          showCustomSnackBar(context, "Max file size is 5mb");
+          print("size is greater then 5 mb");
+          return;
+        }
+        
+
         qualification.qualificationFileName.value = result.files.single.name;
         qualification.qualificationFile.value = File(result.files.single.path!);
       }
