@@ -546,6 +546,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:newifchaly/Profile_Verification_screen.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
+import 'package:newifchaly/views/widgets/snackbar.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -561,6 +562,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
   TextEditingController _educationLevelController = TextEditingController();
   String? _qualificationFileName;
   File? _teachingDetailFile;
+  String? _selectedEducationLevel;
 
   // Function to show a date picker and set the selected date in TextEditingController
   Future<void> _selectDate(
@@ -581,14 +583,15 @@ class _TeachingDetailState extends State<TeachingDetail> {
 
   Future<int?> _storeTeachingExperience() async {
     final user = Supabase.instance.client.auth.currentUser;
-    final educationLevel = _educationLevelController.text;
+    final educationLevel = _selectedEducationLevel;
     final startDate = _startDateController.text;
     final endDate = _endDateController.text;
     final stillWorking = _switchValue;
 
-    if (user != null &&
-        _educationLevelController.text.isNotEmpty &&
-        _startDateController.text.isNotEmpty) {
+    if (user != null && _teachingDetailFile!=null &&
+        _startDateController.text.isNotEmpty && _selectedEducationLevel != null
+        && (_endDateController.text.isNotEmpty || _switchValue )
+        ) {
       try {
         final response =
             await Supabase.instance.client.from('experience').insert({
@@ -607,9 +610,23 @@ class _TeachingDetailState extends State<TeachingDetail> {
         }
       } catch (e) {
         print("Error storing teaching experience: $e");
+        showCustomSnackBar(context, "Server error occured, try after a while");
       }
     } else {
-      print("Please fill all fields.");
+      if(_selectedEducationLevel == null){
+        showCustomSnackBar(context, "Please select student education level");
+        return null;
+      }
+      else if(_startDateController.text.isEmpty){
+         showCustomSnackBar(context, "Please enter start date");
+        return null;
+      }
+      else if (_endDateController.text.isEmpty && !stillWorking){
+        showCustomSnackBar(context, "Either enter end date or mark as still working");
+        return null;
+      }
+      print("Please upload proof of qualification");
+      showCustomSnackBar(context, "Please upload proof of qualification");
     }
     return null;
   }
@@ -625,6 +642,14 @@ class _TeachingDetailState extends State<TeachingDetail> {
       );
 
       if (result != null) {
+         final fileSize = result!.files.single.size ;
+    const maxFileSize = 5242880;
+        if(fileSize>maxFileSize){
+          
+          showCustomSnackBar(context, "Max file size is 5mb");
+          print("size is greater then 5 mb");
+          return;
+        }
         setState(() {
           _qualificationFileName = result.files.single.name;
           _teachingDetailFile = File(result.files.single.path!);
@@ -686,15 +711,18 @@ class _TeachingDetailState extends State<TeachingDetail> {
 
   Future<void> _uploadTeachingFileToSupabase(File file, int teachingId) async {
     try {
+      final id = Supabase.instance.client.auth.currentUser!.id;
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filename = '$timestamp-${file.path.split('/').last}';
       // Upload the file to Supabase storage
       final response = await Supabase.instance.client.storage
           .from('experience_docs') // Replace with your actual bucket name
-          .upload('public/${file.path.split('/').last}', file);
+          .upload('$id/$filename', file);
 
       // Get the public URL for the uploaded file
       final fileUrl = Supabase.instance.client.storage
-          .from('teaching_docs')
-          .getPublicUrl('public/${file.path.split('/').last}');
+          .from('experience_docs')
+          .getPublicUrl('$id/$filename');
 
       print("File uploaded successfully: $fileUrl"); // Log the file URL
       await _updateTeachingExperienceUrl(fileUrl, teachingId);
@@ -813,29 +841,54 @@ class _TeachingDetailState extends State<TeachingDetail> {
                   const SizedBox(height: 15),
 
                   // TextField for Education level
-                 TextField(
-  controller: _educationLevelController,
-  cursorColor: Colors.grey,
-  decoration: InputDecoration(
-    labelText: 'Education Level of Students',
-    labelStyle: const TextStyle(color: Colors.grey),
-    hintText: 'Ex. Matric',
-    hintStyle: const TextStyle(color: Colors.grey),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.grey),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.grey),  // Set the border color to grey
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.grey),  // Set the border color to grey when focused
-    ),
-  ),
-  keyboardAppearance: Brightness.light,
-),
+                 // Education Level Input
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8)
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          labelText: 'Education Level Of Students',
+                          labelStyle: const TextStyle(color: Colors.grey),
+                          hintText: 'Ex. Under Matric',
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8)
+                        ),
+                        ),
+                        dropdownColor: Colors.grey[100],
+                        
+                        value:
+                            _selectedEducationLevel,
+                        items: [
+                          'Under Matric',
+                          'Matric',
+                          'Intermediate',
+                          'Bachelors',
+                          'Masters',
+                          'PhD'
+                        ].map((level) {
+                          return DropdownMenuItem<String>(
+                            value: level,
+                            child: Text(level),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            _selectedEducationLevel = value;
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+
+
 const SizedBox(height: 15),
 
 
