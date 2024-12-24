@@ -81,13 +81,15 @@ class ApproveTutorsScreen extends StatelessWidget {
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
-                        Expanded(
+                       
+                         Expanded(
                           child: Text(
-                            'Tutor ID',
+                            'Qualification',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
+
                       ],
                     ),
                   ),
@@ -115,7 +117,7 @@ class ApproveTutorsScreen extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    tutor.id,
+                                    tutor.qualification,
                                     style: const TextStyle(fontSize: 16),
                                   ),
                                 ),

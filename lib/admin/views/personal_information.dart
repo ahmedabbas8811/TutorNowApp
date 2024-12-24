@@ -134,23 +134,23 @@ class PersonalInformation extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        ElevatedButton.icon(
-          onPressed: (){},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-          ),
-          label: const Text(
-            'Reject Tutor',
-            style: TextStyle(color: Colors.white),
-          ),
-          icon: const Icon(
-            Icons.close,
-            color: Colors.white,
-          ),
-        ),
+        // ElevatedButton.icon(
+        //   onPressed: (){},
+        //   style: ElevatedButton.styleFrom(
+        //     backgroundColor: Colors.red,
+        //     shape: const RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.zero,
+        //     ),
+        //   ),
+        //   label: const Text(
+        //     'Reject Tutor',
+        //     style: TextStyle(color: Colors.white),
+        //   ),
+        //   icon: const Icon(
+        //     Icons.close,
+        //     color: Colors.white,
+        //   ),
+        // ),
       ],
     );
   }
