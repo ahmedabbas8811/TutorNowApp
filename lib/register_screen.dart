@@ -3,6 +3,7 @@ import 'package:form_validator/form_validator.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/utils/features/auth/auth_controller.dart';
 import 'package:newifchaly/utils/form_validators.dart';
+import 'package:newifchaly/views/widgets/snackbar.dart';
 import 'login_screen.dart'; // Import login screen to navigate
 
 class RegisterScreen extends StatefulWidget {
@@ -60,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  String? groupValue = 'null';
+  String? groupValue;
 
   @override
   void dispose() {
@@ -332,13 +333,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   () => ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
+                        if(groupValue == null){
+                          showCustomSnackBar(context, "PLease select user type");
+                        }
+                        else {
                         // Perform registration action
                         controller.signup(
                           _nameController.text,
                           _emailController.text,
                           _passwordController.text,
                           groupValue!,
-                        );
+                        );}
                       }
                     },
                     style: ElevatedButton.styleFrom(

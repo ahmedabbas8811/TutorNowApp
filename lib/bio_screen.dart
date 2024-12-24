@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/location2_screen.dart';
+import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
 import 'package:newifchaly/views/widgets/snackbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -16,14 +17,13 @@ class _BioScreenState extends State<BioScreen> {
   final BioController bioController = Get.put(BioController());
 
   final TextEditingController bioTextController = TextEditingController();
-  
-    @override
+
+  @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (await bioController.isBioCompleted()) {
-       
         final completionData =
             await ProfileCompletionHelper.fetchCompletionData();
         final incompleteSteps =
@@ -31,8 +31,7 @@ class _BioScreenState extends State<BioScreen> {
         ProfileCompletionHelper.navigateToNextScreen(context, incompleteSteps);
       }
     });
-   }
-
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +55,43 @@ class _BioScreenState extends State<BioScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Add Bio',
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+               const Expanded(
+                  child: Text(
+                    'Add Bio',
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                
+                      TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Location2Screen(),
+                              ),
+                            );
+                          },
+                          style:  ButtonStyle(
+                            overlayColor:
+                                WidgetStateProperty.resolveWith<Color?>(
+                              (Set<WidgetState> states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return Colors.green.shade100;
+                                }
+                                return null; // Default behavior
+                              },
+                            ),
+                          ),
+                          child: const Text(
+                            "Skip For Now",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                //  decorationStyle: TextDecorationStyle.solid,
+                                decoration: TextDecoration.underline),
+                          ))
+              ],
             ),
             SizedBox(height: 16),
             TextField(
@@ -78,47 +111,43 @@ class _BioScreenState extends State<BioScreen> {
                 hintText: 'Explain yourself in 2-3 lines...',
               ),
             ),
-         
             SizedBox(height: 16),
             Center(
               child: Row(
                 children: [
-                  
-                    Expanded(
-                      child: ElevatedButton(
-                            onPressed: () async {
-                                    final bioModel = BioModel(
-                                      bio: bioTextController.text,
-                                      userId: userId!,
-                                    );
-                                   final response = await bioController.saveBio(bioModel,context);
-                                    if(response!= null){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Location2Screen(),
-                                      ),
-                                    );}
-                                  
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xff87e64c),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final bioModel = BioModel(
+                          bio: bioTextController.text,
+                          userId: userId!,
+                        );
+                        final response =
+                            await bioController.saveBio(bioModel, context);
+                        if (response != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Location2Screen(),
                             ),
-                            child: const Text(
-                                    'Next',
-                                    style: TextStyle(fontSize: 18, color: Colors.black),
-                                  ),
-                          ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff87e64c),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'Next',
+                        style: TextStyle(fontSize: 18, color: Colors.black),
+                      ),
                     ),
-                  
-                  
+                  ),
                 ],
               ),
             ),
-         
           ],
         ),
       ),

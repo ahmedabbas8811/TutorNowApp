@@ -232,33 +232,32 @@ class _Location2ScreenState extends State<Location2Screen> {
   }
 
   Future<void> _pickImage() async {
-  final ImagePicker _picker = ImagePicker();
-  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
-  if (image != null) {
-    final File imageFile = File(image.path);
+    if (image != null) {
+      final File imageFile = File(image.path);
 
-    // Check file size
-    final int fileSize = await imageFile.length(); 
-    const int maxFileSize = 1048576; 
+      // Check file size
+      final int fileSize = await imageFile.length();
+      const int maxFileSize = 1048576;
 
-    if (fileSize > maxFileSize) {
-      print("The selected file is too large. Please choose a file smaller than 1 MB.");
-      showCustomSnackBar(context, "The selected file is too large. Please choose a file smaller than 1 MB.");
-    } else {
-      setState(() {
-        _image = imageFile;
-      });
+      if (fileSize > maxFileSize) {
+        print(
+            "The selected file is too large. Please choose a file smaller than 1 MB.");
+        showCustomSnackBar(context,
+            "The selected file is too large. Please choose a file smaller than 1 MB.");
+      } else {
+        setState(() {
+          _image = imageFile;
+        });
+      }
     }
   }
-}
-
 
   // Method to upload image and update database
   Future<bool> _uploadImage() async {
-    
-    if (_image == null) 
-    {
+    if (_image == null) {
       showCustomSnackBar(context, "PLease select image");
 
       return false;
@@ -269,11 +268,11 @@ class _Location2ScreenState extends State<Location2Screen> {
       if (user == null) {
         print("User not logged in.");
         showCustomSnackBar(context, "User not logged in");
-        
+
         return false;
       }
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final filename = '$timestamp-${file.path.split('/').last}'; 
+      final filename = '$timestamp-${file.path.split('/').last}';
       final id = user.id;
 
       final storageResponse = await Supabase.instance.client.storage
@@ -295,7 +294,8 @@ class _Location2ScreenState extends State<Location2Screen> {
       return true;
     } catch (e) {
       print("Error uploading image: $e");
-      showCustomSnackBar(context, "Technical error occured, please try after a while");
+      showCustomSnackBar(
+          context, "Technical error occured, please try after a while");
       return false;
     }
   }
@@ -361,7 +361,6 @@ class _Location2ScreenState extends State<Location2Screen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (await _isImageStepCompleted()) {
-      
         final completionData =
             await ProfileCompletionHelper.fetchCompletionData();
         final incompleteSteps =
@@ -391,9 +390,42 @@ class _Location2ScreenState extends State<Location2Screen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Upload your image',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+             Row(
+              children: [
+                Expanded(
+                  child: const Text(
+                    'Upload your image',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LocationScreen(),
+                              ),
+                            );
+                          },
+                          style: ButtonStyle(
+                            overlayColor:
+                                WidgetStateProperty.resolveWith<Color?>(
+                              (Set<WidgetState> states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return Colors.green.shade100;
+                                }
+                                return null; // Default behavior
+                              },
+                            ),
+                          ),
+                          child: const Text(
+                            "Skip For Now",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                //  decorationStyle: TextDecorationStyle.solid,
+                                decoration: TextDecoration.underline),
+                          ))
+              ],
             ),
             const SizedBox(height: 20),
             Center(
@@ -442,12 +474,13 @@ class _Location2ScreenState extends State<Location2Screen> {
               child: ElevatedButton(
                 onPressed: () async {
                   bool isImageUploaded = await _uploadImage();
-                  if (isImageUploaded){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LocationScreen()),
-                  );
-                }},
+                  if (isImageUploaded) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LocationScreen()),
+                    );
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff87e64c),
                   padding:

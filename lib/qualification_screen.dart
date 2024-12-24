@@ -500,7 +500,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
                 children: [
                   Row(
                     children: [
-                      Expanded(
+                     const Expanded(
                         child: const Text(
                           'Add Qualification',
                           style: TextStyle(

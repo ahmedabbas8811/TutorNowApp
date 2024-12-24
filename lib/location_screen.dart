@@ -131,9 +131,43 @@ class _LocationScreenState extends State<LocationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Select your location',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Expanded(
+                  child: const Text(
+                    'Select your location',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                
+                      TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CnicScreen(),
+                              ),
+                            );
+                          },
+                          style: ButtonStyle(
+                            overlayColor:
+                                WidgetStateProperty.resolveWith<Color?>(
+                              (Set<WidgetState> states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return Colors.green.shade100;
+                                }
+                                return null; // Default behavior
+                              },
+                            ),
+                          ),
+                          child: const Text(
+                            "Skip For Now",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                //  decorationStyle: TextDecorationStyle.solid,
+                                decoration: TextDecoration.underline),
+                          ))
+              ],
             ),
             const SizedBox(height: 20),
                         // Province and City Dropdown
