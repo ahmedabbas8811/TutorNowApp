@@ -14,91 +14,90 @@ class ProfileController extends GetxController {
   var selectedIndex = 0.obs;
 
   var profile = ProfileModel(
-    name: "",
-    isProfileComplete: false,
-    upcomingBookings: [],
-    stepscount: 2,
-    isVerified: false
-  ).obs;
+          name: "",
+          isProfileComplete: false,
+          upcomingBookings: [],
+          stepscount: 2,
+          isVerified: false)
+      .obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchUserName(); 
+    fetchUserName();
     updateVerificationStatus();
     updateProfileStatus();
     fetchProfileCompletionData();
-    
   }
- 
-Future<void> updateProfileStatus() async {
-  // Reference to your Supabase client
-  final supabase = Supabase.instance.client;
-  final user = Supabase.instance.client.auth.currentUser;
 
-  try {
-    // Query the profile table
-    final response = await supabase
-        .from('profile_completion_steps') // Replace with your actual table name
-        .select('image, location,cnic,qualification,exp,bios') // Add other columns if necessary
-        .eq('user_id', user!.id) // Filter by the user's ID or your condition
-        .single(); // Fetch a single record
-
-    if (response == null) {
-      throw Exception("Profile not found");
-    }
-
-    // Check if all columns are true
-    final data = response as Map<String, dynamic>;
-    final areAllTrue = data.values.every((value) => value == true);
-    if (response != null && areAllTrue){
-       profile.update((p) {
-            p?.isProfileComplete = true;
-          });
-
-    }
-  } catch (error) {
-    print("Error checking columns: $error");
-   
+  @override
+  void onReady() {
+    super.onReady();
+    updateVerificationStatus();
+    updateProfileStatus();
+    fetchProfileCompletionData();
   }
-}
 
+  Future<void> updateProfileStatus() async {
+    // Reference to your Supabase client
+    final supabase = Supabase.instance.client;
+    final user = Supabase.instance.client.auth.currentUser;
 
-Future<void> updateVerificationStatus() async {
-  // Reference to your Supabase client
-  final supabase = Supabase.instance.client;
-  final user = Supabase.instance.client.auth.currentUser;
+    try {
+      // Query the profile table
+      final response = await supabase
+          .from(
+              'profile_completion_steps') // Replace with your actual table name
+          .select(
+              'image, location,cnic,qualification,exp,bios') // Add other columns if necessary
+          .eq('user_id', user!.id) // Filter by the user's ID or your condition
+          .single(); // Fetch a single record
 
-  try {
-    // Query the profile table
-    final response = await supabase
-        .from('users') // Replace with your actual table name
-        .select('is_verified') // Add other columns if necessary
-        .eq('id', user!.id) // Filter by the user's ID or your condition
-        .single(); // Fetch a single record
+      if (response == null) {
+        throw Exception("Profile not found");
+      }
 
-    if (response == null) {
-      throw Exception("Profile not found");
+      // Check if all columns are true
+      final data = response as Map<String, dynamic>;
+      final areAllTrue = data.values.every((value) => value == true);
+      if (response != null && areAllTrue) {
+        profile.update((p) {
+          p?.isProfileComplete = true;
+        });
+      }
+    } catch (error) {
+      print("Error checking columns: $error");
     }
-
-    // Check if all columns are true
-    
-    if (response != null && response['is_verified']==true){
-       profile.update((p) {
-            p?.isVerified= true;
-          });
-
-    }
-  } catch (error) {
-    print("Error checking columns: $error");
-   
   }
-}
 
+  Future<void> updateVerificationStatus() async {
+    // Reference to your Supabase client
+    final supabase = Supabase.instance.client;
+    final user = Supabase.instance.client.auth.currentUser;
 
+    try {
+      // Query the profile table
+      final response = await supabase
+          .from('users') // Replace with your actual table name
+          .select('is_verified') // Add other columns if necessary
+          .eq('id', user!.id) // Filter by the user's ID or your condition
+          .single(); // Fetch a single record
 
+      if (response == null) {
+        throw Exception("Profile not found");
+      }
 
+      // Check if all columns are true
 
+      if (response != null && response['is_verified'] == true) {
+        profile.update((p) {
+          p?.isVerified = true;
+        });
+      }
+    } catch (error) {
+      print("Error checking columns: $error");
+    }
+  }
 
   // Fetch the user's name from the database
   Future<void> fetchUserName() async {

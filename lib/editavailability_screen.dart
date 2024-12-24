@@ -162,8 +162,6 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
       print("No user is logged in.");
     }
   }
-
-  // Select a time for the time slot
  // Select a time for the time slot
 Future<void> _selectTime(
     BuildContext context, String day, int slotIndex, int timeIndex) async {

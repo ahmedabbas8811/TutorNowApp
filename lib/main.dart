@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/admin/views/confirmation_screen.dart';
-import 'package:newifchaly/bio_screen.dart';
 import 'package:newifchaly/login_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/storage_service.dart';
@@ -46,3 +45,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
+

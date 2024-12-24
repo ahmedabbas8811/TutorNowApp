@@ -589,10 +589,11 @@ class _TeachingDetailState extends State<TeachingDetail> {
     final endDate = _endDateController.text;
     final stillWorking = _switchValue;
 
-    if (user != null && _teachingDetailFile!=null &&
-        _startDateController.text.isNotEmpty && _selectedEducationLevel != null
-        && (_endDateController.text.isNotEmpty || _switchValue )
-        ) {
+    if (user != null &&
+        _teachingDetailFile != null &&
+        _startDateController.text.isNotEmpty &&
+        _selectedEducationLevel != null &&
+        (_endDateController.text.isNotEmpty || _switchValue)) {
       try {
         final response =
             await Supabase.instance.client.from('experience').insert({
@@ -614,16 +615,15 @@ class _TeachingDetailState extends State<TeachingDetail> {
         showCustomSnackBar(context, "Server error occured, try after a while");
       }
     } else {
-      if(_selectedEducationLevel == null){
+      if (_selectedEducationLevel == null) {
         showCustomSnackBar(context, "Please select student education level");
         return null;
-      }
-      else if(_startDateController.text.isEmpty){
-         showCustomSnackBar(context, "Please enter start date");
+      } else if (_startDateController.text.isEmpty) {
+        showCustomSnackBar(context, "Please enter start date");
         return null;
-      }
-      else if (_endDateController.text.isEmpty && !stillWorking){
-        showCustomSnackBar(context, "Either enter end date or mark as still working");
+      } else if (_endDateController.text.isEmpty && !stillWorking) {
+        showCustomSnackBar(
+            context, "Either enter end date or mark as still working");
         return null;
       }
       print("Please upload proof of qualification");
@@ -643,10 +643,9 @@ class _TeachingDetailState extends State<TeachingDetail> {
       );
 
       if (result != null) {
-         final fileSize = result!.files.single.size ;
-    const maxFileSize = 5242880;
-        if(fileSize>maxFileSize){
-          
+        final fileSize = result!.files.single.size;
+        const maxFileSize = 5000000;
+        if (fileSize > maxFileSize) {
           showCustomSnackBar(context, "Max file size is 5mb");
           print("size is greater then 5 mb");
           return;
@@ -817,9 +816,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       backgroundColor: Colors.white,
-    
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
@@ -828,7 +825,9 @@ class _TeachingDetailState extends State<TeachingDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 25,),
+                  SizedBox(
+                    height: 25,
+                  ),
                   IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.black),
                     onPressed: () {
@@ -840,7 +839,8 @@ class _TeachingDetailState extends State<TeachingDetail> {
                       Expanded(
                         child: const Text(
                           'Add Teaching Experience',
-                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 28, fontWeight: FontWeight.bold),
                         ),
                       ),
                       TextButton(
@@ -871,16 +871,14 @@ class _TeachingDetailState extends State<TeachingDetail> {
                                 decoration: TextDecoration.underline),
                           ))
                     ],
-                    
                   ),
                   const SizedBox(height: 15),
 
                   // TextField for Education level
-                 // Education Level Input
+                  // Education Level Input
                   Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8)
-                    ),
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(8)),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButtonFormField<String>(
                         decoration: InputDecoration(
@@ -892,15 +890,12 @@ class _TeachingDetailState extends State<TeachingDetail> {
                             borderRadius: BorderRadius.circular(8),
                             borderSide: const BorderSide(color: Colors.grey),
                           ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8)
-                        ),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(8)),
                         ),
                         dropdownColor: Colors.grey[100],
-                        
-                        value:
-                            _selectedEducationLevel,
+                        value: _selectedEducationLevel,
                         items: [
                           'Under Matric',
                           'Matric',
@@ -923,83 +918,87 @@ class _TeachingDetailState extends State<TeachingDetail> {
                     ),
                   ),
 
-
-const SizedBox(height: 15),
-
+                  const SizedBox(height: 15),
 
                   // TextField for selecting start date
-                TextField(
-  controller: _startDateController,
-  readOnly: true,
-  decoration: InputDecoration(
-    labelText: 'Start Date',
-    labelStyle: const TextStyle(color: Colors.grey),
-    hintText: 'Select Start Date',
-    suffixIcon: IconButton(
-      icon: const Icon(Icons.calendar_today, color: Colors.grey),
-      onPressed: () => _selectDate(context, _startDateController),
-    ),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.grey),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.grey),  // Grey border when enabled
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.grey),  // Grey border when focused
-    ),
-  ),
-  keyboardAppearance: Brightness.light,
-),
-const SizedBox(height: 20),
-
+                  TextField(
+                    controller: _startDateController,
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: 'Start Date',
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      hintText: 'Select Start Date',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_today,
+                            color: Colors.grey),
+                        onPressed: () =>
+                            _selectDate(context, _startDateController),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                            color: Colors.grey), // Grey border when enabled
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                            color: Colors.grey), // Grey border when focused
+                      ),
+                    ),
+                    keyboardAppearance: Brightness.light,
+                  ),
+                  const SizedBox(height: 20),
 
                   // TextField for selecting end date
-                TextField(
-  controller: _endDateController,
-  readOnly: true,
-  enabled: !_switchValue, // Disable when "I Still Work Here" is active
-  decoration: InputDecoration(
-    labelText: 'End Date',
-    labelStyle: const TextStyle(color: Colors.grey),
-    hintText: 'Select End Date',
-    suffixIcon: IconButton(
-      icon: const Icon(Icons.calendar_today, color: Colors.grey),
-      onPressed: !_switchValue
-          ? () => _selectDate(context, _endDateController)
-          : null,
-    ),
-    filled: _switchValue,
-    fillColor: _switchValue
-        // ignore: deprecated_member_use
-        ? const Color(0xff87e64c).withOpacity(0.4)
-        : null,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.grey),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.grey), // Grey border when enabled
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.grey), // Grey border when focused
-    ),
-  ),
-  style: TextStyle(
-    color: _switchValue
-        // ignore: deprecated_member_use
-        ? Colors.grey.withOpacity(0.5)
-        : Colors.black,
-  ),
-  keyboardAppearance: Brightness.light,
-),
-const SizedBox(height: 5),
-
+                  TextField(
+                    controller: _endDateController,
+                    readOnly: true,
+                    enabled:
+                        !_switchValue, // Disable when "I Still Work Here" is active
+                    decoration: InputDecoration(
+                      labelText: 'End Date',
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      hintText: 'Select End Date',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_today,
+                            color: Colors.grey),
+                        onPressed: !_switchValue
+                            ? () => _selectDate(context, _endDateController)
+                            : null,
+                      ),
+                      filled: _switchValue,
+                      fillColor: _switchValue
+                          // ignore: deprecated_member_use
+                          ? const Color(0xff87e64c).withOpacity(0.4)
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                            color: Colors.grey), // Grey border when enabled
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                            color: Colors.grey), // Grey border when focused
+                      ),
+                    ),
+                    style: TextStyle(
+                      color: _switchValue
+                          // ignore: deprecated_member_use
+                          ? Colors.grey.withOpacity(0.5)
+                          : Colors.black,
+                    ),
+                    keyboardAppearance: Brightness.light,
+                  ),
+                  const SizedBox(height: 5),
 
                   Padding(
                     padding: const EdgeInsets.all(8.0),

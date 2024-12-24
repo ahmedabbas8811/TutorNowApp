@@ -500,10 +500,12 @@ class _QualificationScreenState extends State<QualificationScreen> {
                 children: [
                   Row(
                     children: [
-                      const Text(
-                        'Add Qualification',
-                        style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: const Text(
+                          'Add Qualification',
+                          style: TextStyle(
+                              fontSize: 28, fontWeight: FontWeight.bold),
+                        ),
                       ),
                       TextButton(
                           onPressed: () {
@@ -538,9 +540,8 @@ class _QualificationScreenState extends State<QualificationScreen> {
 
                   // Education Level Input
                   Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8)
-                    ),
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(8)),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButtonFormField<String>(
                         decoration: InputDecoration(
@@ -552,17 +553,16 @@ class _QualificationScreenState extends State<QualificationScreen> {
                             borderRadius: BorderRadius.circular(8),
                             borderSide: const BorderSide(color: Colors.grey),
                           ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8)
-                        ),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(8)),
                         ),
                         dropdownColor: Colors.grey[100],
-                        
-                        value:
-                            controller.qualification.educationLevel.value.isNotEmpty
-                                ? controller.qualification.educationLevel.value
-                                : null, // Current value or null
+
+                        value: controller
+                                .qualification.educationLevel.value.isNotEmpty
+                            ? controller.qualification.educationLevel.value
+                            : null, // Current value or null
                         items: [
                           'Matric',
                           'Intermediate',
@@ -577,7 +577,8 @@ class _QualificationScreenState extends State<QualificationScreen> {
                         }).toList(),
                         onChanged: (value) {
                           if (value != null) {
-                            controller.qualification.educationLevel.value = value;
+                            controller.qualification.educationLevel.value =
+                                value;
                           }
                         },
                       ),

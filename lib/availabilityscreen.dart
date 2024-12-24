@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:newifchaly/controllers/profile_controller.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
@@ -50,10 +52,11 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
 
     switch (index) {
       case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ProfileScreen()),
-        );
+        Get.to(() => ProfileScreen(), binding: BindingsBuilder(() {
+          if (!Get.isRegistered<ProfileController>()) {
+            Get.put(ProfileController());
+          }
+        }));
         break;
       case 1:
         Navigator.push(
@@ -150,7 +153,8 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                       final slots = dayData['slots'] as List<dynamic>;
 
                       return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 3.0),
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 3.0),
                         title: Text(
                           day,
                           style: const TextStyle(
@@ -210,7 +214,8 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
               icon: Icon(Icons.event_available), label: 'Availability'),
           BottomNavigationBarItem(
               icon: Icon(Icons.video_camera_front), label: 'Sessions'),
-          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Earnings'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.attach_money), label: 'Earnings'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         onTap: _onItemTapped,
