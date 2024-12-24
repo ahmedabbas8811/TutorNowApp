@@ -334,7 +334,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
                         if(groupValue == null){
-                          showCustomSnackBar(context, "PLease select user type");
+                          showCustomSnackBar(context, "Please select user type");
                         }
                         else {
                         // Perform registration action
@@ -343,6 +343,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           _emailController.text,
                           _passwordController.text,
                           groupValue!,
+                          context
                         );}
                       }
                     },

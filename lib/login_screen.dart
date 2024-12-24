@@ -155,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller.loginLoading.value == false) {
                         // Perform login action if validation passes
                         controller.login(
-                            _emailController.text, _passwordController.text);
+                            _emailController.text, _passwordController.text, context);
                       final user = Supabase.instance.client.auth.currentUser;
                      if (user != null) {
                     print("User UUID: ${user.id}");

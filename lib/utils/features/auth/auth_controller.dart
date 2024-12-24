@@ -36,12 +36,14 @@
 // }
 
 import 'dart:developer';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/api/auth_api.dart';
 import 'package:newifchaly/cnic_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/supabase_service.dart';
+import 'package:newifchaly/views/widgets/snackbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthController extends GetxController {
@@ -55,7 +57,7 @@ class AuthController extends GetxController {
     super.onInit();
   }
 
-  void login(String email, String password) async {
+  void login(String email, String password , BuildContext context) async {
   loginLoading.value = true;
 
   try {
@@ -81,15 +83,15 @@ class AuthController extends GetxController {
         Get.offAll(() => ProfileScreen());
       }
     } else {
-      Get.snackbar("Login Failed", "Invalid email or password.");
+      showCustomSnackBar(context, "Login Failed Invalid email or password");
     }
   } catch (e) {
     loginLoading.value = false;
-    Get.snackbar("Login Error", "An error occurred during login.");
+    showCustomSnackBar(context, "An error occurred during login");
     log("Login error: $e");
   }
 }
-  void signup(String name, String email, String password, String groupValue) async {
+  void signup(String name, String email, String password, String groupValue, BuildContext context) async {
     signupLoading.value = true;
 
     try {
@@ -97,7 +99,6 @@ class AuthController extends GetxController {
       final AuthResponse response = await authApi.signup(name, email, password);
 
       if (response.user != null) {
-        // Add user type to the "users" table
         final userId = response.user!.id;
         await SupabaseService.supabase
             .from('users')
@@ -117,24 +118,26 @@ class AuthController extends GetxController {
 
         signupLoading.value = false;
 
-        Get.snackbar("Signup Success", "Account created successfully.");
+        showCustomSnackBar(context, "Signup Successfull");
         
       } else {
         signupLoading.value = false;
-        Get.snackbar("Signup Failed", "Could not create account.");
+        showCustomSnackBar(context, "Signup Failed! Try Again");
       }
     } catch (e) {
       signupLoading.value = false;
-      Get.snackbar("Signup Error", "An error occurred during signup.");
+      showCustomSnackBar(context, "An error occured during signup");
       log("Signup error: $e");
     }}
 
     // Change password
-  Future<void> changePassword(String currentPassword, String newPassword) async {
+  Future<void> changePassword(String currentPassword, String newPassword, BuildContext context) async {
     try {
       await authApi.changePassword(currentPassword, newPassword);
     } catch (e) {
+      showCustomSnackBar(context, "Error changing password");
       throw Exception("Error changing password: $e");
+      
     }
   }
 }
