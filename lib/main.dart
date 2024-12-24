@@ -7,6 +7,7 @@ import 'package:newifchaly/login_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/storage_service.dart';
 import 'package:newifchaly/services/supabase_service.dart';
+import 'package:newifchaly/utils/app_theme.dart';
 import 'package:newifchaly/utils/features/auth/auth_controller.dart';
 
 void main() async {
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) =>  ProfileScreen(),
         '/ApproveTutorsScreen': (context) => ApproveTutorsScreen(),
       },
+      theme: appTheme(),
     );
   }
 }

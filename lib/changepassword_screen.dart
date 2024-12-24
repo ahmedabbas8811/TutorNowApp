@@ -521,6 +521,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   await _authController.changePassword(
                     _currentPasswordController.text,
                     _newPasswordController.text,
+                    context
                   );
                   Get.snackbar("Password Changed",
                       "Your password has been successfully updated.");
