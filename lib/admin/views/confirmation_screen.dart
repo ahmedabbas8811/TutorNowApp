@@ -13,12 +13,14 @@ class ConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TutorConfirmationController controller = Get.put(TutorConfirmationController());
+    final TutorConfirmationController controller =
+        Get.put(TutorConfirmationController());
 
     // Fetch tutor details when the screen loads
     controller.fetchTutorDetails(tutorId);
 
     return Scaffold(
+      backgroundColor: Color(0xfff3f2f2),
       body: Row(
         children: [
           SideMenu(),
@@ -60,7 +62,8 @@ class ConfirmationScreen extends StatelessWidget {
                               userName: tutor.name,
                               userMail: tutor.email,
                               img_Url: tutor.imageUrl,
-                              userLocation: tutor.location, // Location now visible
+                              userLocation:
+                                  tutor.location, // Location now visible
                               onDownloadPressed: () {
                                 if (tutor.cnicUrl.isNotEmpty) {
                                   controller.openCNIC(tutor.cnicUrl);
@@ -73,7 +76,7 @@ class ConfirmationScreen extends StatelessWidget {
                                 }
                               },
                               onApprovePressed: () {
-                                controller.verifyTutor(tutorId);
+                                controller.verifyTutor(tutorId, context);
                               },
                             ),
                           ),

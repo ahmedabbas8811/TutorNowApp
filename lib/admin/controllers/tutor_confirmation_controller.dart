@@ -1,4 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:newifchaly/admin/views/approve_tutors.dart';
+import 'package:newifchaly/admin/views/confirmation_screen.dart';
+import 'package:newifchaly/views/widgets/snackbar.dart';
 import '../models/tutor_confirmation_model.dart';
 import '../models/supabase_service_tutor_confirmation.dart';
 
@@ -11,36 +15,35 @@ class TutorConfirmationController extends GetxController {
   var isLoading = false.obs;
 
   Future<void> fetchTutorDetails(String tutorId) async {
-  try {
-    isLoading.value = true;
+    try {
+      isLoading.value = true;
 
-    // Fetch tutor details from the 'users' table
-    final fetchedTutor = await _service.fetchTutorDetails(tutorId);
+      // Fetch tutor details from the 'users' table
+      final fetchedTutor = await _service.fetchTutorDetails(tutorId);
 
-    // Fetch location details from the 'location' table
-    final location = await _service.fetchLocation(tutorId);
+      // Fetch location details from the 'location' table
+      final location = await _service.fetchLocation(tutorId);
 
-    // Combine location data into a single string
-    final formattedLocation =
-        '${location['city']}, ${location['state']}, ${location['country']}';
+      // Combine location data into a single string
+      final formattedLocation =
+          '${location['city']}, ${location['state']}, ${location['country']}';
 
-    // Update the tutor object with the location
-    fetchedTutor.location = formattedLocation;
+      // Update the tutor object with the location
+      fetchedTutor.location = formattedLocation;
 
-    // Update the reactive tutor variable
-    tutor.value = fetchedTutor;
-    
-  } catch (e) {
-    Get.snackbar('Error', e.toString());
-  } finally {
-    isLoading.value = false;
+      // Update the reactive tutor variable
+      tutor.value = fetchedTutor;
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
+    } finally {
+      isLoading.value = false;
+    }
   }
-}
 
-  Future<void> verifyTutor(String tutorId) async {
+  Future<void> verifyTutor(String tutorId, BuildContext context) async {
     try {
       await _service.updateTutorVerification(tutorId);
-      Get.snackbar('Success', 'Tutor successfully verified!');
+      showCustomSnackBar(context, "Tutor Successfully Approved");
     } catch (e) {
       Get.snackbar('Error', e.toString());
     }
@@ -55,7 +58,8 @@ class TutorConfirmationController extends GetxController {
     try {
       final publicUrl = cnicUrl;
       if (await canLaunchUrl(Uri.parse(publicUrl))) {
-        await launchUrl(Uri.parse(publicUrl), mode: LaunchMode.externalApplication);
+        await launchUrl(Uri.parse(publicUrl),
+            mode: LaunchMode.externalApplication);
       } else {
         throw 'Could not launch $publicUrl';
       }

@@ -34,6 +34,7 @@ class ProfileController extends GetxController {
   void onReady() {
     super.onReady();
     updateVerificationStatus();
+    fetchUserName();
     updateProfileStatus();
     fetchProfileCompletionData();
   }

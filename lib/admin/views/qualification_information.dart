@@ -151,7 +151,7 @@ class _QualificationInformationState extends State<QualificationInformation> {
                       ),
                     ),
                     child: const Text(
-                      'Download',
+                      'View',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

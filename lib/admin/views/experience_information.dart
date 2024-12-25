@@ -165,7 +165,7 @@ class _ExperienceInformationState extends State<ExperienceInformation> {
                     ),
                   ),
                   child: const Text(
-                    'Download',
+                    'View',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
