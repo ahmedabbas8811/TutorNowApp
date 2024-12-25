@@ -9,7 +9,7 @@ class BioController extends GetxController {
 
   var charCount = 0.obs;
 
-  final int charLimit = 10;
+  final int charLimit = 150;
 
   void updateCharCount(String text) {
     charCount.value = text.length;
