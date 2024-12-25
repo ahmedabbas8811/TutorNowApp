@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:newifchaly/changepassword_screen.dart';
 import 'package:newifchaly/editprofile_screen.dart';
 import '../controllers/person_controller.dart';
 
@@ -106,20 +107,22 @@ class _PersonScreenState extends State<PersonScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Get.to(() => EditProfileScreen());
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff87e64c),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.to(() => ChangePasswordScreen());
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xff87e64c),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.all(16)
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 130, vertical: 10),
-                      ),
-                      child: const Text(
-                        'Edit Profile',
-                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        child: const Text(
+                          'Change Password',
+                          style: TextStyle(color: Colors.black, fontSize: 15),
+                        ),
                       ),
                     ),
                   ],

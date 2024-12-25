@@ -408,12 +408,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             const Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
-                  "Forgot Password",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.underline),
-                ),
+                // Text(
+                //   "Forgot Password",
+                //   style: TextStyle(
+                //       fontWeight: FontWeight.bold,
+                //       decoration: TextDecoration.underline),
+                // ),
               ],
             ),
             const SizedBox(height: 20),

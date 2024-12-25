@@ -96,114 +96,114 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       color: Colors.black),
                 ),
               ),
-              const SizedBox(height: 20),
+             // const SizedBox(height: 20),
               Column(
                 children: [
-                  const CircleAvatar(
-                    radius: 60,
-                    backgroundImage: AssetImage('assets/Ellipse 1.png'),
-                  ),
+                  // const CircleAvatar(
+                  //   radius: 60,
+                  //   backgroundImage: AssetImage('assets/Ellipse 1.png'),
+                  // ),
                   const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 30,
-                        height: 30,
-                        padding: const EdgeInsets.all(0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xff87e64c),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.edit, color: Colors.black),
-                          iconSize: 18,
-                        ),
-                      ),
-                      const SizedBox(width: 7),
-                      Container(
-                        width: 30,
-                        height: 30,
-                        padding: const EdgeInsets.all(0),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.delete, color: Colors.white),
-                          iconSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     Container(
+                  //       width: 30,
+                  //       height: 30,
+                  //       padding: const EdgeInsets.all(0),
+                  //       decoration: BoxDecoration(
+                  //         color: const Color(0xff87e64c),
+                  //         borderRadius: BorderRadius.circular(5),
+                  //       ),
+                  //       child: IconButton(
+                  //         onPressed: () {},
+                  //         icon: const Icon(Icons.edit, color: Colors.black),
+                  //         iconSize: 18,
+                  //       ),
+                  //     ),
+                  //     const SizedBox(width: 7),
+                  //     Container(
+                  //       width: 30,
+                  //       height: 30,
+                  //       padding: const EdgeInsets.all(0),
+                  //       decoration: BoxDecoration(
+                  //         color: Colors.red,
+                  //         borderRadius: BorderRadius.circular(5),
+                  //       ),
+                  //       child: IconButton(
+                  //         onPressed: () {},
+                  //         icon: const Icon(Icons.delete, color: Colors.white),
+                  //         iconSize: 18,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
-              const SizedBox(height: 20),
+             // const SizedBox(height: 20),
             
-              TextField(
-                controller: _fullNameController,
-                focusNode: _fullNameFocusNode,
-                cursorColor: Colors.grey,
-                decoration: InputDecoration(
-                  labelText: 'Full Name',
-                  hintText: 'Aliyan Rizvi',
-                  labelStyle: TextStyle(
-                    color: _fullNameController.text.isNotEmpty
-                        ? Colors.grey
-                        : (_fullNameFocusNode.hasFocus
-                            ? Colors.grey
-                            : Colors.black),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide(
-                      color: _fullNameController.text.isNotEmpty
-                          ? Colors.grey
-                          : (_fullNameFocusNode.hasFocus
-                              ? Colors.grey
-                              : Colors.grey),
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: Colors.grey),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
+              // TextField(
+              //   controller: _fullNameController,
+              //   focusNode: _fullNameFocusNode,
+              //   cursorColor: Colors.grey,
+              //   decoration: InputDecoration(
+              //     labelText: 'Full Name',
+              //     hintText: 'Aliyan Rizvi',
+              //     labelStyle: TextStyle(
+              //       color: _fullNameController.text.isNotEmpty
+              //           ? Colors.grey
+              //           : (_fullNameFocusNode.hasFocus
+              //               ? Colors.grey
+              //               : Colors.black),
+              //     ),
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(10.0),
+              //       borderSide: BorderSide(
+              //         color: _fullNameController.text.isNotEmpty
+              //             ? Colors.grey
+              //             : (_fullNameFocusNode.hasFocus
+              //                 ? Colors.grey
+              //                 : Colors.grey),
+              //       ),
+              //     ),
+              //     focusedBorder: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(10.0),
+              //       borderSide: const BorderSide(color: Colors.grey),
+              //     ),
+              //   ),
+              // ),
+             // const SizedBox(height: 20),
               
-              TextField(
-                controller: _emailController,
-                focusNode: _emailFocusNode,
-                cursorColor: Colors.grey,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'aliyanrizvi@gmail.com',
-                  labelStyle: TextStyle(
-                    color: _emailController.text.isNotEmpty
-                        ? Colors.grey
-                        : (_emailFocusNode.hasFocus
-                            ? Colors.grey
-                            : Colors.black),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide(
-                      color: _emailController.text.isNotEmpty
-                          ? Colors.grey
-                          : (_emailFocusNode.hasFocus
-                              ? Colors.grey
-                              : Colors.grey),
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: Colors.grey),
-                  ),
-                ),
-              ),
+              // TextField(
+              //   controller: _emailController,
+              //   focusNode: _emailFocusNode,
+              //   cursorColor: Colors.grey,
+              //   decoration: InputDecoration(
+              //     labelText: 'Email',
+              //     hintText: 'aliyanrizvi@gmail.com',
+              //     labelStyle: TextStyle(
+              //       color: _emailController.text.isNotEmpty
+              //           ? Colors.grey
+              //           : (_emailFocusNode.hasFocus
+              //               ? Colors.grey
+              //               : Colors.black),
+              //     ),
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(10.0),
+              //       borderSide: BorderSide(
+              //         color: _emailController.text.isNotEmpty
+              //             ? Colors.grey
+              //             : (_emailFocusNode.hasFocus
+              //                 ? Colors.grey
+              //                 : Colors.grey),
+              //       ),
+              //     ),
+              //     focusedBorder: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(10.0),
+              //       borderSide: const BorderSide(color: Colors.grey),
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 20),
               // Password Field
               TextField(

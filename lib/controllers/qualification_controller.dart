@@ -49,11 +49,11 @@ class QualificationController extends GetxController {
      
       if (result != null) {
         final fileSize = result!.files.single.size ;
-    const maxFileSize = 5242880;
+    const maxFileSize = 2000000;
         if(fileSize>maxFileSize){
           
-          showCustomSnackBar(context, "Max file size is 5mb");
-          print("size is greater then 5 mb");
+          showCustomSnackBar(context, "Max file size is 2mb");
+          print("size is greater then 2 mb");
           return;
         }
         
