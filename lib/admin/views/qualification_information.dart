@@ -73,10 +73,6 @@ class _QualificationInformationState extends State<QualificationInformation> {
   }
 
  
-  
-
-  
-  
 
   // Widget to display the qualification details dynamically
   @override

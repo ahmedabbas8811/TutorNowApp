@@ -9,12 +9,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
 
 class PersonController extends GetxController {
-    var profile = PersonModel(
-    name: "",
-    isProfileComplete: false,
-    profileImage: "assets/Ellipse 1.png",
-    isVerified: false
-  ).obs;
+  var profile = PersonModel(
+          name: "",
+          isProfileComplete: false,
+          profileImage: "assets/Ellipse 1.png",
+          isVerified: false)
+      .obs;
 
   @override
   void onInit() {
@@ -23,77 +23,73 @@ class PersonController extends GetxController {
     updateVerificationStatus();
     fetchUserImg();
     updateProfileStatus();
+    fetchQualifications();
+    fetchExperiences();
   }
 
   Future<void> updateVerificationStatus() async {
-  // Reference to your Supabase client
-  final supabase = Supabase.instance.client;
-  final user = Supabase.instance.client.auth.currentUser;
+    // Reference to your Supabase client
+    final supabase = Supabase.instance.client;
+    final user = Supabase.instance.client.auth.currentUser;
 
-  try {
-    // Query the profile table
-    final response = await supabase
-        .from('users') // Replace with your actual table name
-        .select('is_verified') // Add other columns if necessary
-        .eq('id', user!.id) // Filter by the user's ID or your condition
-        .single(); // Fetch a single record
+    try {
+      // Query the profile table
+      final response = await supabase
+          .from('users') // Replace with your actual table name
+          .select('is_verified') // Add other columns if necessary
+          .eq('id', user!.id) // Filter by the user's ID or your condition
+          .single(); // Fetch a single record
 
-    if (response == null) {
-      throw Exception("Profile not found");
+      if (response == null) {
+        throw Exception("Profile not found");
+      }
+
+      // Check if all columns are true
+
+      if (response != null && response['is_verified'] == true) {
+        profile.update((p) {
+          p?.isVerified = true;
+        });
+      }
+    } catch (error) {
+      print("Error checking columns: $error");
     }
-
-    // Check if all columns are true
-    
-    if (response != null && response['is_verified']==true){
-       profile.update((p) {
-            p?.isVerified= true;
-          });
-
-    }
-  } catch (error) {
-    print("Error checking columns: $error");
-   
   }
-}
 
+  Future<void> updateProfileStatus() async {
+    // Reference to your Supabase client
+    final supabase = Supabase.instance.client;
+    final user = Supabase.instance.client.auth.currentUser;
 
+    try {
+      // Query the profile table
+      final response = await supabase
+          .from(
+              'profile_completion_steps') // Replace with your actual table name
+          .select(
+              'image, location,cnic,qualification,exp,bios') // Add other columns if necessary
+          .eq('user_id', user!.id) // Filter by the user's ID or your condition
+          .single(); // Fetch a single record
 
-Future<void> updateProfileStatus() async {
-  // Reference to your Supabase client
-  final supabase = Supabase.instance.client;
-  final user = Supabase.instance.client.auth.currentUser;
+      if (response == null) {
+        throw Exception("Profile not found");
+      }
 
-  try {
-    // Query the profile table
-    final response = await supabase
-        .from('profile_completion_steps') // Replace with your actual table name
-        .select('image, location,cnic,qualification,exp,bios') // Add other columns if necessary
-        .eq('user_id', user!.id) // Filter by the user's ID or your condition
-        .single(); // Fetch a single record
-
-    if (response == null) {
-      throw Exception("Profile not found");
+      // Check if all columns are true
+      final data = response as Map<String, dynamic>;
+      final areAllTrue = data.values.every((value) => value == true);
+      if (response != null && areAllTrue) {
+        profile.update((p) {
+          p?.isProfileComplete = true;
+        });
+      }
+    } catch (error) {
+      print("Error checking columns: $error");
     }
-
-    // Check if all columns are true
-    final data = response as Map<String, dynamic>;
-    final areAllTrue = data.values.every((value) => value == true);
-    if (response != null && areAllTrue){
-       profile.update((p) {
-            p?.isProfileComplete = true;
-          });
-
-    }
-  } catch (error) {
-    print("Error checking columns: $error");
-   
   }
-}
-
 
   Future<void> fetchUserName() async {
     final user = Supabase.instance.client.auth.currentUser;
-    
 
     if (user != null) {
       try {
@@ -115,8 +111,8 @@ Future<void> updateProfileStatus() async {
       }
     }
   }
- 
-   Future<void> fetchUserImg() async {
+
+  Future<void> fetchUserImg() async {
     final user = Supabase.instance.client.auth.currentUser;
 
     if (user != null) {
@@ -139,7 +135,58 @@ Future<void> updateProfileStatus() async {
       }
     }
   }
- 
+
+  Future<void> fetchQualifications() async {
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+
+    if (user != null) {
+      try {
+        final response = await supabase
+            .from('qualification') // Replace with your table name
+            .select('education_level, institute_name')
+            .eq('user_id', user.id);
+
+        if (response != null && response is List) {
+          final qualificationList = response.map((data) {
+            return Qualification.fromJson(data);
+          }).toList();
+
+          profile.update((p) {
+            p?.updateQualifications(qualificationList);
+          });
+        }
+      } catch (e) {
+        print("Error fetching qualifications: $e");
+      }
+    }
+  }
+
+  Future<void> fetchExperiences() async {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+
+  if (user != null) {
+    try {
+      final response = await supabase
+          .from('experience') // Replace with your table name
+          .select('student_education_level, start_date, end_date, still_working')
+          .eq('user_id', user.id);
+
+      if (response != null && response is List) {
+        final experienceList = response.map((data) {
+          return Experience.fromJson(data);
+        }).toList();
+
+        profile.update((p) {
+          p?.updateExperiences(experienceList);
+        });
+      }
+    } catch (e) {
+      print("Error fetching experiences: $e");
+    }
+  }
+}
 
   // Logout the user
   void logout() {
