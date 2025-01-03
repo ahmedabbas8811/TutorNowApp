@@ -57,40 +57,38 @@ class _BioScreenState extends State<BioScreen> {
           children: [
             Row(
               children: [
-               const Expanded(
+                const Expanded(
                   child: Text(
                     'Add Bio',
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                   ),
                 ),
-                
-                      TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Location2Screen(),
-                              ),
-                            );
-                          },
-                          style:  ButtonStyle(
-                            overlayColor:
-                                WidgetStateProperty.resolveWith<Color?>(
-                              (Set<WidgetState> states) {
-                                if (states.contains(WidgetState.pressed)) {
-                                  return Colors.green.shade100;
-                                }
-                                return null; // Default behavior
-                              },
-                            ),
-                          ),
-                          child: const Text(
-                            "Skip For Now",
-                            style: TextStyle(
-                                color: Colors.grey,
-                                //  decorationStyle: TextDecorationStyle.solid,
-                                decoration: TextDecoration.underline),
-                          ))
+                TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Location2Screen(),
+                        ),
+                      );
+                    },
+                    style: ButtonStyle(
+                      overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                        (Set<WidgetState> states) {
+                          if (states.contains(WidgetState.pressed)) {
+                            return Colors.green.shade100;
+                          }
+                          return null; // Default behavior
+                        },
+                      ),
+                    ),
+                    child: const Text(
+                      "Skip For Now",
+                      style: TextStyle(
+                          color: Colors.grey,
+                          //  decorationStyle: TextDecorationStyle.solid,
+                          decoration: TextDecoration.underline),
+                    ))
               ],
             ),
             SizedBox(height: 16),
