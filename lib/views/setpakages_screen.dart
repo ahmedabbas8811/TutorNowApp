@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 
-import 'package:newifchaly/views/setpakages_screen.dart'; // Import the Set Packages screen
+import 'package:newifchaly/views/addnewpackages_screen.dart';
 
-class EarningsScreen extends StatefulWidget {
+class SetpakagesScreen extends StatefulWidget {
+  const SetpakagesScreen({super.key});
+
   @override
-  _EarningsScreenState createState() => _EarningsScreenState();
+  State<SetpakagesScreen> createState() => _SetpakagesScreenState();
 }
 
-class _EarningsScreenState extends State<EarningsScreen> {
-  int _selectedIndex = 3;
+class _SetpakagesScreenState extends State<SetpakagesScreen> {
+  int _selectedIndex = 3; // Keep this outside of the build method
 
+  // On item tap, update selected index and navigate to corresponding screen
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -63,66 +67,69 @@ class _EarningsScreenState extends State<EarningsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 35),
+            const SizedBox(height: 40),
+            const Text(
+              "Set Packages",
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'My Earnings',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SetpakagesScreen()),
-                    );
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    print("Box clicked!");
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff87e64c),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    width: 325,
+                    height: 150,
+                    child: CustomPaint(
+                      painter: DashedBorderPainter(),
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 10),
+                          Text(
+                            'You have no active package',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                        ],
+                      ),
                     ),
                   ),
-                  child: const Text(
-                    'Set Packages',
-                    style: TextStyle(color: Colors.black),
-                  ),
                 ),
+                const Spacer(),
               ],
             ),
-            const SizedBox(height: 20),
-
-            // Clickable Container with a dashed border
-            GestureDetector(
-              onTap: () {
-                print("Box clicked!");
-              },
-              child: Container(
-                width: 350,
-                height: 150,
-                child: CustomPaint(
-                  painter: DashedBorderPainter(),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 10),
-                      Text(
-                        'Your earnings reports will be shown here',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                    ],
+            const Spacer(), // Pushes the button to the bottom
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff87e64c),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddNewPackagesScreen()),
+                  );
+                },
+                child: const Text(
+                  "Add New Package",
+                  style: TextStyle(fontSize: 18, color: Colors.black),
                 ),
               ),
             ),
-
-            const Spacer(),
           ],
         ),
       ),
