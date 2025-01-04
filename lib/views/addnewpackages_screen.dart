@@ -1,224 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:newifchaly/availabilityscreen.dart';
-// import 'package:newifchaly/earningscreen.dart';
-// import 'package:newifchaly/personscreen.dart';
-// import 'package:newifchaly/profile_screen.dart';
-// import 'package:newifchaly/sessionscreen.dart';
-
-// class AddNewPackagesScreen extends StatefulWidget {
-//   @override
-//   _AddNewPackagesScreenState createState() => _AddNewPackagesScreenState();
-// }
-
-// class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
-//   int _selectedIndex = 3;
-
-//   void _onItemTapped(int index) {
-//     setState(() {
-//       _selectedIndex = index;
-//     });
-
-//     // Navigate to a new page based on the selected index
-//     switch (index) {
-//       case 0:
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(builder: (context) => ProfileScreen()),
-//         );
-//         break;
-//       case 1:
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(builder: (context) => AvailabilityScreen()),
-//         );
-//         break;
-//       case 2:
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(builder: (context) => SessionsScreen()),
-//         );
-//         break;
-//       case 3:
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(builder: (context) => EarningsScreen()),
-//         );
-//         break;
-//       case 4:
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(builder: (context) => PersonScreen()),
-//         );
-//         break;
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-
-//       body: const Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: SingleChildScrollView(
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               SizedBox(height: 35),
-//               Text(
-//                 'Add New Package',
-//                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-//               ),
-//               SizedBox(height: 10),
-//               // Package Name
-//               Text('Package Name', style: TextStyle(fontWeight: FontWeight.bold)),
-//               SizedBox(height: 16),
-//               TextField(
-//                 decoration: InputDecoration(
-//                   labelText: 'Basic Package',
-//                   border: OutlineInputBorder(),
-//                 ),
-//               ),
-//               SizedBox(height: 16),
-//               // Package Description
-//               Text('Package Description', style: TextStyle(fontWeight: FontWeight.bold)),
-//               SizedBox(height: 16),
-//               TextField(
-//                 maxLines: 3,
-//                 decoration: InputDecoration(
-//                   labelText: '',
-//                   hintText: 'Tell students why they should purchase this package\nAdd key features of your sessions',
-//                   border: OutlineInputBorder(),
-//                 ),
-//               ),
-//               SizedBox(height: 16),
-//               // Duration of Each Session
-//               Text('Duration Of Each Session', style: TextStyle(fontWeight: FontWeight.bold)),
-//               SizedBox(height: 16),
-//               Row(
-//                 children: [
-//                   Expanded(
-//                     child: TextField(
-//                       keyboardType: TextInputType.number,
-//                       decoration: InputDecoration(
-//                         labelText: 'Hours',
-//                         border: OutlineInputBorder(),
-//                       ),
-//                     ),
-//                   ),
-//                   SizedBox(width: 16),
-//                   Expanded(
-//                     child: TextField(
-//                       keyboardType: TextInputType.number,
-//                       decoration: InputDecoration(
-//                         labelText: 'Minutes',
-//                         border: OutlineInputBorder(),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//               SizedBox(height: 16),
-//               // Session Per Week
-//               Text('Session Per Week', style: TextStyle(fontWeight: FontWeight.bold)),
-//               SizedBox(height: 16),
-//               TextField(
-//                 keyboardType: TextInputType.number,
-//                 decoration: InputDecoration(
-//                   labelText: '5',
-//                   border: OutlineInputBorder(),
-//                 ),
-//               ),
-//               SizedBox(height: 16),
-//               // Number of Weeks
-//               Text('Number of Weeks', style: TextStyle(fontWeight: FontWeight.bold)),
-//               SizedBox(height: 16),
-//               TextField(
-//                 keyboardType: TextInputType.number,
-//                 decoration: InputDecoration(
-//                   labelText: '4',
-//                   border: OutlineInputBorder(),
-//                 ),
-//               ),
-//               SizedBox(height: 16),
-//               // Price
-//               Text('Price', style: TextStyle(fontWeight: FontWeight.bold)),
-//               SizedBox(height: 16),
-//               TextField(
-//                 keyboardType: TextInputType.number,
-//                 decoration: InputDecoration(
-//                   labelText: '10,000',
-//                   border: OutlineInputBorder(),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//       bottomNavigationBar: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           // Save button at the bottom
-//           Padding(
-
-//             padding: const EdgeInsets.symmetric(vertical: 16.0),
-
-//             child: ElevatedButton(
-
-//               onPressed: () {
-//                 // Handle save action
-//               },
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: const Color(0xff87e64c),
-//                   shape: RoundedRectangleBorder(
-//                     borderRadius: BorderRadius.circular(8),
-//                   ),
-//                 padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 16),
-//               ),
-//               child:const Text(
-//                 'Save',
-//                 style: TextStyle(fontSize: 18, color: Colors.black),
-//               ),
-//             ),
-//           ),
-//           // Bottom Navigation Bar
-//           BottomNavigationBar(
-//             currentIndex: _selectedIndex,
-//             type: BottomNavigationBarType.fixed,
-//             backgroundColor: Colors.white,
-//             selectedItemColor: const Color(0xff87e64c),
-//             unselectedItemColor: Colors.black,
-//             showSelectedLabels: true,
-//             showUnselectedLabels: true,
-//             items: const [
-//               BottomNavigationBarItem(
-//                 icon: Icon(Icons.home),
-//                 label: 'Home',
-//               ),
-//               BottomNavigationBarItem(
-//                 icon: Icon(Icons.event_available),
-//                 label: 'Availability',
-//               ),
-//               BottomNavigationBarItem(
-//                 icon: Icon(Icons.video_camera_front),
-//                 label: 'Sessions',
-//               ),
-//               BottomNavigationBarItem(
-//                 icon: Icon(Icons.attach_money),
-//                 label: 'Earnings',
-//               ),
-//               BottomNavigationBarItem(
-//                 icon: Icon(Icons.person),
-//                 label: 'Profile',
-//               ),
-//             ],
-//             onTap: _onItemTapped,
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/controllers/addpackage_controller.dart';
@@ -257,7 +36,6 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
       _selectedIndex = index;
     });
 
-    // Navigate to a new page based on the selected index
     switch (index) {
       case 0:
         Navigator.push(
@@ -299,7 +77,6 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
       return;
     }
 
-    // Perform input validation
     if (_packageNameController.text.isEmpty) {
       showCustomSnackBar(context, 'Package name cannot be empty.');
       return;
@@ -373,7 +150,6 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
       return;
     }
 
-    // Create the package model
     final package = AddPackageModel(
       packageName: _packageNameController.text,
       packageDescription: _packageDescriptionController.text,
@@ -385,13 +161,32 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
       userId: user.id,
     );
 
-    // Call the controller method and handle the result
     int? packageId = await _controller.addPackage(package);
     if (packageId != null) {
       showCustomSnackBar(context, 'Package added successfully!');
     } else {
       showCustomSnackBar(context, 'Failed to add package.');
     }
+  }
+
+  InputDecoration _inputDecoration(String hintText) {
+    return InputDecoration(
+      hintText: hintText,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Colors.grey),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Colors.grey),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Color(0xff87e64c)),
+      ),
+      filled: true,
+      fillColor: Colors.white,
+    );
   }
 
   @override
@@ -414,10 +209,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _packageNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Basic Package',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: _inputDecoration('Basic package'),
               ),
               const SizedBox(height: 16),
               const Text('Package Description',
@@ -426,10 +218,10 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
               TextField(
                 controller: _packageDescriptionController,
                 maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText:
-                      'Tell students why they should purchase this package\nAdd key features of your sessions',
-                  border: OutlineInputBorder(),
+                decoration: _inputDecoration(
+                  'Tell students why they should purchase this package\n'
+                  'Add key features of your sessions\n'
+                  // 'Add key features of your sessions',
                 ),
               ),
               const SizedBox(height: 16),
@@ -442,10 +234,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
                     child: TextField(
                       controller: _hoursController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Hours',
-                        border: OutlineInputBorder(),
-                      ),
+                      decoration: _inputDecoration('1 (Hours)'),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -453,10 +242,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
                     child: TextField(
                       controller: _minutesController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Minutes',
-                        border: OutlineInputBorder(),
-                      ),
+                      decoration: _inputDecoration('30 (Minutes)'),
                     ),
                   ),
                 ],
@@ -468,10 +254,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
               TextField(
                 controller: _sessionsPerWeekController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: '5',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: _inputDecoration('5'),
               ),
               const SizedBox(height: 16),
               const Text('Number of Weeks',
@@ -480,10 +263,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
               TextField(
                 controller: _numberOfWeeksController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: '4',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: _inputDecoration('4'),
               ),
               const SizedBox(height: 16),
               const Text('Price',
@@ -492,10 +272,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
               TextField(
                 controller: _priceController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: '10,000/-PKR',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: _inputDecoration('10,000-/PKR'),
               ),
             ],
           ),
@@ -559,3 +336,4 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
     );
   }
 }
+
