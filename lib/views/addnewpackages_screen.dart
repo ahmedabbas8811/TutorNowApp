@@ -172,6 +172,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
   InputDecoration _inputDecoration(String hintText) {
     return InputDecoration(
       hintText: hintText,
+      hintStyle: const TextStyle(color: Colors.grey),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: const BorderSide(color: Colors.grey),
@@ -221,7 +222,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
                 decoration: _inputDecoration(
                   'Tell students why they should purchase this package\n'
                   'Add key features of your sessions\n'
-                  // 'Add key features of your sessions',
+                  
                 ),
               ),
               const SizedBox(height: 16),
@@ -336,4 +337,3 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
     );
   }
 }
-
