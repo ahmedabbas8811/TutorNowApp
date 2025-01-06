@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:newifchaly/teach_to.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
-import '../controllers/qualification_controller.dart';
+import '../controllers/teachto_controller.dart';
 import 'teaching_detail.dart';
 
-class QualificationScreen extends StatefulWidget {
+class TeachTo extends StatefulWidget {
   @override
-  State<QualificationScreen> createState() => _QualificationScreenState();
+  State<TeachTo> createState() => _QualificationScreenState();
 }
 
-class _QualificationScreenState extends State<QualificationScreen> {
-  // Access the QualificationController
-  final QualificationController controller = Get.put(QualificationController());
+class _QualificationScreenState extends State<TeachTo> {
+  final TeachToController controller = Get.put(TeachToController());
+  final TextEditingController subjectController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    subjectController.text = controller.teachto.subject.value;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (await controller.isQualificationCompleted()) {
+      if (await controller.isTeachToCompleted()) {
         final completionData =
             await ProfileCompletionHelper.fetchCompletionData();
         final incompleteSteps =
@@ -66,7 +66,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => TeachTo(),
+                                builder: (context) => TeachingDetail(),
                               ),
                             );
                           },
@@ -113,10 +113,10 @@ class _QualificationScreenState extends State<QualificationScreen> {
                         ),
                         dropdownColor: Colors.grey[100],
 
-                        value: controller
-                                .qualification.educationLevel.value.isNotEmpty
-                            ? controller.qualification.educationLevel.value
-                            : null, // Current value or null
+                        value:
+                            controller.teachto.educationLevel.value.isNotEmpty
+                                ? controller.teachto.educationLevel.value
+                                : null, // Current value or null
                         items: [
                           'Matric',
                           'Intermediate',
@@ -131,8 +131,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
                         }).toList(),
                         onChanged: (value) {
                           if (value != null) {
-                            controller.qualification.educationLevel.value =
-                                value;
+                            controller.teachto.educationLevel.value = value;
                           }
                         },
                       ),
@@ -143,10 +142,11 @@ class _QualificationScreenState extends State<QualificationScreen> {
 
                   // Institute Name Input
                   TextField(
+                    controller: subjectController,
                     decoration: InputDecoration(
-                      labelText: 'Institute Name',
+                      labelText: 'Subject',
                       labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: 'Ex. IMCB',
+                      hintText: 'Bio, Chemistry',
                       hintStyle: const TextStyle(color: Colors.grey),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -155,95 +155,9 @@ class _QualificationScreenState extends State<QualificationScreen> {
                     ),
                     keyboardAppearance: Brightness.light,
                     onChanged: (value) =>
-                        controller.qualification.instituteName.value = value,
+                        controller.teachto.subject.value = value,
                   ),
                   const SizedBox(height: 40),
-
-                  // Upload Proof Of Qualification Section
-                  Container(
-                    width: 330,
-                    height: 220,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(3.0),
-                          child: Text(
-                            'Upload Proof Of Qualification',
-                            style: TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 3.0),
-                          child: Text(
-                            'Degree/Marksheet/Certificate',
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
-                          ),
-                        ),
-                        const SizedBox(height: 7),
-
-                        // File Picker Section
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: InkWell(
-                            onTap: () =>
-                                controller.pickQualificationFile(context),
-                            child: Container(
-                              width: double.infinity,
-                              height: 140,
-                              child: CustomPaint(
-                                painter: DashedBorderPainter(),
-                                child: Obx(() => Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.cloud_upload,
-                                          size: 50,
-                                          color: Colors.grey,
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Text(
-                                          controller
-                                                  .qualification
-                                                  .qualificationFileName
-                                                  .value
-                                                  .isEmpty
-                                              ? 'Tap to upload'
-                                              : controller.qualification
-                                                  .qualificationFileName.value,
-                                          style: const TextStyle(fontSize: 16),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          controller
-                                                      .qualification
-                                                      .qualificationFileName
-                                                      .value ==
-                                                  null
-                                              ? '*pdf accepted'
-                                              : 'Tap to upload another document',
-                                          style: const TextStyle(
-                                              fontSize: 12, color: Colors.grey),
-                                        ),
-                                      ],
-                                    )),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 70),
 
                   SizedBox(
                     width: double.infinity,
@@ -251,21 +165,14 @@ class _QualificationScreenState extends State<QualificationScreen> {
                     child: ElevatedButton(
                       onPressed: () async {
                         final qualificationId =
-                            await controller.storeQualification(context);
-                        if (qualificationId != null &&
-                            controller.qualification.qualificationFile.value !=
-                                null) {
-                          await controller.uploadFileToSupabase(
-                              controller.qualification.qualificationFile.value!,
-                              qualificationId);
-                        }
+                            await controller.storeteachto(context);
 
                         // Clear fields
-                        controller.qualification.educationLevel.value = '';
-                        controller.qualification.instituteName.value = '';
-                        controller.qualification.qualificationFileName.value =
-                            '';
-                        controller.qualification.qualificationFile.value = null;
+                        setState(() {
+                          controller.teachto.educationLevel.value = '';
+                          controller.teachto.subject.value = '';
+                          subjectController.clear();
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
@@ -289,13 +196,8 @@ class _QualificationScreenState extends State<QualificationScreen> {
                     child: ElevatedButton(
                       onPressed: () async {
                         final qualificationId =
-                            await controller.storeQualification(context);
-                        if (qualificationId != null &&
-                            controller.qualification.qualificationFile.value !=
-                                null) {
-                          await controller.uploadFileToSupabase(
-                              controller.qualification.qualificationFile.value!,
-                              qualificationId);
+                            await controller.storeteachto(context);
+                        if (qualificationId != null) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(

@@ -50,7 +50,7 @@ class ProfileController extends GetxController {
           .from(
               'profile_completion_steps') // Replace with your actual table name
           .select(
-              'image, location,cnic,qualification,exp,bios') // Add other columns if necessary
+              'image, location,cnic,qualification,exp,bios,teachto') // Add other columns if necessary
           .eq('user_id', user!.id) // Filter by the user's ID or your condition
           .single(); // Fetch a single record
 

@@ -43,6 +43,7 @@ import 'package:newifchaly/api/auth_api.dart';
 import 'package:newifchaly/cnic_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/supabase_service.dart';
+import 'package:newifchaly/splashscreen.dart';
 import 'package:newifchaly/views/widgets/snackbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -57,41 +58,37 @@ class AuthController extends GetxController {
     super.onInit();
   }
 
-  void login(String email, String password , BuildContext context) async {
-  loginLoading.value = true;
+  void login(String email, String password, BuildContext context) async {
+    loginLoading.value = true;
 
-  try {
-    final AuthResponse? response = await authApi.login(email, password);
-    loginLoading.value = false;
+    try {
+      final AuthResponse? response = await authApi.login(email, password);
+      loginLoading.value = false;
 
-    if (response != null && response.user != null) {
-      log("The login response is ${response.user?.toJson()}");
+      if (response != null && response.user != null) {
+        log("The login response is ${response.user?.toJson()}");
 
-      // Fetch the user details from the users table
-      final userId = response.user!.id;
-      final user = await SupabaseService.supabase
-          .from('users')
-          .select('user_type')
-          .eq('id', userId)
-          .single();
+        // Fetch the user details from the users table
+        final userId = response.user!.id;
+        final user = await SupabaseService.supabase
+            .from('users')
+            .select('user_type')
+            .eq('id', userId)
+            .single();
 
-      if (user != null && user['user_type'] == 'Admin') {
-        // Navigate to AdminScreen
-        Get.offAll(() => ApproveTutorsScreen() );
+        Get.offAll(() => SplashScreen(userId: userId));
       } else {
-        // Navigate to ProfileScreen for regular users
-        Get.offAll(() => ProfileScreen());
+        showCustomSnackBar(context, "Login Failed Invalid email or password");
       }
-    } else {
-      showCustomSnackBar(context, "Login Failed Invalid email or password");
+    } catch (e) {
+      loginLoading.value = false;
+      showCustomSnackBar(context, "An error occurred during login");
+      log("Login error: $e");
     }
-  } catch (e) {
-    loginLoading.value = false;
-    showCustomSnackBar(context, "An error occurred during login");
-    log("Login error: $e");
   }
-}
-  void signup(String name, String email, String password, String groupValue, BuildContext context) async {
+
+  void signup(String name, String email, String password, String groupValue,
+      BuildContext context) async {
     signupLoading.value = true;
 
     try {
@@ -100,26 +97,21 @@ class AuthController extends GetxController {
 
       if (response.user != null) {
         final userId = response.user!.id;
-        await SupabaseService.supabase
-            .from('users')
-            .upsert({
-              'id': userId,
-              'email': email, 
-              'user_type': groupValue, // Add groupValue as user type
-            });
-        
-        await SupabaseService.supabase
-        .from('profile_completion_steps')
-        .insert({
-        'user_id': userId,
-      });
+        await SupabaseService.supabase.from('users').upsert({
+          'id': userId,
+          'email': email,
+          'user_type': groupValue, // Add groupValue as user type
+        });
+
+        await SupabaseService.supabase.from('profile_completion_steps').insert({
+          'user_id': userId,
+        });
 
         log("User type successfully added for user: ${response.user?.toJson()}");
 
         signupLoading.value = false;
 
         showCustomSnackBar(context, "Signup Successfull");
-        
       } else {
         signupLoading.value = false;
         showCustomSnackBar(context, "Signup Failed! Try Again");
@@ -128,17 +120,17 @@ class AuthController extends GetxController {
       signupLoading.value = false;
       showCustomSnackBar(context, "An error occured during signup");
       log("Signup error: $e");
-    }}
+    }
+  }
 
-    // Change password
-  Future<void> changePassword(String currentPassword, String newPassword, BuildContext context) async {
+  // Change password
+  Future<void> changePassword(
+      String currentPassword, String newPassword, BuildContext context) async {
     try {
       await authApi.changePassword(currentPassword, newPassword);
     } catch (e) {
       showCustomSnackBar(context, "Error changing password");
       throw Exception("Error changing password: $e");
-      
     }
   }
 }
-

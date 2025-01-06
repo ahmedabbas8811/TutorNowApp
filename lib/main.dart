@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
-import 'package:newifchaly/admin/views/confirmation_screen.dart';
 import 'package:newifchaly/login_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/storage_service.dart';
 import 'package:newifchaly/services/supabase_service.dart';
+import 'package:newifchaly/teach_to.dart';
 import 'package:newifchaly/utils/app_theme.dart';
 import 'package:newifchaly/utils/features/auth/auth_controller.dart';
 
@@ -20,7 +20,7 @@ void main() async {
   await Get.putAsync<SupabaseService>(() async => SupabaseService());
 
   // * AuthController initialization
-  Get.put(AuthController());  // Initialize the AuthController
+  Get.put(AuthController()); // Initialize the AuthController
 
   // Debugging: Print the session value
   print("User session: ${StorageService.getUserSession}");
@@ -40,13 +40,10 @@ class MyApp extends StatelessWidget {
       // Define the routes
       routes: {
         '/login': (context) => LoginScreen(),
-        '/home': (context) =>  ProfileScreen(),
+        '/home': (context) => ProfileScreen(),
         '/ApproveTutorsScreen': (context) => ApproveTutorsScreen(),
       },
       theme: appTheme(),
     );
   }
 }
-
-
-
