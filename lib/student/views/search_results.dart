@@ -25,8 +25,9 @@ class _SearchResultsState extends State<SearchResults> {
   void _onSearchChanged() {
     setState(() {
       filteredTutors = tutors
-          .where((tutor) =>
-              tutor.toLowerCase().contains(_searchController.text.toLowerCase()))
+          .where((tutor) => tutor
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase()))
           .toList();
     });
   }
@@ -62,14 +63,14 @@ class _SearchResultsState extends State<SearchResults> {
                         border: InputBorder.none,
                         hintText: 'Matric',
                         prefixIcon: Icon(Icons.search, color: Colors.grey),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 12.0),
                       ),
                       style: const TextStyle(fontSize: 16),
                     ),
                   ),
                 ),
-             const    SizedBox(width: 10),
+                const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {},
                   child: Container(
@@ -85,13 +86,14 @@ class _SearchResultsState extends State<SearchResults> {
               ],
             ),
           ),
-         const SizedBox(height: 20),
+          const SizedBox(height: 20),
           Expanded(
             child: filteredTutors.isEmpty
-                ?const  Center(child: Text('No tutors found'))
+                ? const Center(child: Text('No tutors found'))
                 : GridView.builder(
-                    padding:const EdgeInsets.symmetric(horizontal: 16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
@@ -113,7 +115,8 @@ class _SearchResultsState extends State<SearchResults> {
         unselectedItemColor: Colors.black,
         showSelectedLabels: true,
         showUnselectedLabels: true,
-        selectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        selectedLabelStyle:
+            const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
         unselectedLabelStyle: const TextStyle(fontSize: 12),
         items: const [
           BottomNavigationBarItem(
@@ -162,10 +165,11 @@ class TutorCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-        const  Center(
+          const Center(
             child: CircleAvatar(
               radius: 60, // Reduced radius to prevent overflow
-              backgroundImage: AssetImage('assets/Ellipse 1.png'), // Placeholder image
+              backgroundImage:
+                  AssetImage('assets/Ellipse1.png'), // Placeholder image
             ),
           ),
           Padding(
@@ -175,13 +179,14 @@ class TutorCard extends StatelessWidget {
               children: [
                 Text(
                   tutorInfo.split(' - ')[0],
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   tutorInfo.split(' - ')[1],
                   style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
-               const  SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Row(
                   children: List.generate(5, (starIndex) {
                     return Icon(

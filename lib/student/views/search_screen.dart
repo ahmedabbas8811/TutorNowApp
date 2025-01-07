@@ -37,7 +37,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (index == 0) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => StudentHomeScreen()),
       );
     }
   }
