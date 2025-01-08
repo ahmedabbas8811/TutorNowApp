@@ -76,7 +76,7 @@ class AuthController extends GetxController {
             .eq('id', userId)
             .single();
 
-        Get.offAll(() => SplashScreen(userId: userId));
+        Get.offAll(() => SplashScreen());
       } else {
         showCustomSnackBar(context, "Login Failed Invalid email or password");
       }

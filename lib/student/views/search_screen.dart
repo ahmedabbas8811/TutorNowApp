@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:newifchaly/student/views/search_results.dart';
 import 'package:newifchaly/student/views/student_home_screen.dart';
+import 'package:newifchaly/student/views/student_profile.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -39,7 +40,12 @@ class _SearchScreenState extends State<SearchScreen> {
         context,
         MaterialPageRoute(builder: (context) => StudentHomeScreen()),
       );
-    }
+    }else if (index == 3) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => StudentProfileScreen()),
+    );
+  }
   }
 
   @override
