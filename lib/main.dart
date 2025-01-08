@@ -6,6 +6,7 @@ import 'package:newifchaly/login_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/storage_service.dart';
 import 'package:newifchaly/services/supabase_service.dart';
+import 'package:newifchaly/splashscreen.dart';
 import 'package:newifchaly/teach_to.dart';
 import 'package:newifchaly/utils/app_theme.dart';
 import 'package:newifchaly/utils/features/auth/auth_controller.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // Dynamically determine the initial route
       initialRoute: StorageService.getUserSession != null ? '/home' : '/login',
+
       // Define the routes
       routes: {
         '/login': (context) => LoginScreen(),

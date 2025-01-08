@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/student/views/search_results.dart';
 import '../controllers/student_home_controller.dart';
 import '../models/student_home_model.dart';
 import 'search_screen.dart'; // Import the SearchScreen
@@ -58,7 +59,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     if (index == 1) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => SearchScreen()),
+        MaterialPageRoute(builder: (context) => SearchResults()),
       );
     }
   }

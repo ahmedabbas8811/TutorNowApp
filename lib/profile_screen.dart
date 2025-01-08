@@ -6,6 +6,8 @@ import 'package:newifchaly/bio_screen.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/sessionscreen.dart';
+import 'package:newifchaly/splashscreen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../controllers/profile_controller.dart';
 import 'location_screen.dart';
 import 'messagescreen.dart';
@@ -18,6 +20,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   int _selectedIndex = 0; // Set initial selected index to Home (0)
   bool _isLoading = true; // Loader state
+  final id = Supabase.instance.client.auth.currentUser!.id;
 
   @override
   void initState() {
@@ -81,6 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       controller.updateVerificationStatus();
       controller.fetchProfileCompletionData();
       controller.fetchUserName();
+    
     });
 
     return Scaffold(
