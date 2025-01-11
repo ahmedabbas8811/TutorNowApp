@@ -207,6 +207,7 @@
 import 'package:flutter/material.dart';
 import 'package:newifchaly/student/controllers/search_controller.dart';
 import 'package:newifchaly/student/models/search_model.dart';
+import 'package:newifchaly/student/views/tutor_details.dart';
 
 class SearchResults extends StatefulWidget {
   @override
@@ -249,6 +250,18 @@ class _SearchResultsState extends State<SearchResults> {
 
     final results = await _controller.searchTutors(keyword);
     setState(() => displayedTutors = results); // Update to filtered results
+  }
+
+  void _navigateToTutorDetail(String tutorId, String tutorname) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TutorDetailScreen(
+          tutorId: tutorId,
+          tutorname: tutorname,
+        ),
+      ),
+    );
   }
 
   @override
@@ -314,8 +327,16 @@ class _SearchResultsState extends State<SearchResults> {
                     itemBuilder: (context, index) {
                       final tutor = displayedTutors[index];
                       return ListTile(
-                        title: Text(tutor.educationLevel),
-                        subtitle: Text(tutor.subject),
+                        onTap: () =>
+                            _navigateToTutorDetail(tutor.userId, tutor.name),
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              NetworkImage(tutor.imgurl), // Image from a URL
+                          radius: 25,
+                        ),
+                        title: Text(tutor.name),
+                        subtitle:
+                            Text("${tutor.educationLevel} - ${tutor.subject}"),
                       );
                     },
                   ),

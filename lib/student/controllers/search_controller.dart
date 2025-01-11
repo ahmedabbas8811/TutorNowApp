@@ -7,7 +7,10 @@ class TutorController {
   // Fetch all tutors
   Future<List<Tutor>> getAllTutors() async {
     try {
-      final response = await _supabase.from('teachto').select();
+      final response = await _supabase.from('teachto').select(
+          'id, user_id, education_level, subject, users!inner(image_url, metadata)');
+      print(response);
+
       return response.map((data) => Tutor.fromMap(data)).toList();
     } catch (e) {
       print('Error fetching all tutors: $e');
@@ -17,14 +20,28 @@ class TutorController {
 
   Future<List<Map<String, dynamic>>> fetchTutors(String keyword) async {
     try {
-      // Perform text search on the combined `search_vector` column
+      // Perform the initial text search on the combined `search_vector` column
       final response = await _supabase
           .from('teachto')
-          .select()
-          .textSearch('search_vector', keyword); // Use the combined column
+          .select(
+              'id, user_id, education_level, subject, users!inner(image_url, metadata)')
+          .textSearch('search_vector', keyword);
 
       print('Supabase response: $response');
-      if (response.isEmpty) {}
+
+      // If no results are found, perform a fallback search in the users table metadata
+      if (response.isEmpty) {
+        final fallbackResponse = await _supabase
+            .from('teachto')
+            .select(
+                'id, user_id, education_level, subject, users!inner(image_url, metadata)')
+            .ilike('users.metadata->>name',
+                '%$keyword%'); // Fallback search in metadata column
+
+        print('****************Fallback response: $fallbackResponse');
+        return fallbackResponse;
+      }
+
       return response;
     } catch (e) {
       print('Error fetching tutors: $e');
