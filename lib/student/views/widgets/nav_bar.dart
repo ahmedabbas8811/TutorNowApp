@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int selectedIndex;
@@ -20,16 +21,16 @@ class CustomBottomNavigationBar extends StatelessWidget {
       unselectedItemColor: Colors.black, // Black color for unselected state
       onTap: onItemTapped,
       items: [
-        _buildNavBarItem(Icons.home, 'Home', 0),
-        _buildNavBarItem(Icons.search, 'Search', 1),
-        _buildNavBarItem(Icons.calendar_today, 'Bookings', 2),
-        _buildNavBarItem(Icons.person, 'Profile', 3),
+        _buildNavBarItem('assets/home_icon.svg', 'Home', 0),
+        _buildNavBarItem('assets/search_icon.svg', 'Search', 1),
+        _buildNavBarItem('assets/calendar_icon.svg', 'Bookings', 2),
+        _buildNavBarItem('assets/profile_icon.svg', 'Profile', 3),
       ],
     );
   }
 
   BottomNavigationBarItem _buildNavBarItem(
-      IconData icon, String label, int index) {
+      dynamic icon, String label, int index) {
     return BottomNavigationBarItem(
       icon: Container(
         decoration: BoxDecoration(
@@ -37,11 +38,21 @@ class CustomBottomNavigationBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
         ),
         padding: const EdgeInsets.all(8),
-        child: Icon(
-          icon,
-          color:
-              selectedIndex == index ? const Color(0xFF87E64B) : Colors.black,
-        ),
+        child: icon is String
+            ? SvgPicture.asset(
+                icon as String,
+                color: selectedIndex == index
+                    ? const Color(0xFF87E64B)
+                    : Colors.black,
+                width: 24,
+                height: 24,
+              )
+            : Icon(
+                icon,
+                color: selectedIndex == index
+                    ? const Color(0xFF87E64B)
+                    : Colors.black,
+              ),
       ),
       label: label,
     );
