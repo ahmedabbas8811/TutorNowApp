@@ -9,8 +9,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
 
 class PersonController extends GetxController {
+  var selectedTab = 0.obs;
   var profile = PersonModel(
           name: "",
+          bio: "",
           isProfileComplete: false,
           profileImage: "assets/Ellipse 1.png",
           isVerified: false)
@@ -163,30 +165,31 @@ class PersonController extends GetxController {
   }
 
   Future<void> fetchExperiences() async {
-  final supabase = Supabase.instance.client;
-  final user = supabase.auth.currentUser;
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
 
-  if (user != null) {
-    try {
-      final response = await supabase
-          .from('experience') // Replace with your table name
-          .select('student_education_level, start_date, end_date, still_working')
-          .eq('user_id', user.id);
+    if (user != null) {
+      try {
+        final response = await supabase
+            .from('experience') // Replace with your table name
+            .select(
+                'student_education_level, start_date, end_date, still_working')
+            .eq('user_id', user.id);
 
-      if (response != null && response is List) {
-        final experienceList = response.map((data) {
-          return Experience.fromJson(data);
-        }).toList();
+        if (response != null && response is List) {
+          final experienceList = response.map((data) {
+            return Experience.fromJson(data);
+          }).toList();
 
-        profile.update((p) {
-          p?.updateExperiences(experienceList);
-        });
+          profile.update((p) {
+            p?.updateExperiences(experienceList);
+          });
+        }
+      } catch (e) {
+        print("Error fetching experiences: $e");
       }
-    } catch (e) {
-      print("Error fetching experiences: $e");
     }
   }
-}
 
   // Logout the user
   void logout() {

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/profile_screen.dart';
+import 'package:newifchaly/student/views/bookings.dart';
 import 'package:newifchaly/student/views/search_results.dart';
 import 'package:newifchaly/student/views/student_profile.dart';
+import 'package:newifchaly/student/views/widgets/nav_bar.dart';
 import '../controllers/student_home_controller.dart';
 import '../models/student_home_model.dart';
 import 'search_screen.dart'; // Import the SearchScreen
@@ -52,59 +55,71 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
   // Method to handle bottom navigation bar taps
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
 
-    // Navigate to SearchScreen when the Search tab is tapped
-    if (index == 1) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => SearchResults()),
-      );
-    } else if (index == 3) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => StudentProfileScreen()),
-    );
-  }
+      switch (index) {
+        case 0:
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => StudentHomeScreen(),
+            ),
+          );
+          break;
+        case 1:
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SearchResults(),
+            ),
+          );
+          break;
+        case 2:
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  BookingsScreen(), // Replace with your bookings screen
+            ),
+          );
+          break;
+        case 3:
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => StudentProfileScreen(),
+            ),
+          );
+          break;
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-          child: _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _educationLevels.map((level) {
-                      return buildSection(level);
-                    }).toList(),
-                  ),
-                ),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        currentIndex: _selectedIndex, // Set the current index
-        selectedItemColor: const Color(0xff87e64c),
-        unselectedItemColor: Colors.black,
-        onTap: _onItemTapped, // Call _onItemTapped on tap
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today), label: 'Bookings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
-    );
+        body: SafeArea(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _educationLevels.map((level) {
+                        return buildSection(level);
+                      }).toList(),
+                    ),
+                  ),
+          ),
+        ),
+        bottomNavigationBar: CustomBottomNavigationBar(
+            selectedIndex: 0, onItemTapped: _onItemTapped));
   }
 
   Widget buildSection(String educationLevel) {

@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:newifchaly/login_screen.dart';
-import 'package:newifchaly/services/supabase_service.dart';
-import 'package:newifchaly/student/views/bookings.dart';
 import 'package:newifchaly/student/views/search_results.dart';
-import 'package:newifchaly/student/views/search_screen.dart';
 import 'package:newifchaly/student/views/student_home_screen.dart';
+import 'package:newifchaly/student/views/student_profile.dart';
 import 'package:newifchaly/student/views/widgets/nav_bar.dart';
 
-class StudentProfileScreen extends StatefulWidget {
+class BookingsScreen extends StatefulWidget {
   @override
-  _StudentProfileScreenState createState() => _StudentProfileScreenState();
+  _BookingsScreenState createState() => _BookingsScreenState();
 }
 
-class _StudentProfileScreenState extends State<StudentProfileScreen> {
-  int _selectedIndex = 3; // Set the default index for Profile tab
+class _BookingsScreenState extends State<BookingsScreen> {
+  int _selectedIndex = 2;
 
-  // Handle navigation for BottomNavigationBar
   void _onItemTapped(int index) {
     if (_selectedIndex != index) {
       setState(() {
@@ -44,8 +39,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  BookingsScreen(), // Replace with your bookings screen
+              builder: (context) => BookingsScreen(),
             ),
           );
           break;
@@ -68,35 +62,14 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           title: const Text('Profile'),
           backgroundColor: Colors.transparent,
           elevation: 0,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 15.0),
-              child: ElevatedButton(
-                onPressed: () async {
-                  SupabaseService().logout(); // Call logout method
-                  Get.offAll(() => LoginScreen()); // Navigate to LoginScreen
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xffe64b4b),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Logout',
-                  style: TextStyle(color: Colors.white, fontSize: 17),
-                ),
-              ),
-            ),
-          ],
         ),
         body: const Center(
           child: Text(
-            'Welcome to the Profile Screen',
+            'Welcome to the Bookings Screen',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
-            selectedIndex: 3, onItemTapped: _onItemTapped));
+            selectedIndex: 2, onItemTapped: _onItemTapped));
   }
 }

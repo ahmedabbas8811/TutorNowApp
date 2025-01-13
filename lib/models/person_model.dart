@@ -37,6 +37,8 @@ class Experience {
 
 class PersonModel {
   String name;
+  String bio;
+
   String profileImage;
   bool isProfileComplete;
   bool isVerified;
@@ -45,22 +47,25 @@ class PersonModel {
 
   PersonModel({
     required this.name,
+    required this.bio,
     required this.profileImage,
     required this.isProfileComplete,
     required this.isVerified,
     this.qualifications = const [], // Initialize as an empty list by default
-    this.experiences = const [],   // Initialize as an empty list by default
+    this.experiences = const [], // Initialize as an empty list by default
   });
 
   // Create a PersonModel from JSON data
   factory PersonModel.fromJson(Map<String, dynamic> json) {
     return PersonModel(
       name: json['name'] ?? '',
+      bio: json['bio'] ?? '',
       profileImage: json['profileImage'] ?? 'assets/Ellipse1.png',
       isProfileComplete: json['isProfileComplete'] ?? false,
       isVerified: false,
       qualifications: (json['qualifications'] as List<dynamic>?)
-              ?.map((item) => Qualification.fromJson(item as Map<String, dynamic>))
+              ?.map((item) =>
+                  Qualification.fromJson(item as Map<String, dynamic>))
               .toList() ??
           [],
       experiences: (json['experiences'] as List<dynamic>?)
@@ -80,5 +85,3 @@ class PersonModel {
     experiences = newExperiences;
   }
 }
-
-
