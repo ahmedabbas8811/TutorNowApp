@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/login_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
@@ -24,72 +25,73 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _startSplashSequence() async {
     print("Starting splash sequence...");
-    
+
     // Delay to show the splash screen for at least 3 seconds
-    await Future.delayed(const Duration(seconds: 3));
-    
+    await Future.delayed(const Duration(seconds: 4));
+
     // Fetch the user type and handle redirection
     await _fetchUserTypeAndRedirect();
   }
 
-Future<void> _fetchUserTypeAndRedirect() async {
-  try {
-    print("Fetching session...");
-    final session = StorageService.getUserSession;
-    
-    if (session == null || session.user == null || session.user!.id == null) {
-      print("Session is null or invalid, redirecting to login...");
-      Get.offAll(() => LoginScreen());
-      return;
-    }
+  Future<void> _fetchUserTypeAndRedirect() async {
+    try {
+      print("Fetching session...");
+      final session = StorageService.getUserSession;
 
-    final userId = session.user!.id; // Retrieve userId from the session
-    print("User ID: $userId");
+      if (session == null || session.user == null || session.user!.id == null) {
+        print("Session is null or invalid, redirecting to login...");
+        Get.offAll(() => LoginScreen());
+        return;
+      }
 
-    // Fetch user type from the database
-    final user = await SupabaseService.supabase
-        .from('users')
-        .select('user_type')
-        .eq('id', userId)
-        .single();
-    print("User data: $user");
+      final userId = session.user!.id; // Retrieve userId from the session
+      print("User ID: $userId");
 
-    if (user != null && user['user_type'] != null) {
-      final userType = user['user_type'];
-      print("User type: $userType");
+      // Fetch user type from the database
+      final user = await SupabaseService.supabase
+          .from('users')
+          .select('user_type')
+          .eq('id', userId)
+          .single();
+      print("User data: $user");
 
-      // Redirect based on user type
-      if (userType == 'Admin') {
-        Get.offAll(() => ApproveTutorsScreen());
-      } else if (userType == 'Student') {
-        Get.offAll(() => StudentHomeScreen());
-      } else if (userType == 'Tutor') {
-        Get.offAll(() => ProfileScreen());
+      if (user != null && user['user_type'] != null) {
+        final userType = user['user_type'];
+        print("User type: $userType");
+
+        // Redirect based on user type
+        if (userType == 'Admin') {
+          Get.offAll(() => ApproveTutorsScreen());
+        } else if (userType == 'Student') {
+          Get.offAll(() => StudentHomeScreen());
+        } else if (userType == 'Tutor') {
+          Get.offAll(() => ProfileScreen());
+        } else {
+          print("Unknown user type, redirecting to login...");
+          Get.offAll(() => LoginScreen());
+        }
       } else {
-        print("Unknown user type, redirecting to login...");
+        print("User not found or user type is null, redirecting to login...");
         Get.offAll(() => LoginScreen());
       }
-    } else {
-      print("User not found or user type is null, redirecting to login...");
+    } catch (e) {
+      log("Error fetching user type: $e");
+      Get.snackbar("Error", "Failed to load user data.");
       Get.offAll(() => LoginScreen());
     }
-  } catch (e) {
-    log("Error fetching user type: $e");
-    Get.snackbar("Error", "Failed to load user data.");
-    Get.offAll(() => LoginScreen());
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Image.asset(
-          'assets/ali.png', // Replace with your actual logo asset path
-          width: 150,
-          height: 150,
+        child: Lottie.asset(
+          'assets/animation2.json',
+          repeat: true,
+          animate: true,
+          width: 250,
+          height: 250,
         ),
       ),
     );
