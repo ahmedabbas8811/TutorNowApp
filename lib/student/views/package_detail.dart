@@ -131,7 +131,7 @@ class PackageDetailScreen extends StatelessWidget {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          Get.to(() => TutorAvailabilityScreen());
+                          Get.to(() => TutorAvailabilityScreen(packageId: packageId));
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: Size(double.infinity, 0),
