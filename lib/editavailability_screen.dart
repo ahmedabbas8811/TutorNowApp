@@ -177,7 +177,7 @@ Future<void> _selectTime(
     setState(() {
       if (timeIndex == 0) {
         // Validate start time
-        if (pickedTime.hour > endTime.hour ||
+        if (pickedTime.hour < endTime.hour ||
             (pickedTime.hour == endTime.hour && pickedTime.minute < endTime.minute)) {
           _timeSlots[day]![slotIndex][timeIndex] = pickedTime;
         } else {
@@ -205,7 +205,6 @@ Future<void> _selectTime(
     });
   }
 }
-
 
   // Add a new time slot for a day
   void _addTimeSlot(String day) {

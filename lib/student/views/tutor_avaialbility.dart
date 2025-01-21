@@ -125,51 +125,63 @@ class TutorAvailabilityScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Select Day Section
+            // Select Day Section
             const Text(
               "Select Day",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _controller.availabilityList.map((availability) {
-                  return GestureDetector(
-                    onTap: () {
-                      _controller.selectedDay.value = availability.day;
+            Obx(() {
+              if (_controller.availabilityList.isEmpty) {
+                return const Center(
+                  child: Text("No available days."),
+                );
+              }
 
-                      // Process slots for the selected day
-                      _controller.processSlots(availability.slots);
-                    },
-                    child: Obx(() {
-                      return Container(
-                        margin: const EdgeInsets.only(right: 12),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: _controller.selectedDay.value ==
-                                  availability.day
-                              ? const Color(0xff87e64c)
-                              : Colors.grey[200],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          availability.day,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: _controller.availabilityList.map((availability) {
+                    return GestureDetector(
+                      onTap: () {
+                        _controller.selectedDay.value = availability.day;
+                        _controller.processSlots(availability
+                            .slots); // Process slots for selected day
+                        print("Day selected: ${_controller.selectedDay.value}");
+                        print(
+                            "Slots for selected day: ${_controller.availableSlots}");
+                      },
+                      child: Obx(() {
+                        return Container(
+                          margin: const EdgeInsets.only(right: 12),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 16),
+                          decoration: BoxDecoration(
                             color: _controller.selectedDay.value ==
                                     availability.day
-                                ? Colors.black
-                                : Colors.grey[600],
+                                ? const Color(0xff87e64c)
+                                : Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ),
-                      );
-                    }),
-                  );
-                }).toList(),
-              ),
-            ),
+                          child: Text(
+                            availability.day,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: _controller.selectedDay.value ==
+                                      availability.day
+                                  ? Colors.black
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                        );
+                      }),
+                    );
+                  }).toList(),
+                ),
+              );
+            }),
+
             const SizedBox(height: 24),
 
             // Available Slots Section
@@ -191,35 +203,45 @@ class TutorAvailabilityScreen extends StatelessWidget {
                     return GestureDetector(
                       onTap: () {
                         _controller.selectedTime.value = slot;
+                        // Validate slot selection
+                        if (_controller.areConsecutiveSlotsAvailable(slot)) {
+                          print("Slot $slot is valid for booking.");
+                        } else {
+                          print("Slot $slot is NOT valid for booking.");
+                          Get.snackbar(
+                            "Slot Unavailable",
+                            "The tutor is not available for the required duration.",
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        }
                       },
-                      child: Obx(() {
-                        return Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 16),
-                          decoration: BoxDecoration(
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: _controller.selectedTime.value == slot
+                              ? const Color(0xff87e64c)
+                              : Colors.grey[200],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          slot,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
                             color: _controller.selectedTime.value == slot
-                                ? const Color(0xff87e64c)
-                                : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8),
+                                ? Colors.black
+                                : Colors.grey[600],
                           ),
-                          child: Text(
-                            slot,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: _controller.selectedTime.value == slot
-                                  ? Colors.black
-                                  : Colors.grey[600],
-                            ),
-                          ),
-                        );
-                      }),
+                        ),
+                      ),
                     );
                   }).toList(),
                 ),
               );
             }),
+
             const Spacer(),
 
             // Confirm Booking Button

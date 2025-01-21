@@ -13,8 +13,10 @@ class TutorAvailabilityController extends GetxController {
   var availabilityList = <TutorAvailabilityModel>[].obs;
   var userId = ''.obs;
   var availableSlots = <String>[].obs;
+  late int required30MinSessions;
 
-  TutorAvailabilityController({required this.totalSessions, required this.packageId});
+  TutorAvailabilityController(
+      {required this.totalSessions, required this.packageId});
 
   @override
   void onInit() {
@@ -22,19 +24,26 @@ class TutorAvailabilityController extends GetxController {
     fetchUserId();
   }
 
-  // Fetch user_id based on packageId
   Future<void> fetchUserId() async {
     try {
+      // Fetch user_id, hours_per_session, and minutes_per_session
       final response = await Supabase.instance.client
           .from('packages')
-          .select('user_id')
+          .select('user_id, hours_per_session, minutes_per_session')
           .eq('id', packageId)
           .single();
 
       if (response != null) {
         userId.value = response['user_id'];
         print("Fetched user_id: ${userId.value}");
-        fetchAvailability();
+
+        // Use the fetched hours and minutes to calculate total sessions
+        calculateRequiredSessions(
+          response['hours_per_session'] ?? 0, // Default to 0 if null
+          response['minutes_per_session'] ?? 0, // Default to 0 if null
+        );
+
+        fetchAvailability(); // Proceed to fetch availability
       } else {
         print("No user found for packageId: $packageId");
       }
@@ -43,84 +52,160 @@ class TutorAvailabilityController extends GetxController {
     }
   }
 
-  // Fetch availability data from the availability table
-  Future<void> fetchAvailability() async {
-  if (userId.value.isEmpty) {
-    print("User ID is empty. Cannot fetch availability.");
-    return;
+  void calculateRequiredSessions(int hours, int minutes) {
+    int totalMinutes =
+        (hours * 60) + minutes; // Convert hours and minutes to total minutes
+    required30MinSessions =
+        (totalMinutes / 30).ceil(); // Calculate 30-minute sessions
+    print("Required 30-minute sessions: $required30MinSessions");
   }
 
-  try {
-    final List<dynamic> response = await Supabase.instance.client
-        .from('availability')
-        .select('day, is_available, slots')
-        .eq('user_id', userId.value);
+  bool areConsecutiveSlotsAvailable(String selectedSlot) {
+  final parsedStartTime = _parseTime(selectedSlot); // Parse selected slot time
+  int consecutiveCount = 0;
 
-    print("Raw response from availability table: $response");
+  // Check for required slots after the selected slot
+  for (int i = 1; i <= required30MinSessions; i++) {
+    final nextSlotTime = parsedStartTime.add(Duration(minutes: i * 30));
+    final formattedTime = DateFormat('h:mm a').format(nextSlotTime);
 
-    if (response.isNotEmpty) {
-      final filteredData = response.where((item) => item['is_available'] == true).toList();
-      print("Filtered availability data: $filteredData");
-
-      availabilityList.value = filteredData
-          .map((item) => TutorAvailabilityModel(
-                day: item['day'], // Extract day
-                slots: item['slots'], // Extract slots
-              ))
-          .toList();
-
-      // Debugging: Print each day and its processed slots
-      for (var availability in availabilityList) {
-        print("Day: ${availability.day}");
-        processSlots(availability.slots); // Process slots for debugging
-        print("Processed Slots for ${availability.day}: $availableSlots");
-      }
+    if (availableSlots.contains(formattedTime)) {
+      consecutiveCount++;
     } else {
-      print("No availability found for user_id: ${userId.value}");
+      break; // Stop if a required slot is missing
     }
-  } catch (e) {
-    print("Error fetching availability: $e");
   }
+
+  return consecutiveCount == required30MinSessions; // Valid if all 5 slots are found
 }
 
 
 
-  // Process slots for a specific day
-  void processSlots(List<dynamic> slotsJson) {
-  availableSlots.clear();
-  for (var slot in slotsJson) {
-    final startTime = _parseTime(slot['start']); // Extract start time
-    final endTime = _parseTime(slot['end']); // Extract end time
+  Future<void> fetchAvailability() async {
+    if (userId.value.isEmpty) {
+      print("User ID is empty. Cannot fetch availability.");
+      return;
+    }
 
-    var current = startTime;
-    while (current.isBefore(endTime) || current == endTime) {
-      availableSlots.add(DateFormat('h:mm a').format(current)); // Format to 12-hour
-      current = current.add(const Duration(minutes: 30)); // Add 30-minute intervals
+    try {
+      print("Fetching availability for user_id: ${userId.value}");
+      final List<dynamic> response = await Supabase.instance.client
+          .from('availability')
+          .select('day, is_available, slots')
+          .eq('user_id', userId.value);
+
+      print("Raw response from availability table: $response");
+
+      if (response.isNotEmpty) {
+        final filteredData =
+            response.where((item) => item['is_available'] == true).toList();
+        print("Filtered availability data: $filteredData");
+
+        // Clear and update availabilityList
+        availabilityList.clear();
+        availabilityList.addAll(filteredData.map((item) {
+          return TutorAvailabilityModel(
+            day: item['day'], // Extract day
+            slots: item['slots'], // Extract slots
+          );
+        }).toList());
+
+        availabilityList.refresh(); // Trigger UI update
+        print("Updated availabilityList: $availabilityList");
+      } else {
+        print("No availability found for user_id: ${userId.value}");
+        availabilityList.clear();
+        availabilityList.refresh();
+      }
+    } catch (e) {
+      print("Error fetching availability: $e");
     }
   }
-  print("Processed slots: $availableSlots");
-}
 
-
-  // Helper method to parse time strings (e.g., "8:0") into DateTime objects
+  // Helper method to parse time strings (e.g., "8:0" or "8:30 AM") into DateTime objects
   DateTime _parseTime(String time) {
-    final parts = time.split(':');
-    final hour = int.parse(parts[0]);
-    final minute = int.parse(parts[1]);
-    return DateTime(0, 0, 0, hour, minute);
+    try {
+      // Ensure the time has a consistent format
+      if (!time.contains("AM") && !time.contains("PM")) {
+        // Default to AM if no period is specified
+        time += " AM";
+      }
+
+      // Split the hour and minute
+      final parts = time.split(':');
+      if (parts.length != 2) {
+        throw FormatException("Invalid time format: $time");
+      }
+
+      // Extract hour and minute
+      final hour = int.parse(parts[0].trim());
+      final minuteAndPeriod = parts[1].split(' '); // Split minutes and AM/PM
+      if (minuteAndPeriod.length != 2) {
+        throw FormatException("Invalid minute format: $time");
+      }
+      final minute = int.parse(minuteAndPeriod[0].trim());
+      final period = minuteAndPeriod[1].trim();
+
+      // Validate AM/PM
+      if (period != "AM" && period != "PM") {
+        throw FormatException("Invalid period: $period in $time");
+      }
+
+      // Convert to 24-hour format
+      final hour24 = period == "PM" && hour != 12
+          ? hour + 12
+          : period == "AM" && hour == 12
+              ? 0
+              : hour;
+
+      return DateTime(0, 0, 0, hour24, minute);
+    } catch (e) {
+      print("Error parsing time: $time. Exception: $e");
+      throw FormatException("Invalid time format: $time");
+    }
   }
 
+// Process slots for a specific day
+  void processSlots(List<dynamic> slotsJson) {
+    availableSlots.clear();
+    for (var slot in slotsJson) {
+      try {
+        final startTime = _parseTime(slot['start']); // Extract start time
+        final endTime = _parseTime(slot['end']); // Extract end time
 
+        var current = startTime;
+        while (current.isBefore(endTime) || current == endTime) {
+          availableSlots
+              .add(DateFormat('h:mm a').format(current)); // Format to 12-hour
+          current = current
+              .add(const Duration(minutes: 30)); // Add 30-minute intervals
+        }
+      } catch (e) {
+        print("Skipping slot due to parsing error: $e");
+      }
+    }
+    print("Processed slots: $availableSlots");
+    availableSlots.refresh(); // Trigger UI update
+  }
 
   // Move to the next session
   void nextSession() {
   if (currentSession.value < totalSessions) {
-    // Add the current selection to the availability list
-    availabilityList.add(TutorAvailabilityModel(
-      day: selectedDay.value,
-      slots: [], // Leave slots empty if not required here
-      selectedTime: selectedTime.value, // Store the selected time
-    ));
+    // Check if the selected day already exists in the availability list
+    bool dayAlreadyExists = availabilityList.any(
+      (availability) => availability.day == selectedDay.value,
+    );
+
+    // Add the selected day to the list only if it doesn't exist
+    if (!dayAlreadyExists) {
+      availabilityList.add(TutorAvailabilityModel(
+        day: selectedDay.value,
+        slots: [],
+        selectedTime: selectedTime.value, // Store the selected time
+      ));
+    }
+
+    // Move to the next session
     currentSession.value++;
 
     // Clear selections for the next session
@@ -128,21 +213,20 @@ class TutorAvailabilityController extends GetxController {
   }
 }
 
-
   // Confirm availability
   void confirmAvailability() {
-  // Add the last selection to the availability list
-  availabilityList.add(TutorAvailabilityModel(
-    day: selectedDay.value,
-    slots: [], // Leave slots empty if no slots are required here
-    selectedTime: selectedTime.value, // Store the selected time
-  ));
-  print("Final Availability List:");
-  for (var availability in availabilityList) {
-    print("Day: ${availability.day}, Selected Time: ${availability.selectedTime}");
+    // Add the last selection to the availability list
+    availabilityList.add(TutorAvailabilityModel(
+      day: selectedDay.value,
+      slots: [], // Leave slots empty if no slots are required here
+      selectedTime: selectedTime.value, // Store the selected time
+    ));
+    print("Final Availability List:");
+    for (var availability in availabilityList) {
+      print(
+          "Day: ${availability.day}, Selected Time: ${availability.selectedTime}");
+    }
   }
-}
-
 
   // Check if it's the last session
   bool isLastSession() {
