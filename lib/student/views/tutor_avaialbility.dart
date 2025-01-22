@@ -125,7 +125,6 @@ class TutorAvailabilityScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Select Day Section
-            // Select Day Section
             const Text(
               "Select Day",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

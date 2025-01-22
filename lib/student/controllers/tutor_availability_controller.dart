@@ -60,24 +60,48 @@ class TutorAvailabilityController extends GetxController {
     print("Required 30-minute sessions: $required30MinSessions");
   }
 
+  //checking for consecutive slots
   bool areConsecutiveSlotsAvailable(String selectedSlot) {
   final parsedStartTime = _parseTime(selectedSlot); // Parse selected slot time
   int consecutiveCount = 0;
 
-  // Check for required slots after the selected slot
-  for (int i = 1; i <= required30MinSessions; i++) {
+  print("Checking availability for slot: $selectedSlot");
+
+  for (int i = 0; i < required30MinSessions; i++) {
     final nextSlotTime = parsedStartTime.add(Duration(minutes: i * 30));
     final formattedTime = DateFormat('h:mm a').format(nextSlotTime);
 
+    // Check if the slot exists in availableSlots
     if (availableSlots.contains(formattedTime)) {
       consecutiveCount++;
+      print("Consecutive slot found: $formattedTime (Count: $consecutiveCount)");
     } else {
-      break; // Stop if a required slot is missing
+      print("Slot $formattedTime is not consecutive. Stopping check.");
+      return false; // Stop as soon as a slot is invalid
     }
   }
 
-  return consecutiveCount == required30MinSessions; // Valid if all 5 slots are found
+  // If all required slots are consecutive, ensure the last slot fits the session duration
+  final adjustedEndTime =
+      parsedStartTime.add(Duration(minutes: required30MinSessions * 30));
+
+  print("Calculated session end time: ${DateFormat('h:mm a').format(adjustedEndTime)}");
+
+  // Check if the adjusted end time is within the original slot's end time
+  for (var slot in availabilityList) {
+    for (var jsonSlot in slot.slots) {
+      final slotEndTime = _parseTime(jsonSlot['end']);
+      if (adjustedEndTime.isBefore(slotEndTime.add(const Duration(minutes: 30)))) {
+        print("Session fits within the available time. Slot is valid.");
+        return true; // Valid if all conditions pass
+      }
+    }
+  }
+
+  print("Not enough consecutive slots for $selectedSlot.");
+  return false;
 }
+
 
 
 
@@ -166,27 +190,32 @@ class TutorAvailabilityController extends GetxController {
   }
 
 // Process slots for a specific day
-  void processSlots(List<dynamic> slotsJson) {
-    availableSlots.clear();
-    for (var slot in slotsJson) {
-      try {
-        final startTime = _parseTime(slot['start']); // Extract start time
-        final endTime = _parseTime(slot['end']); // Extract end time
+void processSlots(List<dynamic> slotsJson) {
+  availableSlots.clear();
+  print("Processing slots for selected day...");
 
-        var current = startTime;
-        while (current.isBefore(endTime) || current == endTime) {
-          availableSlots
-              .add(DateFormat('h:mm a').format(current)); // Format to 12-hour
-          current = current
-              .add(const Duration(minutes: 30)); // Add 30-minute intervals
-        }
-      } catch (e) {
-        print("Skipping slot due to parsing error: $e");
+  for (var slot in slotsJson) {
+    try {
+      final startTime = _parseTime(slot['start']); // Extract start time
+      final endTime = _parseTime(slot['end']); // Extract end time
+
+      // Adjust the end time to exclude the last 30 minutes
+      final adjustedEndTime = endTime.subtract(const Duration(minutes: 30));
+
+      var current = startTime;
+      while (current.isBefore(adjustedEndTime) || current == adjustedEndTime) {
+        availableSlots.add(DateFormat('h:mm a').format(current)); // Format to 12-hour
+        current = current.add(const Duration(minutes: 30)); // Add 30-minute intervals
       }
+    } catch (e) {
+      print("Skipping slot due to parsing error: $e");
     }
-    print("Processed slots: $availableSlots");
-    availableSlots.refresh(); // Trigger UI update
   }
+  print("Processed slots: $availableSlots");
+  availableSlots.refresh(); // Trigger UI update
+}
+
+
 
   // Move to the next session
   void nextSession() {
