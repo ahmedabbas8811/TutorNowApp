@@ -142,13 +142,17 @@ class TutorAvailabilityScreen extends StatelessWidget {
                 child: Row(
                   children: _controller.availabilityList.map((availability) {
                     return GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         _controller.selectedDay.value = availability.day;
-                        _controller.processSlots(availability
+                        await _controller.processSlots(availability
                             .slots); // Process slots for selected day
                         print("Day selected: ${_controller.selectedDay.value}");
                         print(
                             "Slots for selected day: ${_controller.availableSlots}");
+                        _controller.filterAvailableSlots();
+
+                        print(
+                            "Filtered Slots for selected day: ${_controller.availableSlots}");
                       },
                       child: Obx(() {
                         return Container(
