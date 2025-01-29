@@ -14,6 +14,7 @@ class TutorAvailabilityController extends GetxController {
   var userId = ''.obs;
   var availableSlots = <String>[].obs;
   late int required30MinSessions;
+  var selectedSlots = <String, String>{}.obs; // To store selected time slots
 
   TutorAvailabilityController(
       {required this.totalSessions, required this.packageId});
@@ -242,44 +243,112 @@ class TutorAvailabilityController extends GetxController {
         Duration(milliseconds: 100)); // Add a small delay if needed
   }
 
-  //move to next session
   void nextSession() {
     if (currentSession.value < totalSessions) {
-      //check if the selected day already exists in availability list
+      // store selected time slot for the current session in the selectedSlots map
+      if (selectedTime.value.isNotEmpty) {
+        selectedSlots["${currentSession.value}"] = selectedTime.value;
+      } else {
+        // leave value empty if no slot selected
+        selectedSlots["${currentSession.value}"] = "";
+      }
+
+      // check if the selected day already exists in the availability list
       bool dayAlreadyExists = availabilityList.any(
         (availability) => availability.day == selectedDay.value,
       );
 
-      //add selected day to list only if it doesn't exist
+      // add selected day to the list only if it doesn't exist
       if (!dayAlreadyExists) {
         availabilityList.add(TutorAvailabilityModel(
           day: selectedDay.value,
-          slots: [],
-          selectedTime: selectedTime.value, // Store selected time
+          slots: [], // Slots can be populated later if needed
+          selectedTime: selectedTime.value.isNotEmpty ? selectedTime.value : "",
         ));
       }
 
-      //move to next session
+      // move to the next session
       currentSession.value++;
 
-      //clear selections for next session
+      // clear selections for the next session
       resetSelections();
     }
   }
 
-  //confirm availability
-  void confirmAvailability() {
-    //add last selection to list
+  Future<void> confirmAvailability() async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user == null) {
+      print("No user is currently logged in.");
+      Get.snackbar(
+        "Error",
+        "You must be logged in to confirm a booking.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // add last sessions selected slot to the selectedSlots map
+    if (selectedTime.value.isNotEmpty) {
+      selectedSlots["${currentSession.value}"] = selectedTime.value;
+    } else {
+      // Leave the value empty if no slot is selected
+      selectedSlots["${currentSession.value}"] = "";
+    }
+
+    // add last sessions details to the availability list
     availabilityList.add(TutorAvailabilityModel(
       day: selectedDay.value,
-      slots: [], //leave slots empty if no slots are required here
-      selectedTime: selectedTime.value, //store selected time
+      slots: [],
+      selectedTime: selectedTime.value.isNotEmpty ? selectedTime.value : "",
     ));
+
     print("Final Availability List:");
     for (var availability in availabilityList) {
       print(
           "Day: ${availability.day}, Selected Time: ${availability.selectedTime}");
     }
+
+    // prepare data to insert into the database
+    final bookingData = {
+      'user_id': user.id, // Use the authenticated user's ID
+      'time slots': selectedSlots, // Store all selected time slots
+    };
+
+    try {
+      // insert data into the bookings table
+      final response = await Supabase.instance.client
+          .from('bookings')
+          .insert(bookingData)
+          .select(); // Ensure .select() is used to fetch inserted data
+
+      if (response != null && response.isNotEmpty) {
+        print("Booking confirmed successfully!");
+        print("Inserted Data: $response");
+        Get.snackbar(
+          "Success",
+          "Booking has been confirmed.",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        print("No data returned from insert operation.");
+        Get.snackbar(
+          "Error",
+          "Failed to confirm booking. Please try again.",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      print("Exception during booking: $e");
+      Get.snackbar(
+        "Error",
+        "An unexpected error occurred. Please try again.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+
+    // clear the selectedSlots map after confirmation
+    selectedSlots.clear();
   }
 
   // Check if its last session
@@ -290,6 +359,6 @@ class TutorAvailabilityController extends GetxController {
   //reset day and time
   void resetSelections() {
     selectedDay.value = "Mon"; //default to first day
-    selectedTime.value = "12:00 PM"; //default to first time slot
+    selectedTime.value = ""; //default to empty
   }
 }
