@@ -1,0 +1,202 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart'; // ✅ Import for formatting timestamps
+import 'package:newifchaly/student/models/message.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+final supabase = Supabase.instance.client; // ✅ Ensure Supabase client is used
+
+class ChatScreen extends StatefulWidget {
+  final String receiverId;
+
+  const ChatScreen({Key? key, required this.receiverId}) : super(key: key);
+
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  late Stream<List<Message>> _messagesStream;
+  final TextEditingController _textController = TextEditingController();
+  final ScrollController _scrollController =
+      ScrollController(); // ✅ Add ScrollController
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMessages();
+  }
+
+  /// ✅ Fetch messages and enable real-time updates
+  void _fetchMessages() {
+    final myUserId = supabase.auth.currentUser?.id;
+    if (myUserId == null) {
+      Get.snackbar('Error', 'User not authenticated');
+      return;
+    }
+
+    print('Fetching messages between $myUserId and ${widget.receiverId}');
+
+    _messagesStream = supabase
+        .from('messages')
+        .stream(primaryKey: ['id']) // ✅ Real-time updates
+        .order('created_at', ascending: true) // ✅ Correct ordering
+        .map((maps) => maps
+            .where((map) =>
+                (map['sender_id'] == myUserId &&
+                    map['receiver_id'] == widget.receiverId) ||
+                (map['sender_id'] == widget.receiverId &&
+                    map['receiver_id'] ==
+                        myUserId)) // ✅ Filter messages manually
+            .map((map) => Message.fromMap(map: map, myUserId: myUserId))
+            .toList());
+
+    setState(() {}); // ✅ Ensure UI rebuilds
+  }
+
+  /// ✅ Auto-scroll to the latest message
+  void _scrollToBottom() {
+    Future.delayed(Duration(milliseconds: 300), () {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+  }
+
+  /// ✅ Send message to Supabase database
+  Future<void> _sendMessage() async {
+    final text = _textController.text.trim();
+    if (text.isEmpty) return;
+
+    final myUserId = supabase.auth.currentUser?.id;
+    if (myUserId == null) {
+      Get.snackbar('Error', 'User not authenticated');
+      return;
+    }
+
+    try {
+      await supabase.from('messages').insert({
+        'sender_id': myUserId,
+        'receiver_id': widget.receiverId,
+        'content': text,
+        'created_at': DateTime.now().toIso8601String(), // ✅ Store timestamp
+      });
+
+      _textController.clear();
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to send message: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat with Tutor'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder<List<Message>>(
+              stream: _messagesStream, // ✅ Use the correct stream
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  print('Error: ${snapshot.error}');
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                final messages = snapshot.data ?? [];
+                if (messages.isEmpty) {
+                  return Center(
+                      child: Text('No messages yet. Start chatting!'));
+                }
+
+                WidgetsBinding.instance.addPostFrameCallback((_) =>
+                    _scrollToBottom()); // ✅ Auto-scroll when messages update
+
+                return ListView.builder(
+                  controller: _scrollController, // ✅ Attach ScrollController
+                  reverse: false, // ✅ Ensures messages appear in correct order
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
+                    return _buildMessageBubble(message);
+                  },
+                );
+              },
+            ),
+          ),
+          _buildMessageInput(),
+        ],
+      ),
+    );
+  }
+
+  /// ✅ Builds chat bubbles for messages with timestamps
+  Widget _buildMessageBubble(Message message) {
+    final isMe = message.isMine;
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment:
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isMe ? Colors.blue : Colors.grey[300],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              message.content,
+              style: TextStyle(color: isMe ? Colors.white : Colors.black),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Text(
+              _formatTimestamp(message.createdAt), // ✅ Show formatted timestamp
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ✅ Formats timestamp to show time in "hh:mm a" format
+  String _formatTimestamp(DateTime timestamp) {
+    return DateFormat('hh:mm a').format(timestamp); // Example: "10:30 PM"
+  }
+
+  /// ✅ Builds input field and send button
+  Widget _buildMessageInput() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _textController,
+              decoration: InputDecoration(
+                hintText: 'Type a message...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 8),
+          IconButton(
+            onPressed: _sendMessage,
+            icon: Icon(Icons.send, color: Colors.blue),
+          ),
+        ],
+      ),
+    );
+  }
+}
