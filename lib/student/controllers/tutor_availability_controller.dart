@@ -312,6 +312,8 @@ class TutorAvailabilityController extends GetxController {
     // prepare data to insert into the database
     final bookingData = {
       'user_id': user.id, // Use the authenticated user's ID
+      'tutor_id': userId.value,
+      'package_id': packageId,
       'time slots': selectedSlots, // Store all selected time slots
     };
 

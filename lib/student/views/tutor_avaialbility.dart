@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/student/controllers/package_controller.dart';
 import 'package:newifchaly/student/controllers/tutor_availability_controller.dart';
+import 'package:newifchaly/student/views/bookings.dart';
 
 class TutorAvailabilityScreen extends StatelessWidget {
   final int packageId;
@@ -211,11 +212,11 @@ class TutorAvailabilityScreen extends StatelessWidget {
                           print("Slot $slot is valid for booking.");
                         } else {
                           print("Slot $slot is NOT valid for booking.");
-                          Get.snackbar(
-                            "Slot Unavailable",
-                            "The tutor is not available for the required duration.",
-                            snackPosition: SnackPosition.BOTTOM,
-                          );
+                          // Get.snackbar(
+                          //   "Slot Unavailable",
+                          //   "The tutor is not available for the required duration.",
+                          //   snackPosition: SnackPosition.BOTTOM,
+                          // );
                         }
                       },
                       child: Container(
@@ -272,7 +273,7 @@ class TutorAvailabilityScreen extends StatelessWidget {
                     onPressed: () {
                       if (isLastSession) {
                         _controller.confirmAvailability();
-                        Navigator.pop(context);
+                        Get.off(() => BookingsScreen());
                       } else {
                         _controller.nextSession();
                       }
