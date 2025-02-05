@@ -55,7 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 2:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => SessionsScreen()),
+          MaterialPageRoute(builder: (context) => SessionScreen()),
         );
         break;
       case 3:
@@ -265,8 +265,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             label: 'Availability',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.video_camera_front),
-            label: 'Sessions',
+            icon: Icon(Icons.group),
+            label: 'Bookings',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.attach_money),

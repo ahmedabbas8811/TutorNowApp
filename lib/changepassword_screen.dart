@@ -335,7 +335,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         break;
       case 2:
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SessionsScreen()));
+            context, MaterialPageRoute(builder: (context) => SessionScreen()));
         break;
       case 3:
         Navigator.push(
@@ -558,7 +558,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today), label: 'Availability'),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Sessions'),
+          BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Bookings'),
           BottomNavigationBarItem(
               icon: Icon(Icons.attach_money), label: 'Earnings'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),

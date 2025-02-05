@@ -3,13 +3,19 @@ import 'package:newifchaly/availabilityscreen.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
+import 'package:get/get.dart';
+import 'package:newifchaly/sessionscreen.dart';
+import 'package:newifchaly/utils/profile_helper.dart';
+import 'package:newifchaly/views/booking_request_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SessionsScreen extends StatefulWidget {
+
+class SessionScreen extends StatefulWidget {
   @override
-  _SessionsScreenState createState() => _SessionsScreenState();
+  _SessionScreenState createState() => _SessionScreenState();
 }
 
-class _SessionsScreenState extends State<SessionsScreen> {
+class _SessionScreenState extends State<SessionScreen> {
   int _selectedIndex = 2;
 
   void _onItemTapped(int index) {
@@ -17,197 +23,222 @@ class _SessionsScreenState extends State<SessionsScreen> {
       _selectedIndex = index;
     });
 
-    // Navigate to a new page based on the selected index
+    Widget screen;
     switch (index) {
       case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ProfileScreen()),
-        );
+        screen = ProfileScreen();
         break;
       case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AvailabilityScreen()),
-        );
+        screen = AvailabilityScreen();
         break;
       case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SessionsScreen()),
-        );
+        screen = SessionScreen();
         break;
       case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => EarningsScreen()),
-        );
+        screen = EarningsScreen();
         break;
       case 4:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PersonScreen()),
-        );
+        screen = PersonScreen();
         break;
+      default:
+        return;
     }
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => screen));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'My Sessions',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-
-            // Clickable Container with a dashed border
-            GestureDetector(
-              onTap: () {
-                print("Box clicked!");
-              },
-              child: Container(
-                width: 350,
-                height: 150,
-                child: CustomPaint(
-                  painter: DashedBorderPainter(),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 10),
-                      Text(
-                        'You can manage all your sessions here,',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'once they are started',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            const Spacer(),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 30),
+              const Text('My Bookings',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              buildSection('Booking Requests', Colors.orange),
+              const SizedBox(height: 24),
+              buildSection('Active Bookings', Colors.green),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed, // Fixed type ensures white background
-          backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
         selectedItemColor: const Color(0xff87e64c),
         unselectedItemColor: Colors.black,
         showSelectedLabels: true,
         showUnselectedLabels: true,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+              icon: Icon(Icons.event_available), label: 'Availability'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event_available),
-            label: 'Availability',
-          ),
+              icon: Icon(Icons.group), label: 'Bookings'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.video_camera_front),
-            label: 'Sessions',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Earnings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+              icon: Icon(Icons.attach_money), label: 'Earnings'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         onTap: _onItemTapped,
       ),
     );
   }
+
+  Widget buildSection(String title, Color statusColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        const Text('Tap to see details',
+            style: TextStyle(fontSize: 14, color: Colors.grey)),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 170,
+          width: double.infinity,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  // Navigate to the new screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookingRequestScreen(), 
+                    ),
+                  );
+                },
+                child: SwipeableSessionCard(
+                  name: 'Shehdad Ali',
+                  package: 'Package Name',
+                  time: '90 Min / Session',
+                  frequency: '3X / Week',
+                  duration: '8 Weeks',
+                  price: '5000/- PKR',
+                  statusColor: statusColor,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  // Navigate to the new screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookingRequestScreen(), 
+                    ),
+                  );
+                },
+                child: SwipeableSessionCard(
+                  name: 'John Doe',
+                  package: 'Another Package',
+                  time: '60 Min / Session',
+                  frequency: '2X / Week',
+                  duration: '6 Weeks',
+                  price: '4000/- PKR',
+                  statusColor: statusColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-class DashedBorderPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.grey
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
+class SwipeableSessionCard extends StatelessWidget {
+  final String name;
+  final String package;
+  final String time;
+  final String frequency;
+  final String duration;
+  final String price;
+  final Color statusColor;
 
-    const dashWidth = 7.0;
-    const dashSpace = 4.0;
-    double startX = 0.0;
-
-    // Top border
-    while (startX < size.width) {
-      canvas.drawLine(
-        Offset(startX, 0),
-        Offset(startX + dashWidth, 0),
-        paint,
-      );
-      startX += dashWidth + dashSpace;
-    }
-
-    double startY = 0.0;
-    while (startY < size.height) {
-      canvas.drawLine(
-        Offset(size.width, startY),
-        Offset(size.width, startY + dashWidth),
-        paint,
-      );
-      startY += dashWidth + dashSpace;
-    }
-
-    startX = 0.0;
-    while (startX < size.width) {
-      canvas.drawLine(
-        Offset(startX, size.height),
-        Offset(startX + dashWidth, size.height),
-        paint,
-      );
-      startX += dashWidth + dashSpace;
-    }
-
-    startY = 0.0;
-    while (startY < size.height) {
-      canvas.drawLine(
-        Offset(0, startY),
-        Offset(0, startY + dashWidth),
-        paint,
-      );
-      startY += dashWidth + dashSpace;
-    }
-  }
+  const SwipeableSessionCard({
+    required this.name,
+    required this.package,
+    required this.time,
+    required this.frequency,
+    required this.duration,
+    required this.price,
+    required this.statusColor,
+  });
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+  Widget build(BuildContext context) {
+    return Container(
+      width: 280,
+      margin:const  EdgeInsets.only(right: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xfff7f7f7), 
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.black, width: 1), 
+      ),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 0, 
+        color: Colors.transparent, 
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                const   CircleAvatar(
+                    radius: 30,
+                    backgroundImage: AssetImage('assets/Ellipse1.png'),
+                  ),
+                const  SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(name,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(package,
+                            style:const  TextStyle(color: Colors.grey, fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                  CircleAvatar(radius: 4, backgroundColor: statusColor),
+                ],
+              ),
+           const   SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                      children: [const Icon(Icons.timer, size: 18), const SizedBox(width: 4), Text(time)]),
+                  Row(
+                      children: [const Icon(Icons.refresh, size: 18), const SizedBox(width: 4), Text(frequency)]),
+                ],
+              ),
+             const  SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                      children: [const Icon(Icons.calendar_today, size: 18), const SizedBox(width: 4), Text(duration)]),
+                  Row(
+                      children: [const Icon(Icons.attach_money, size: 18), const SizedBox(width: 4), Text(price)]),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

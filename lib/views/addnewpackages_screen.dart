@@ -52,7 +52,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
       case 2:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => SessionsScreen()),
+          MaterialPageRoute(builder: (context) =>  SessionScreen()),
         );
         break;
       case 3:
@@ -318,8 +318,8 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
                 label: 'Availability',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.video_camera_front),
-                label: 'Sessions',
+                icon: Icon(Icons.group),
+                label: 'Bookings',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.attach_money),

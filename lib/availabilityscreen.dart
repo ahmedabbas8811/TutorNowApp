@@ -67,7 +67,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       case 2:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => SessionsScreen()),
+          MaterialPageRoute(builder: (context) => SessionScreen()),
         );
         break;
       case 3:
@@ -213,7 +213,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
           BottomNavigationBarItem(
               icon: Icon(Icons.event_available), label: 'Availability'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.video_camera_front), label: 'Sessions'),
+              icon: Icon(Icons.group), label: 'Bookings'),
           BottomNavigationBarItem(
               icon: Icon(Icons.attach_money), label: 'Earnings'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),

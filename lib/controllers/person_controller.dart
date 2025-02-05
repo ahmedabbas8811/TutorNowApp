@@ -206,7 +206,7 @@ class PersonController extends GetxController {
         Get.to(() => AvailabilityScreen());
         break;
       case 2:
-        Get.to(() => SessionsScreen());
+        Get.to(() => SessionScreen());
         break;
       case 3:
         Get.to(() => EarningsScreen());

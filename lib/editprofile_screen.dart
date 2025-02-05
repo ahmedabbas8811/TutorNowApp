@@ -55,7 +55,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     case 2:
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => SessionsScreen()), // Replace with actual SessionsScreen widget
+        MaterialPageRoute(builder: (context) => SessionScreen()), // Replace with actual SessionsScreen widget
       );
       break;
     case 3:
