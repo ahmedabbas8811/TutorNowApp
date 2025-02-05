@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/student/controllers/package_controller.dart';
 import 'package:newifchaly/student/controllers/tutor_detail_controller.dart';
+import 'package:newifchaly/student/views/chat_screen.dart';
 import 'package:newifchaly/student/views/widgets/about_tutor.dart';
 import 'package:newifchaly/student/views/widgets/packages.dart';
 import 'package:newifchaly/student/views/widgets/reviews.dart';
@@ -125,7 +126,9 @@ class TutorDetailScreen extends StatelessWidget {
                   ],
                 ),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(() => ChatScreen(receiverId: userId));
+                  },
                   style: ElevatedButton.styleFrom(
                       elevation: 0,
                       backgroundColor: Theme.of(context).primaryColor,

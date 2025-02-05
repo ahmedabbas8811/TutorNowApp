@@ -113,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       IconButton(
                         icon: const Icon(Icons.message_outlined,
                             color: Colors.black),
-                        onPressed: () => Get.to(() => const MessageScreen()),
+                        onPressed: () => Get.to(() => TutorChatListScreen()),
                       ),
                     ],
                   ),
