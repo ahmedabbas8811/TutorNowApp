@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/controllers/booking_controller.dart';
+import 'package:newifchaly/models/tutor_booking_model.dart';
 import 'package:newifchaly/availabilityscreen.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
@@ -6,12 +8,29 @@ import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 
 class BookingRequestScreen extends StatefulWidget {
+  final BookingModel booking; // Receive booking details
+
+  const BookingRequestScreen({Key? key, required this.booking}) : super(key: key);
+
   @override
   _BookingRequestScreenState createState() => _BookingRequestScreenState();
 }
 
 class _BookingRequestScreenState extends State<BookingRequestScreen> {
+  final TutorBookingsController controller = TutorBookingsController();
   int _selectedIndex = 2;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBookingDetails();
+  }
+
+  Future<void> fetchBookingDetails() async {
+    await controller.fetchStudentInfo(widget.booking);
+    await controller.fetchPackageInfo(widget.booking);
+    setState(() {}); // Refresh UI after fetching data
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -65,16 +84,19 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
             const SizedBox(height: 30),
             CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.grey[300],
+              backgroundImage: widget.booking.studentImage.isNotEmpty &&
+                      Uri.tryParse(widget.booking.studentImage)?.hasAbsolutePath == true
+                  ? NetworkImage(widget.booking.studentImage)
+                  : const AssetImage('assets/Ellipse1.png') as ImageProvider,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Shehdad Ali',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              widget.booking.studentName,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const Text(
-              'Package Name',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+            Text(
+              widget.booking.packageName,
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 16),
             Container(
@@ -83,31 +105,39 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                 color: Colors.green[50],
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.access_time),
-                      SizedBox(width: 8),
-                      Text('1 Hour 30 Min / Session',
-                          style: TextStyle(fontSize: 15)),
+                      const Icon(Icons.access_time),
+                      const SizedBox(width: 8),
+                      Text(
+                        "${widget.booking.minutesPerSession} Min / Session",
+                        style: const TextStyle(fontSize: 15),
+                      ),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.refresh),
-                      SizedBox(width: 8),
-                      Text('3X / Week', style: TextStyle(fontSize: 15))
+                      const Icon(Icons.refresh),
+                      const SizedBox(width: 8),
+                      Text(
+                        "${widget.booking.sessionsPerWeek}X / Week",
+                        style: const TextStyle(fontSize: 15),
+                      )
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today),
-                      SizedBox(width: 8),
-                      Text('8 Weeks', style: TextStyle(fontSize: 15))
+                      const Icon(Icons.calendar_today),
+                      const SizedBox(width: 8),
+                      Text(
+                        "${widget.booking.numberOfWeeks} Weeks",
+                        style: const TextStyle(fontSize: 15),
+                      )
                     ],
                   ),
                 ],
@@ -115,7 +145,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
             ),
             const SizedBox(height: 16),
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.green[50],
                 borderRadius: BorderRadius.circular(12),
