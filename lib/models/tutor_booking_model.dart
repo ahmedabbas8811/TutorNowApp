@@ -1,10 +1,8 @@
 class BookingModel {
   final String bookingId;
-  final String userId; // Student ID
+  final String userId; 
   final String packageId;
   final String tutorId;
-
-  // Fields to be updated after fetching related data
   String studentName;
   String studentImage;
   String packageName;
@@ -12,6 +10,7 @@ class BookingModel {
   String sessionsPerWeek;
   String numberOfWeeks;
   String price;
+  Map<String, dynamic> timeSlots;
 
   BookingModel({
     required this.bookingId,
@@ -25,25 +24,30 @@ class BookingModel {
     this.sessionsPerWeek = '0',
     this.numberOfWeeks = '0',
     this.price = '0',
+    this.timeSlots = const {}, 
   });
 
-  // Factory method to create BookingModel from JSON
+  // factory method to create BookingModel from JSON
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     return BookingModel(
-      bookingId: json['id'].toString(), // Fetching the booking ID
+      bookingId: json['id'].toString(),
       userId: json['user_id'] ?? '',
       packageId: json['package_id'] != null ? json['package_id'].toString() : '',
       tutorId: json['tutor_id'] ?? '',
+      timeSlots: json['time_slots'] != null 
+          ? Map<String, dynamic>.from(json['time_slots'])  // Convert JSONB to Map
+          : {},
     );
   }
 
-  // Method to update student info (instead of tutor info)
+
+  // method to update student info 
   void updateStudentInfo(String name, String imageUrl) {
     studentName = name.isNotEmpty ? name : 'Unknown Student';
     studentImage = imageUrl.isNotEmpty ? imageUrl : '';
   }
 
-  // Method to update package info
+  // method to update package info
   void updatePackageInfo(String name, String minutes, String sessions,
       String weeks, String price) {
     packageName = name.isNotEmpty ? name : 'Unknown Package';

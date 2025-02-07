@@ -18,14 +18,14 @@ class Message {
   factory Message.fromMap(
       {required Map<String, dynamic> map, required String myUserId}) {
     return Message(
-      id: map['id'].toString(), // ✅ Convert `id` from int to String
-      senderId: map['sender_id'].toString(), // ✅ Ensure sender_id is a string
+      id: map['id'].toString(), // convert `id` from int to String
+      senderId: map['sender_id'].toString(), // ensure sender_id is a string
       receiverId:
-          map['receiver_id'].toString(), // ✅ Ensure receiver_id is a string
+          map['receiver_id'].toString(), // ensure receiver_id is a string
       content: map['content'],
       createdAt: DateTime.parse(map['created_at']),
       isMine: myUserId ==
-          map['sender_id'].toString(), // ✅ Ensure correct comparison
+          map['sender_id'].toString(), // ensure correct comparison
     );
   }
 }

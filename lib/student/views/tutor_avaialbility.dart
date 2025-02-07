@@ -11,23 +11,22 @@ class TutorAvailabilityScreen extends StatelessWidget {
       : super(key: key);
 
   final PackagesController _packagesController = Get.put(
-      PackagesController(UserId: "someUserId")); // Replace with actual UserId
+      PackagesController(UserId: "someUserId")); 
 
   @override
   Widget build(BuildContext context) {
-    print("Package ID passed to this screen: $packageId"); // Debugging line
+    print("Package ID passed to this screen: $packageId"); 
 
-    // Fetch the sessions per week from the package details
+    // fetch sessions per week from the package details
     final int sessionsPerWeek = _packagesController.packages.first.sessions;
 
-    // Initialize TutorAvailabilityController with the sessions per week
+    // initialize TutorAvailabilityController with the sessions per week
     final TutorAvailabilityController _controller =
         Get.put(TutorAvailabilityController(
       totalSessions: sessionsPerWeek,
       packageId: packageId,
     ));
 
-    // Top or bottom of tutor_availability_screen.dart
     String ordinal(int number) {
       switch (number) {
         case 1:
@@ -80,8 +79,8 @@ class TutorAvailabilityScreen extends StatelessWidget {
             const SizedBox(height: 10),
             Obx(() {
               return Wrap(
-                spacing: 8, // Horizontal gap between items
-                runSpacing: 8, // Vertical gap for wrapped lines
+                spacing: 8, 
+                runSpacing: 8, 
                 children: List.generate(
                   _controller.totalSessions,
                   (index) {
@@ -92,13 +91,13 @@ class TutorAvailabilityScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "${ordinal(index + 1)} Session", // Updated text format
+                          "${ordinal(index + 1)} Session", 
                           style: TextStyle(
-                            fontSize: 10, // Font size as per design
+                            fontSize: 10, 
                             fontWeight: isCurrentOrPast
                                 ? FontWeight.w600
                                 : FontWeight.normal,
-                            height: 1.36, // Line height adjustment
+                            height: 1.36, 
                             color: isCurrentOrPast
                                 ? Colors.black
                                 : const Color(0xffa6a6a6),
@@ -106,15 +105,15 @@ class TutorAvailabilityScreen extends StatelessWidget {
                         ),
                         if (index < _controller.totalSessions - 1) ...[
                           const SizedBox(
-                            width: 8, // Space between text and arrow
+                            width: 8, 
                           ),
                           const Icon(
                             Icons.arrow_forward,
-                            size: 12, // Arrow size as per design
-                            color: Color(0xffa6a6a6), // Arrow color
+                            size: 12, 
+                            color: Color(0xffa6a6a6), 
                           ),
                           const SizedBox(
-                            width: 8, // Space between arrow and next text
+                            width: 8, 
                           ),
                         ],
                       ],
@@ -125,7 +124,7 @@ class TutorAvailabilityScreen extends StatelessWidget {
             }),
             const SizedBox(height: 24),
 
-            // Select Day Section
+            // select day section
             const Text(
               "Select Day",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -146,7 +145,7 @@ class TutorAvailabilityScreen extends StatelessWidget {
                       onTap: () async {
                         _controller.selectedDay.value = availability.day;
                         await _controller.processSlots(availability
-                            .slots); // Process slots for selected day
+                            .slots); 
                         print("Day selected: ${_controller.selectedDay.value}");
                         print(
                             "Slots for selected day: ${_controller.availableSlots}");
@@ -188,7 +187,7 @@ class TutorAvailabilityScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Available Slots Section
+            // available slots section
             const Text(
               "Available Slots",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -248,7 +247,7 @@ class TutorAvailabilityScreen extends StatelessWidget {
 
             const Spacer(),
 
-            // Confirm Booking Button
+            // confirm booking button
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: Container(

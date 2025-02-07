@@ -1,7 +1,7 @@
 class TutorAvailabilityModel {
-  final String day; // Represents the day (e.g., "Mon", "Tue", etc.)
-  final List<dynamic> slots; // Represents the list of time slots (e.g., [{"start": "8:0", "end": "10:0"}])
-  final String? selectedTime; // Represents the user-selected time (optional)
+  final String day; // represents the day 
+  final List<dynamic> slots; // represents the list of time slots 
+  final String? selectedTime; // represents the user selected time 
 
   TutorAvailabilityModel({
     required this.day,

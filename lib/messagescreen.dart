@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart'; // ✅ For timestamp formatting
+import 'package:intl/intl.dart'; 
 import 'package:newifchaly/student/views/chat_screen.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'; // ✅ Import chat screen
+import 'package:supabase_flutter/supabase_flutter.dart'; 
 
-final supabase = Supabase.instance.client; // ✅ Ensure Supabase client is used
+final supabase = Supabase.instance.client; 
 
 class TutorChatListScreen extends StatefulWidget {
   @override
@@ -13,7 +13,7 @@ class TutorChatListScreen extends StatefulWidget {
 
 class _TutorChatListScreenState extends State<TutorChatListScreen> {
   List<Map<String, dynamic>> chatList =
-      []; // ✅ Stores students with latest messages
+      []; // stores students with latest messages
   bool isLoading = true;
 
   @override
@@ -22,7 +22,7 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
     _fetchChatList();
   }
 
-  /// ✅ Fetch unique students who have sent messages to this tutor
+  // fetch unique students who have sent messages to this tutor
   Future<void> _fetchChatList() async {
     final myUserId = supabase.auth.currentUser?.id; // ✅ Tutor's ID
     if (myUserId == null) {
@@ -34,8 +34,8 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
         .from('messages')
         .select('sender_id, content, created_at')
         .eq('receiver_id',
-            myUserId) // ✅ Only messages where the tutor is the receiver
-        .order('created_at', ascending: false); // ✅ Get latest messages first
+            myUserId) // only messages where the tutor is the receiver
+        .order('created_at', ascending: false); // get latest messages first
 
     if (response == null) {
       setState(() {
@@ -45,7 +45,7 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
       return;
     }
 
-    // ✅ Process data to get unique students with their latest message
+    // process data to get unique students with their latest message
     Map<String, Map<String, dynamic>> uniqueChats = {};
 
     for (var message in response) {
@@ -86,17 +86,17 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
     );
   }
 
-  /// ✅ Builds chat list item with profile image and name
+  // builds chat list item with profile image and name
   Widget _buildChatTile(Map<String, dynamic> chatUser) {
     return FutureBuilder<Map<String, String>>(
       future:
-          _fetchStudentDetails(chatUser['student_id']), // ✅ Fetch name & image
+          _fetchStudentDetails(chatUser['student_id']), // fetch name & image
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return ListTile(
             leading: CircleAvatar(
               backgroundImage: AssetImage(
-                  'assets/Ellipse1.png'), // ✅ Show default image while loading
+                  'assets/Ellipse1.png'), // show default image while loading
             ),
             title: Text('Loading...', style: TextStyle(color: Colors.grey)),
             subtitle: Text(chatUser['last_message'],
@@ -109,7 +109,7 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
           return ListTile(
             leading: CircleAvatar(
                 child: Icon(Icons.error,
-                    color: Colors.red)), // ✅ Show error icon if failed
+                    color: Colors.red)), // show error icon if failed
             title: Text('Error fetching data'),
             subtitle: Text(chatUser['last_message'],
                 maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -123,13 +123,13 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
         return ListTile(
           leading: CircleAvatar(
             backgroundImage: studentImage.isNotEmpty
-                ? NetworkImage(studentImage) // ✅ Load profile image from URL
+                ? NetworkImage(studentImage) // load profile image from URL
                 : AssetImage('assets/Ellipse1.png')
-                    as ImageProvider, // ✅ Default image if empty
+                    as ImageProvider, // default image if empty
           ),
           title: Text(studentName,
               style: TextStyle(
-                  fontWeight: FontWeight.bold)), // ✅ Show student name
+                  fontWeight: FontWeight.bold)), // show student name
           subtitle: Text(chatUser['last_message'],
               maxLines: 1, overflow: TextOverflow.ellipsis),
           trailing: Text(_formatTimestamp(chatUser['created_at'])),
@@ -141,7 +141,7 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
     );
   }
 
-  /// ✅ Fetch student name (from metadata) & profile image (from image_url)
+  // fetch student name (from metadata) & profile image (from image_url)
   Future<Map<String, String>> _fetchStudentDetails(String studentId) async {
     try {
       final response = await supabase
@@ -151,37 +151,36 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
           .single();
 
       if (response == null) {
-        return {'name': 'Unknown', 'image_url': ''}; // ✅ Default values
+        return {'name': 'Unknown', 'image_url': ''}; 
       }
 
-      // ✅ Extract metadata properly
-      final metadata = response['metadata']; // ✅ This is a JSON object
+      final metadata = response['metadata']; 
       final String name = metadata is Map<String, dynamic>
           ? metadata['name'] ?? 'Unknown'
           : 'Unknown';
       final String imageUrl =
-          response['image_url'] ?? ''; // ✅ Extract image URL
+          response['image_url'] ?? ''; 
 
       return {'name': name, 'image_url': imageUrl};
     } catch (e) {
       print("Error fetching student details: $e");
-      return {'name': 'Unknown', 'image_url': ''}; // ✅ Handle errors gracefully
+      return {'name': 'Unknown', 'image_url': ''}; 
     }
   }
 
-  /// ✅ Open Chat Screen
+  // open chat screen
   void _openChatScreen(String studentId) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ChatScreen(receiverId: studentId), // ✅ Open chat
+        builder: (context) => ChatScreen(receiverId: studentId), 
       ),
     );
   }
 
-  /// ✅ Format timestamp for display
+  // format timestamp for display
   String _formatTimestamp(String timestamp) {
     final date = DateTime.parse(timestamp);
-    return DateFormat('hh:mm a').format(date); // Example: "10:30 PM"
+    return DateFormat('hh:mm a').format(date); 
   }
 }

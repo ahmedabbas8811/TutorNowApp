@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart'; // ✅ Import for formatting timestamps
+import 'package:intl/intl.dart'; 
 import 'package:newifchaly/student/models/message.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-final supabase = Supabase.instance.client; // ✅ Ensure Supabase client is used
+final supabase = Supabase.instance.client; 
 
 class ChatScreen extends StatefulWidget {
   final String receiverId;
@@ -19,7 +19,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late Stream<List<Message>> _messagesStream;
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController =
-      ScrollController(); // ✅ Add ScrollController
+      ScrollController(); 
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _fetchMessages();
   }
 
-  /// ✅ Fetch messages and enable real-time updates
+  // fetch messages and enable real time updates
   void _fetchMessages() {
     final myUserId = supabase.auth.currentUser?.id;
     if (myUserId == null) {
@@ -39,22 +39,22 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _messagesStream = supabase
         .from('messages')
-        .stream(primaryKey: ['id']) // ✅ Real-time updates
-        .order('created_at', ascending: true) // ✅ Correct ordering
+        .stream(primaryKey: ['id']) // real-time updates
+        .order('created_at', ascending: true) // Correct ordering
         .map((maps) => maps
             .where((map) =>
                 (map['sender_id'] == myUserId &&
                     map['receiver_id'] == widget.receiverId) ||
                 (map['sender_id'] == widget.receiverId &&
                     map['receiver_id'] ==
-                        myUserId)) // ✅ Filter messages manually
+                        myUserId)) // filter messages manually
             .map((map) => Message.fromMap(map: map, myUserId: myUserId))
             .toList());
 
-    setState(() {}); // ✅ Ensure UI rebuilds
+    setState(() {}); 
   }
 
-  /// ✅ Auto-scroll to the latest message
+  // auto scroll to the latest message
   void _scrollToBottom() {
     Future.delayed(Duration(milliseconds: 300), () {
       if (_scrollController.hasClients) {
@@ -63,7 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  /// ✅ Send message to Supabase database
+  // send message to Supabase database
   Future<void> _sendMessage() async {
     final text = _textController.text.trim();
     if (text.isEmpty) return;
@@ -79,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
         'sender_id': myUserId,
         'receiver_id': widget.receiverId,
         'content': text,
-        'created_at': DateTime.now().toIso8601String(), // ✅ Store timestamp
+        'created_at': DateTime.now().toIso8601String(), // store timestamp
       });
 
       _textController.clear();
@@ -98,7 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: StreamBuilder<List<Message>>(
-              stream: _messagesStream, // ✅ Use the correct stream
+              stream: _messagesStream, // use the correct stream
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   print('Error: ${snapshot.error}');
@@ -115,11 +115,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 }
 
                 WidgetsBinding.instance.addPostFrameCallback((_) =>
-                    _scrollToBottom()); // ✅ Auto-scroll when messages update
+                    _scrollToBottom()); // auto scroll when messages update
 
                 return ListView.builder(
-                  controller: _scrollController, // ✅ Attach ScrollController
-                  reverse: false, // ✅ Ensures messages appear in correct order
+                  controller: _scrollController, // attach ScrollController
+                  reverse: false, // ensures messages appear in correct order
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
@@ -135,7 +135,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  /// ✅ Builds chat bubbles for messages with timestamps
+  // builds chat bubbles for messages with timestamps
   Widget _buildMessageBubble(Message message) {
     final isMe = message.isMine;
     return Align(
@@ -159,7 +159,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: Text(
-              _formatTimestamp(message.createdAt), // ✅ Show formatted timestamp
+              _formatTimestamp(message.createdAt), 
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ),
@@ -168,12 +168,12 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  /// ✅ Formats timestamp to show time in "hh:mm a" format
+  // formats timestamp to show time in "hh:mm a" format
   String _formatTimestamp(DateTime timestamp) {
     return DateFormat('hh:mm a').format(timestamp); // Example: "10:30 PM"
   }
 
-  /// ✅ Builds input field and send button
+  // builds input field and send button
   Widget _buildMessageInput() {
     return Padding(
       padding: const EdgeInsets.all(8.0),

@@ -13,7 +13,7 @@ class TutorBookingsController {
 
     final response = await supabase
         .from('bookings')
-        .select('id, package_id, user_id, tutor_id') // Fetching booking ID
+        .select('id, package_id, user_id, tutor_id, time_slots') 
         .eq('tutor_id', user.id);
 
     if (response.isEmpty) {
@@ -28,7 +28,7 @@ class TutorBookingsController {
       return booking;
     }).toList();
 
-    // Fetch details for each booking
+    // fetch details for each booking
     for (var booking in bookings) {
       await fetchStudentInfo(booking);
       await fetchPackageInfo(booking);

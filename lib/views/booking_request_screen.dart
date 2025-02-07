@@ -8,9 +8,10 @@ import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 
 class BookingRequestScreen extends StatefulWidget {
-  final BookingModel booking; // Receive booking details
+  final BookingModel booking; 
 
-  const BookingRequestScreen({Key? key, required this.booking}) : super(key: key);
+  const BookingRequestScreen({Key? key, required this.booking})
+      : super(key: key);
 
   @override
   _BookingRequestScreenState createState() => _BookingRequestScreenState();
@@ -29,7 +30,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
   Future<void> fetchBookingDetails() async {
     await controller.fetchStudentInfo(widget.booking);
     await controller.fetchPackageInfo(widget.booking);
-    setState(() {}); // Refresh UI after fetching data
+    setState(() {}); 
   }
 
   void _onItemTapped(int index) {
@@ -66,147 +67,149 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 30),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  ' Booking Request',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: widget.booking.studentImage.isNotEmpty &&
-                      Uri.tryParse(widget.booking.studentImage)?.hasAbsolutePath == true
-                  ? NetworkImage(widget.booking.studentImage)
-                  : const AssetImage('assets/Ellipse1.png') as ImageProvider,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              widget.booking.studentName,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              widget.booking.packageName,
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green[50],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 30),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time),
-                      const SizedBox(width: 8),
-                      Text(
-                        "${widget.booking.minutesPerSession} Min / Session",
-                        style: const TextStyle(fontSize: 15),
+                  Text(
+                    ' Booking Request',
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: widget.booking.studentImage.isNotEmpty &&
+                        Uri.tryParse(widget.booking.studentImage)
+                                ?.hasAbsolutePath ==
+                            true
+                    ? NetworkImage(widget.booking.studentImage)
+                    : const AssetImage('assets/Ellipse1.png') as ImageProvider,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                widget.booking.studentName,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                widget.booking.packageName,
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+
+              // package details
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${widget.booking.minutesPerSession} Min / Session",
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.refresh),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${widget.booking.sessionsPerWeek}X / Week",
+                          style: const TextStyle(fontSize: 15),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.calendar_today),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${widget.booking.numberOfWeeks} Weeks",
+                          style: const TextStyle(fontSize: 15),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // dynamic time slots
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: widget.booking.timeSlots.entries.map((entry) {
+                    final slot = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        children: [
+                          Text('${slot['day']} ',
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold)),
+                          Text('${slot['time']}',
+                              style: const TextStyle(fontSize: 15)),
+                        ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.refresh),
-                      const SizedBox(width: 8),
-                      Text(
-                        "${widget.booking.sessionsPerWeek}X / Week",
-                        style: const TextStyle(fontSize: 15),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today),
-                      const SizedBox(width: 8),
-                      Text(
-                        "${widget.booking.numberOfWeeks} Weeks",
-                        style: const TextStyle(fontSize: 15),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green[50],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text('Monday ',
-                          style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold)),
-                      Text('8:30 - 10', style: TextStyle(fontSize: 15))
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text('Tuesday ',
-                          style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold)),
-                      Text('8:30 - 10', style: TextStyle(fontSize: 15))
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text('Wednesday ',
-                          style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold)),
-                      Text('8:30 - 10', style: TextStyle(fontSize: 15))
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff87e64c),
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                    );
+                  }).toList(),
                 ),
               ),
-              child: const Text('Accept',
-                  style: TextStyle(fontSize: 16, color: Colors.black)),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+              const SizedBox(height: 16),
+
+              // accept and delete buttons
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff87e64c),
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
+                child: const Text('Accept',
+                    style: TextStyle(fontSize: 16, color: Colors.black)),
               ),
-              child: const Text('Delete',
-                  style: TextStyle(fontSize: 16, color: Colors.white)),
-            ),
-          ],
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text('Delete',
+                    style: TextStyle(fontSize: 16, color: Colors.white)),
+              ),
+              const SizedBox(
+                  height: 20), 
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

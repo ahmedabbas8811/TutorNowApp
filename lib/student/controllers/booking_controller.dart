@@ -32,10 +32,10 @@ class BookingController extends GetxController {
         for (var booking in response) {
           BookingModel bookingData = BookingModel.fromJson(booking);
 
-          // Fetch tutor info and update
+          // fetch tutor info and update
           await fetchTutorInfo(bookingData);
 
-          // Fetch package info and update
+          // fetch package info and update
           await fetchPackageInfo(bookingData);
 
           bookings.add(bookingData);
@@ -63,7 +63,7 @@ class BookingController extends GetxController {
                 : 'Unknown Tutor';
 
         final tutorImage =
-            response['image_url'] ?? ''; // Fetch image_url directly
+            response['image_url'] ?? ''; 
 
         booking.updateTutorInfo(tutorName, tutorImage);
 
@@ -87,14 +87,14 @@ class BookingController extends GetxController {
           .single();
 
       if (response != null) {
-        // Compute Minutes Per Session
+        // calculate minutes per session
         int hours = response['hours_per_session'] ?? 0;
         int minutes = response['minutes_per_session'] ?? 0;
         int totalMinutes = (hours * 60) + minutes;
 
         booking.updatePackageInfo(
           response['package_name'] ?? 'Unknown Package',
-          totalMinutes.toString(), // Convert to string for UI
+          totalMinutes.toString(), 
           response['sessions_per_week'].toString(),
           response['number_of_weeks'].toString(),
           response['price'].toString(),

@@ -166,7 +166,7 @@ class _SessionScreenState extends State<SessionScreen> {
             children: [
               SwipeableSessionCard(
                 name: 'Shehdad Ali',
-                imageUrl: 'assets/Ellipse1.png', // Default image for Active Bookings
+                imageUrl: 'assets/Ellipse1.png', 
                 package: 'Package Name',
                 time: '90 Min / Session',
                 frequency: '3X / Week',
