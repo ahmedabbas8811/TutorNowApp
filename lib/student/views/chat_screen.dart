@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
 import 'package:newifchaly/student/models/message.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-final supabase = Supabase.instance.client; 
+final supabase = Supabase.instance.client;
 
 class ChatScreen extends StatefulWidget {
   final String receiverId;
@@ -18,8 +18,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   late Stream<List<Message>> _messagesStream;
   final TextEditingController _textController = TextEditingController();
-  final ScrollController _scrollController =
-      ScrollController(); 
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -46,12 +45,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 (map['sender_id'] == myUserId &&
                     map['receiver_id'] == widget.receiverId) ||
                 (map['sender_id'] == widget.receiverId &&
-                    map['receiver_id'] ==
-                        myUserId)) // filter messages manually
+                    map['receiver_id'] == myUserId)) // filter messages manually
             .map((map) => Message.fromMap(map: map, myUserId: myUserId))
             .toList());
 
-    setState(() {}); 
+    setState(() {});
   }
 
   // auto scroll to the latest message
@@ -91,46 +89,49 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 232, 245, 224),
       appBar: AppBar(
         title: Text('Chat with Tutor'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<List<Message>>(
-              stream: _messagesStream, // use the correct stream
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  print('Error: ${snapshot.error}');
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: StreamBuilder<List<Message>>(
+                stream: _messagesStream, // use the correct stream
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    print('Error: ${snapshot.error}');
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
 
-                final messages = snapshot.data ?? [];
-                if (messages.isEmpty) {
-                  return Center(
-                      child: Text('No messages yet. Start chatting!'));
-                }
+                  final messages = snapshot.data ?? [];
+                  if (messages.isEmpty) {
+                    return Center(
+                        child: Text('No messages yet. Start chatting!'));
+                  }
 
-                WidgetsBinding.instance.addPostFrameCallback((_) =>
-                    _scrollToBottom()); // auto scroll when messages update
+                  WidgetsBinding.instance.addPostFrameCallback((_) =>
+                      _scrollToBottom()); // auto scroll when messages update
 
-                return ListView.builder(
-                  controller: _scrollController, // attach ScrollController
-                  reverse: false, // ensures messages appear in correct order
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    return _buildMessageBubble(message);
-                  },
-                );
-              },
+                  return ListView.builder(
+                    controller: _scrollController, // attach ScrollController
+                    reverse: false, // ensures messages appear in correct order
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final message = messages[index];
+                      return _buildMessageBubble(message);
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-          _buildMessageInput(),
-        ],
+            _buildMessageInput(),
+          ],
+        ),
       ),
     );
   }
@@ -148,18 +149,18 @@ class _ChatScreenState extends State<ChatScreen> {
             margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isMe ? Colors.blue : Colors.grey[300],
+              color: isMe ? Color(0xFF87E64B) : Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               message.content,
-              style: TextStyle(color: isMe ? Colors.white : Colors.black),
+              style: TextStyle(color: Colors.black),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: Text(
-              _formatTimestamp(message.createdAt), 
+              _formatTimestamp(message.createdAt),
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ),
@@ -193,7 +194,7 @@ class _ChatScreenState extends State<ChatScreen> {
           SizedBox(width: 8),
           IconButton(
             onPressed: _sendMessage,
-            icon: Icon(Icons.send, color: Colors.blue),
+            icon: Icon(Icons.send, color: Colors.black),
           ),
         ],
       ),
