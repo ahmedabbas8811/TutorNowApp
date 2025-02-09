@@ -131,7 +131,22 @@ class PackageDetailScreen extends StatelessWidget {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          Get.to(() => TutorAvailabilityScreen(packageId: packageId));
+                          if (!_controller.isLoading.value) {
+                            // Ensure data is loaded before accessing
+                            int sessionsPerWeek = _controller.package.value
+                                .sessions; // Get sessions per week
+
+                            print(
+                                "Passing Sessions Per Week: $sessionsPerWeek"); // Debugging log
+
+                            Get.to(() => TutorAvailabilityScreen(
+                                  packageId: packageId,
+                                  sessions:
+                                      sessionsPerWeek, // Pass sessionsPerWeek
+                                ));
+                          } else {
+                            print("Data is still loading...");
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: Size(double.infinity, 0),
@@ -144,7 +159,7 @@ class PackageDetailScreen extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Continue (${package.price} PKR)',
+                          'Continue (${_controller.package.value.price} PKR)', // Ensure dynamic price value
                           style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
                       ),

@@ -6,19 +6,23 @@ import 'package:newifchaly/student/views/bookings.dart';
 
 class TutorAvailabilityScreen extends StatelessWidget {
   final int packageId;
+  final int sessions;
 
-  TutorAvailabilityScreen({Key? key, required this.packageId})
-      : super(key: key);
+  TutorAvailabilityScreen(
+      {Key? key, required this.packageId, required this.sessions})
+      : super(key: key) {
+    print("Sessions Per Week (Passed): $sessions");
+  }
 
-  final PackagesController _packagesController = Get.put(
-      PackagesController(UserId: "someUserId")); 
+  final PackagesController _packagesController =
+      Get.put(PackagesController(UserId: "someUserId"));
 
   @override
   Widget build(BuildContext context) {
-    print("Package ID passed to this screen: $packageId"); 
+    print("Package ID passed to this screen: $packageId");
 
     // fetch sessions per week from the package details
-    final int sessionsPerWeek = _packagesController.packages.first.sessions;
+    final int sessionsPerWeek = sessions;
 
     // initialize TutorAvailabilityController with the sessions per week
     final TutorAvailabilityController _controller =
@@ -79,8 +83,8 @@ class TutorAvailabilityScreen extends StatelessWidget {
             const SizedBox(height: 10),
             Obx(() {
               return Wrap(
-                spacing: 8, 
-                runSpacing: 8, 
+                spacing: 8,
+                runSpacing: 8,
                 children: List.generate(
                   _controller.totalSessions,
                   (index) {
@@ -91,13 +95,13 @@ class TutorAvailabilityScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "${ordinal(index + 1)} Session", 
+                          "${ordinal(index + 1)} Session",
                           style: TextStyle(
-                            fontSize: 10, 
+                            fontSize: 10,
                             fontWeight: isCurrentOrPast
                                 ? FontWeight.w600
                                 : FontWeight.normal,
-                            height: 1.36, 
+                            height: 1.36,
                             color: isCurrentOrPast
                                 ? Colors.black
                                 : const Color(0xffa6a6a6),
@@ -105,15 +109,15 @@ class TutorAvailabilityScreen extends StatelessWidget {
                         ),
                         if (index < _controller.totalSessions - 1) ...[
                           const SizedBox(
-                            width: 8, 
+                            width: 8,
                           ),
                           const Icon(
                             Icons.arrow_forward,
-                            size: 12, 
-                            color: Color(0xffa6a6a6), 
+                            size: 12,
+                            color: Color(0xffa6a6a6),
                           ),
                           const SizedBox(
-                            width: 8, 
+                            width: 8,
                           ),
                         ],
                       ],
@@ -144,8 +148,7 @@ class TutorAvailabilityScreen extends StatelessWidget {
                     return GestureDetector(
                       onTap: () async {
                         _controller.selectedDay.value = availability.day;
-                        await _controller.processSlots(availability
-                            .slots); 
+                        await _controller.processSlots(availability.slots);
                         print("Day selected: ${_controller.selectedDay.value}");
                         print(
                             "Slots for selected day: ${_controller.availableSlots}");
