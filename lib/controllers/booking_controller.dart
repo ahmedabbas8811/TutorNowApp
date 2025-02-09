@@ -1,40 +1,66 @@
+import 'package:flutter/material.dart';
+import 'package:newifchaly/sessionscreen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:newifchaly/models/tutor_booking_model.dart';
 
 class TutorBookingsController {
   final SupabaseClient supabase = Supabase.instance.client;
 
-  Future<List<BookingModel>> fetchTutorBookings() async {
+  Future<Map<String, List<BookingModel>>> fetchTutorBookings() async {
     final user = supabase.auth.currentUser;
     if (user == null) {
       print("No tutor is logged in.");
-      return [];
+      return {'pending': [], 'active': [], 'completed': []};
     }
 
     final response = await supabase
         .from('bookings')
-        .select('id, package_id, user_id, tutor_id, time_slots') 
+        .select('id, package_id, user_id, tutor_id, time_slots, status')
         .eq('tutor_id', user.id);
 
     if (response.isEmpty) {
       print("No bookings found for this tutor.");
-      return [];
+      return {'pending': [], 'active': [], 'completed': []};
     }
 
-    List<BookingModel> bookings = response.map((data) {
+    List<BookingModel> pendingBookings = [];
+    List<BookingModel> activeBookings = [];
+    List<BookingModel> completedBookings = [];
+
+    response.forEach((data) {
       BookingModel booking = BookingModel.fromJson(data);
       print(
-          "Fetched Booking - Booking ID: ${booking.bookingId}, Package ID: ${booking.packageId}, Student ID: ${booking.userId}");
-      return booking;
-    }).toList();
+          "Fetched Booking - Booking ID: ${booking.bookingId}, Package ID: ${booking.packageId}, Student ID: ${booking.userId}, Status: ${data['status']}");
 
-    // fetch details for each booking
-    for (var booking in bookings) {
+      //categorize bookings based on status
+      switch (data['status']) {
+        case 'pending':
+          pendingBookings.add(booking);
+          break;
+        case 'active':
+          activeBookings.add(booking);
+          break;
+        case 'completed':
+          completedBookings.add(booking);
+          break;
+      }
+    });
+
+    //fetch details for each booking
+    for (var booking in [
+      ...pendingBookings,
+      ...activeBookings,
+      ...completedBookings
+    ]) {
       await fetchStudentInfo(booking);
       await fetchPackageInfo(booking);
     }
 
-    return bookings;
+    return {
+      'pending': pendingBookings,
+      'active': activeBookings,
+      'completed': completedBookings,
+    };
   }
 
   Future<void> fetchStudentInfo(BookingModel booking) async {
@@ -94,6 +120,41 @@ class TutorBookingsController {
       }
     } catch (e) {
       print("Error fetching package info: $e");
+    }
+  }
+
+  Future<void> activateBooking(String bookingId, BuildContext context) async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user == null) {
+      print("No user is currently logged in.");
+      return;
+    }
+
+    try {
+      final response = await Supabase.instance.client
+          .from('bookings')
+          .update({'status': 'active'})
+          .eq('id', bookingId)
+          .select();
+
+      print(response);
+
+      if (response.isNotEmpty) {
+        print("Booking status updated to active for booking ID: $bookingId");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Booking Accepted')),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SessionScreen()),
+        );
+      } else {
+        print("No booking found with the provided ID or user mismatch.");
+      }
+    } catch (e) {
+      print("Error updating booking status: $e");
     }
   }
 }

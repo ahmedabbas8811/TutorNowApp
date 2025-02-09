@@ -3,7 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:newifchaly/student/models/booking_model.dart';
 
 class BookingController extends GetxController {
-  var bookings = <BookingModel>[].obs;
+  RxList<BookingModel> pendingBookings = <BookingModel>[].obs;
+  RxList<BookingModel> activeBookings = <BookingModel>[].obs;
+  RxList<BookingModel> rejectedBookings = <BookingModel>[].obs;
 
   @override
   void onInit() {
@@ -22,24 +24,38 @@ class BookingController extends GetxController {
     try {
       final response = await Supabase.instance.client
           .from('bookings')
-          .select('id, user_id, package_id, tutor_id')
+          .select('id, user_id, package_id, tutor_id, status')
           .eq('user_id', user.id);
 
       if (response.isNotEmpty) {
         print("Bookings fetched successfully: $response");
 
-        bookings.clear();
+        //clear existing bookings
+        activeBookings.clear();
+        pendingBookings.clear();
+        rejectedBookings.clear();
+
         for (var booking in response) {
           BookingModel bookingData = BookingModel.fromJson(booking);
 
-          // fetch tutor info and update
+          //fetch tutor info and update
           await fetchTutorInfo(bookingData);
 
-          // fetch package info and update
+          //fetch package info and update
           await fetchPackageInfo(bookingData);
 
-          bookings.add(bookingData);
+          //categorize bookings based on status
+          if (booking['status'] == 'active') {
+            activeBookings.add(bookingData);
+          } else if (booking['status'] == 'pending') {
+            pendingBookings.add(bookingData);
+          } else if (booking['status'] == 'rejected') {
+            rejectedBookings.add(bookingData);
+          }
         }
+
+        print(
+            "Active Bookings: ${activeBookings.length}, Pending Bookings: ${pendingBookings.length}, Rejected Bookings: ${rejectedBookings.length}");
       } else {
         print("No bookings found for user_id: ${user.id}");
       }
@@ -62,8 +78,7 @@ class BookingController extends GetxController {
                 ? response['metadata']['name']
                 : 'Unknown Tutor';
 
-        final tutorImage =
-            response['image_url'] ?? ''; 
+        final tutorImage = response['image_url'] ?? '';
 
         booking.updateTutorInfo(tutorName, tutorImage);
 
@@ -94,7 +109,7 @@ class BookingController extends GetxController {
 
         booking.updatePackageInfo(
           response['package_name'] ?? 'Unknown Package',
-          totalMinutes.toString(), 
+          totalMinutes.toString(),
           response['sessions_per_week'].toString(),
           response['number_of_weeks'].toString(),
           response['price'].toString(),

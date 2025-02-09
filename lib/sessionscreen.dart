@@ -15,7 +15,8 @@ class SessionScreen extends StatefulWidget {
 class _SessionScreenState extends State<SessionScreen> {
   final TutorBookingsController controller = TutorBookingsController();
   int _selectedIndex = 2;
-  List<BookingModel> bookings = [];
+  List<BookingModel> pendingBookings = [];
+  List<BookingModel> activeBookings = [];
 
   @override
   void initState() {
@@ -24,9 +25,14 @@ class _SessionScreenState extends State<SessionScreen> {
   }
 
   Future<void> fetchBookings() async {
-    List<BookingModel> fetchedBookings = await controller.fetchTutorBookings();
+    final bookingsData = await controller.fetchTutorBookings();
+    List<BookingModel> pending = bookingsData['pending']!;
+    List<BookingModel> active = bookingsData['active']!;
+    List<BookingModel> completed = bookingsData['completed']!;
+
     setState(() {
-      bookings = fetchedBookings;
+      pendingBookings = pending;
+      activeBookings = active;
     });
   }
 
@@ -74,7 +80,7 @@ class _SessionScreenState extends State<SessionScreen> {
               const SizedBox(height: 8),
               buildBookingRequestsSection(),
               const SizedBox(height: 24),
-              buildSection('Active Bookings', Colors.green),
+              buildBookingActiveSection(),
             ],
           ),
         ),
@@ -91,8 +97,7 @@ class _SessionScreenState extends State<SessionScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
               icon: Icon(Icons.event_available), label: 'Availability'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.group), label: 'Bookings'),
+          BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Bookings'),
           BottomNavigationBarItem(
               icon: Icon(Icons.attach_money), label: 'Earnings'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
@@ -115,19 +120,70 @@ class _SessionScreenState extends State<SessionScreen> {
         SizedBox(
           height: 170,
           width: double.infinity,
-          child: bookings.isEmpty
+          child: pendingBookings.isEmpty
               ? const Center(child: Text("No booking requests found."))
               : ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: bookings.length,
+                  itemCount: pendingBookings.length,
                   itemBuilder: (context, index) {
-                    var booking = bookings[index];
+                    var booking = pendingBookings[index];
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => BookingRequestScreen(booking: bookings[index] ,),
+                            builder: (context) => BookingRequestScreen(
+                              booking: pendingBookings[index],
+                            ),
+                          ),
+                        );
+                      },
+                      child: SwipeableSessionCard(
+                        name: booking.studentName,
+                        imageUrl: booking.studentImage,
+                        package: booking.packageName,
+                        time: "${booking.minutesPerSession} Min / Session",
+                        frequency: "${booking.sessionsPerWeek}X / Week",
+                        duration: "${booking.numberOfWeeks} Weeks",
+                        price: "${booking.price}/- PKR",
+                        statusColor: Colors.orange,
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildBookingActiveSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Active',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        const Text('Tap to see details',
+            style: TextStyle(fontSize: 14, color: Colors.grey)),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 170,
+          width: double.infinity,
+          child: activeBookings.isEmpty
+              ? const Center(child: Text("No booking requests found."))
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: activeBookings.length,
+                  itemBuilder: (context, index) {
+                    var booking = activeBookings[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BookingRequestScreen(
+                              booking: activeBookings[index],
+                            ),
                           ),
                         );
                       },
@@ -153,7 +209,8 @@ class _SessionScreenState extends State<SessionScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(title,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         const Text('Tap to see details',
             style: TextStyle(fontSize: 14, color: Colors.grey)),
@@ -166,7 +223,7 @@ class _SessionScreenState extends State<SessionScreen> {
             children: [
               SwipeableSessionCard(
                 name: 'Shehdad Ali',
-                imageUrl: 'assets/Ellipse1.png', 
+                imageUrl: 'assets/Ellipse1.png',
                 package: 'Package Name',
                 time: '90 Min / Session',
                 frequency: '3X / Week',
@@ -228,7 +285,8 @@ class SwipeableSessionCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: imageUrl.isNotEmpty && Uri.tryParse(imageUrl)?.hasAbsolutePath == true
+                    backgroundImage: imageUrl.isNotEmpty &&
+                            Uri.tryParse(imageUrl)?.hasAbsolutePath == true
                         ? NetworkImage(imageUrl)
                         : const AssetImage('assets/Ellipse1.png'),
                   ),
@@ -241,7 +299,8 @@ class SwipeableSessionCard extends StatelessWidget {
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold)),
                         Text(package,
-                            style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 14)),
                       ],
                     ),
                   ),
@@ -252,16 +311,28 @@ class SwipeableSessionCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(children: [const Icon(Icons.timer, size: 18), Text(time)]),
-                  Row(children: [const Icon(Icons.refresh, size: 18), Text(frequency)]),
+                  Row(children: [
+                    const Icon(Icons.timer, size: 18),
+                    Text(time)
+                  ]),
+                  Row(children: [
+                    const Icon(Icons.refresh, size: 18),
+                    Text(frequency)
+                  ]),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(children: [const Icon(Icons.calendar_today, size: 18), Text(duration)]),
-                  Row(children: [const Icon(Icons.attach_money, size: 18), Text(price)]),
+                  Row(children: [
+                    const Icon(Icons.calendar_today, size: 18),
+                    Text(duration)
+                  ]),
+                  Row(children: [
+                    const Icon(Icons.attach_money, size: 18),
+                    Text(price)
+                  ]),
                 ],
               ),
             ],

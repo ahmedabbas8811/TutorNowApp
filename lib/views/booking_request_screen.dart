@@ -8,7 +8,7 @@ import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 
 class BookingRequestScreen extends StatefulWidget {
-  final BookingModel booking; 
+  final BookingModel booking;
 
   const BookingRequestScreen({Key? key, required this.booking})
       : super(key: key);
@@ -19,6 +19,7 @@ class BookingRequestScreen extends StatefulWidget {
 
 class _BookingRequestScreenState extends State<BookingRequestScreen> {
   final TutorBookingsController controller = TutorBookingsController();
+
   int _selectedIndex = 2;
 
   @override
@@ -30,7 +31,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
   Future<void> fetchBookingDetails() async {
     await controller.fetchStudentInfo(widget.booking);
     await controller.fetchPackageInfo(widget.booking);
-    setState(() {}); 
+    setState(() {});
   }
 
   void _onItemTapped(int index) {
@@ -182,7 +183,13 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
 
               // accept and delete buttons
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  print(
+                      "Activating booking with ID: ${widget.booking.bookingId}");
+                  await controller.activateBooking(
+                      widget.booking.bookingId, context);
+                  setState(() {}); // Refresh UI after activation
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff87e64c),
                   minimumSize: const Size(double.infinity, 50),
@@ -195,7 +202,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
               ),
               const SizedBox(height: 8),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: activate,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   minimumSize: const Size(double.infinity, 50),
@@ -206,8 +213,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                 child: const Text('Delete',
                     style: TextStyle(fontSize: 16, color: Colors.white)),
               ),
-              const SizedBox(
-                  height: 20), 
+              const SizedBox(height: 20),
             ],
           ),
         ),
