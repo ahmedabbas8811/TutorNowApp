@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:newifchaly/controllers/booking_controller.dart';
+import 'package:newifchaly/controllers/profile_controller.dart';
 import 'package:newifchaly/models/tutor_booking_model.dart';
 import 'package:newifchaly/views/booking_request_screen.dart';
 import 'package:newifchaly/availabilityscreen.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
+import 'package:newifchaly/views/widgets/nav_bar.dart';
 
 class SessionScreen extends StatefulWidget {
   @override
@@ -67,44 +70,31 @@ class _SessionScreenState extends State<SessionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ProfileController profilecontroller = Get.put(ProfileController());
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 30),
-              const Text('My Bookings',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              buildBookingRequestsSection(),
-              const SizedBox(height: 24),
-              buildBookingActiveSection(),
-            ],
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 30),
+                const Text('My Bookings',
+                    style:
+                        TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                buildBookingRequestsSection(),
+                const SizedBox(height: 24),
+                buildBookingActiveSection(),
+              ],
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xff87e64c),
-        unselectedItemColor: Colors.black,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.event_available), label: 'Availability'),
-          BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Bookings'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.attach_money), label: 'Earnings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-        onTap: _onItemTapped,
-      ),
-    );
+        bottomNavigationBar: Obx(() => TutorBottomNavigationBar(
+            selectedIndex: _selectedIndex,
+            onItemTapped: _onItemTapped,
+            pendingBookingsCount:
+                profilecontroller.pendingBookingsCount.value)));
   }
 
   Widget buildBookingRequestsSection() {

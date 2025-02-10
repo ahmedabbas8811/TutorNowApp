@@ -6,6 +6,7 @@ import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 import 'package:newifchaly/editavailability_screen.dart';
+import 'package:newifchaly/views/widgets/nav_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -87,139 +88,125 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ProfileController profilecontroller = Get.put(ProfileController());
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 40),
-            const Text(
-              'Set Availability',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Sessions that are already booked are not affected by changing availability',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-            const SizedBox(height: 4),
-            Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: () {
-                  // Navigate to EditAvailabilityScreen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditAvailabilityScreen(),
+        backgroundColor: Colors.white,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 40),
+              const Text(
+                'Set Availability',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Sessions that are already booked are not affected by changing availability',
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+              const SizedBox(height: 4),
+              Align(
+                alignment: Alignment.centerRight,
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigate to EditAvailabilityScreen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditAvailabilityScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'Edit Schedule',
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
                     ),
-                  );
-                },
-                child: const Text(
-                  'Edit Schedule',
-                  style: TextStyle(
-                    decoration: TextDecoration.underline,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 17,
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: _fetchAvailabilityData(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Error: ${snapshot.error}'),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                      child: Text('No availability data found'),
-                    );
-                  }
-
-                  final availabilityData = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: availabilityData.length,
-                    itemBuilder: (context, index) {
-                      final dayData = availabilityData[index];
-                      final day = dayData['day'] as String;
-                      final slots = dayData['slots'] as List<dynamic>;
-
-                      return ListTile(
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 3.0),
-                        title: Text(
-                          day,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: slots.map((slot) {
-                            if (slot is Map<String, dynamic>) {
-                              final startTime = slot['start'] ?? '';
-                              final endTime = slot['end'] ?? '';
-                              return Text(
-                                _convertTo12HourFormat('$startTime-$endTime'),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              );
-                            } else if (slot is String) {
-                              return Text(
-                                _convertTo12HourFormat(slot),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              );
-                            } else {
-                              return const Text(
-                                'Invalid slot format',
-                                style: TextStyle(color: Colors.red),
-                              );
-                            }
-                          }).toList(),
-                        ),
+              Expanded(
+                child: FutureBuilder<List<Map<String, dynamic>>>(
+                  future: _fetchAvailabilityData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
                       );
-                    },
-                  );
-                },
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(
+                        child: Text('No availability data found'),
+                      );
+                    }
+
+                    final availabilityData = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: availabilityData.length,
+                      itemBuilder: (context, index) {
+                        final dayData = availabilityData[index];
+                        final day = dayData['day'] as String;
+                        final slots = dayData['slots'] as List<dynamic>;
+
+                        return ListTile(
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 3.0),
+                          title: Text(
+                            day,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: slots.map((slot) {
+                              if (slot is Map<String, dynamic>) {
+                                final startTime = slot['start'] ?? '';
+                                final endTime = slot['end'] ?? '';
+                                return Text(
+                                  _convertTo12HourFormat('$startTime-$endTime'),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                );
+                              } else if (slot is String) {
+                                return Text(
+                                  _convertTo12HourFormat(slot),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                );
+                              } else {
+                                return const Text(
+                                  'Invalid slot format',
+                                  style: TextStyle(color: Colors.red),
+                                );
+                              }
+                            }).toList(),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xff87e64c),
-        unselectedItemColor: Colors.black,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.event_available), label: 'Availability'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.group), label: 'Bookings'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.attach_money), label: 'Earnings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-        onTap: _onItemTapped,
-      ),
-    );
+        bottomNavigationBar: Obx(() => TutorBottomNavigationBar(
+            selectedIndex: _selectedIndex,
+            onItemTapped: _onItemTapped,
+            pendingBookingsCount:
+                profilecontroller.pendingBookingsCount.value)));
   }
 }

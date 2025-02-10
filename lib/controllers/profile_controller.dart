@@ -12,6 +12,7 @@ import '../models/profile_model.dart';
 
 class ProfileController extends GetxController {
   var selectedIndex = 0.obs;
+  var pendingBookingsCount = 0.obs;
 
   var profile = ProfileModel(
           name: "",
@@ -28,6 +29,7 @@ class ProfileController extends GetxController {
     updateVerificationStatus();
     updateProfileStatus();
     fetchProfileCompletionData();
+    fetchPendingBookingsCount();
   }
 
   @override
@@ -171,5 +173,15 @@ class ProfileController extends GetxController {
         print("Error fetching profile completion data: $e");
       }
     }
+  }
+
+  Future<void> fetchPendingBookingsCount() async {
+    final response = await Supabase.instance.client
+        .from('bookings')
+        .select()
+        .eq('status', 'pending')
+        .eq('tutor_id', Supabase.instance.client.auth.currentUser!.id);
+
+    pendingBookingsCount.value = response.length;
   }
 }

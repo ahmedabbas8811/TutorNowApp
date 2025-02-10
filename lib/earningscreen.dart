@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/controllers/profile_controller.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 
-import 'package:newifchaly/views/setpakages_screen.dart'; // Import the Set Packages screen
+import 'package:newifchaly/views/setpakages_screen.dart';
+import 'package:newifchaly/views/widgets/nav_bar.dart'; // Import the Set Packages screen
 
 class EarningsScreen extends StatefulWidget {
   @override
@@ -56,109 +59,82 @@ class _EarningsScreenState extends State<EarningsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ProfileController profilecontroller = Get.put(ProfileController());
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 35),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'My Earnings',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SetpakagesScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff87e64c),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+        backgroundColor: Colors.white,
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 35),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'My Earnings',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SetpakagesScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff87e64c),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      'Set Packages',
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
-                  child: const Text(
-                    'Set Packages',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
+                ],
+              ),
+              const SizedBox(height: 20),
 
-            // Clickable Container with a dashed border
-            GestureDetector(
-              onTap: () {
-                print("Box clicked!");
-              },
-              child: Container(
-                width: 350,
-                height: 150,
-                child: CustomPaint(
-                  painter: DashedBorderPainter(),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 10),
-                      Text(
-                        'Your earnings reports will be shown here',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
+              // Clickable Container with a dashed border
+              GestureDetector(
+                onTap: () {
+                  print("Box clicked!");
+                },
+                child: Container(
+                  width: 350,
+                  height: 150,
+                  child: CustomPaint(
+                    painter: DashedBorderPainter(),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 10),
+                        Text(
+                          'Your earnings reports will be shown here',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 5),
-                    ],
+                        SizedBox(height: 5),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            const Spacer(),
-          ],
+              const Spacer(),
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed, // Fixed type ensures white background
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xff87e64c),
-        unselectedItemColor: Colors.black,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event_available),
-            label: 'Availability',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            label: 'Bookings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Earnings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        onTap: _onItemTapped,
-      ),
-    );
+        bottomNavigationBar: Obx(() => TutorBottomNavigationBar(
+            selectedIndex: _selectedIndex,
+            onItemTapped: _onItemTapped,
+            pendingBookingsCount:
+                profilecontroller.pendingBookingsCount.value)));
   }
 }
 

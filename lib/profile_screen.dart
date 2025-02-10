@@ -7,6 +7,7 @@ import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 import 'package:newifchaly/splashscreen.dart';
+import 'package:newifchaly/views/widgets/nav_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../controllers/profile_controller.dart';
 import 'location_screen.dart';
@@ -84,201 +85,171 @@ class _ProfileScreenState extends State<ProfileScreen> {
       controller.updateVerificationStatus();
       controller.fetchProfileCompletionData();
       controller.fetchUserName();
-    
+      controller.fetchPendingBookingsCount();
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(
-                valueColor:
-                    AlwaysStoppedAnimation<Color>(const Color(0xff87e64c)),
-              ),
-            )
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: screenHeight * 0.05),
-                  // Top Row with Logo and Messages Icon
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Image.asset(
-                        'assets/ali.png',
-                        height: screenHeight * 0.05,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.message_outlined,
-                            color: Colors.black),
-                        onPressed: () => Get.to(() => TutorChatListScreen()),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-
-                  // Welcome Text
-                  Obx(() => Text(
-                        'Hello ${controller.profile.value.name}',
-                        style: const TextStyle(
-                            fontSize: 31, fontWeight: FontWeight.bold),
-                      )),
-                  SizedBox(height: screenHeight * 0.02),
-
-                  // Upcoming Bookings Section
-                  const Text(
-                    'Upcoming Bookings',
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: screenHeight * 0.01),
-                  Obx(() => Container(
-                        width: screenWidth,
-                        height: screenHeight * 0.15,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(10),
+        backgroundColor: Colors.white,
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(const Color(0xff87e64c)),
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: screenHeight * 0.05),
+                    // Top Row with Logo and Messages Icon
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Image.asset(
+                          'assets/ali.png',
+                          height: screenHeight * 0.05,
                         ),
-                        child: Center(
-                          child: Text(
-                            controller.profile.value.upcomingBookings.isEmpty
-                                ? 'Your upcoming sessions will be shown\nhere, once booked'
-                                : controller.profile.value.upcomingBookings
-                                    .join("\n"),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
+                        IconButton(
+                          icon: const Icon(Icons.message_outlined,
+                              color: Colors.black),
+                          onPressed: () => Get.to(() => TutorChatListScreen()),
                         ),
-                      )),
-                  SizedBox(height: screenHeight * 0.1),
+                      ],
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
 
-                  // Profile Completion Section
-                  Obx(() {
-                    if (controller.profile.value.isVerified) {
-                      // If profile is verified, show nothing
-                      return SizedBox.shrink();
-                    } else if (!controller.profile.value.isProfileComplete) {
-                      // If profile is NOT complete
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Profile Incomplete Message
-                          Text(
-                            'Your profile is not complete; incomplete profiles are not visible to students',
-                            style: const TextStyle(color: Colors.black),
+                    // Welcome Text
+                    Obx(() => Text(
+                          'Hello ${controller.profile.value.name}',
+                          style: const TextStyle(
+                              fontSize: 31, fontWeight: FontWeight.bold),
+                        )),
+                    SizedBox(height: screenHeight * 0.02),
+
+                    // Upcoming Bookings Section
+                    const Text(
+                      'Upcoming Bookings',
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: screenHeight * 0.01),
+                    Obx(() => Container(
+                          width: screenWidth,
+                          height: screenHeight * 0.15,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey[300]!),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          SizedBox(height: screenHeight * 0.01),
-
-                          // Steps Remaining
-                          Text(
-                            '${controller.profile.value.stepscount} Steps Remaining',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
+                          child: Center(
+                            child: Text(
+                              controller.profile.value.upcomingBookings.isEmpty
+                                  ? 'Your upcoming sessions will be shown\nhere, once booked'
+                                  : controller.profile.value.upcomingBookings
+                                      .join("\n"),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.grey),
                             ),
                           ),
-                          SizedBox(height: screenHeight * 0.03),
+                        )),
+                    SizedBox(height: screenHeight * 0.1),
 
-                          // Complete Profile Button
-                          Center(
-                            child: ElevatedButton(
-                              onPressed: () => Get.to(() => BioScreen()),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xff87e64c),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 12, horizontal: 100),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                    // Profile Completion Section
+                    Obx(() {
+                      if (controller.profile.value.isVerified) {
+                        // If profile is verified, show nothing
+                        return SizedBox.shrink();
+                      } else if (!controller.profile.value.isProfileComplete) {
+                        // If profile is NOT complete
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Profile Incomplete Message
+                            Text(
+                              'Your profile is not complete; incomplete profiles are not visible to students',
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                            SizedBox(height: screenHeight * 0.01),
+
+                            // Steps Remaining
+                            Text(
+                              '${controller.profile.value.stepscount} Steps Remaining',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                            ),
+                            SizedBox(height: screenHeight * 0.03),
+
+                            // Complete Profile Button
+                            Center(
+                              child: ElevatedButton(
+                                onPressed: () => Get.to(() => BioScreen()),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xff87e64c),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 12, horizontal: 100),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Complete Profile',
+                                  style: TextStyle(
+                                      fontSize: 15, color: Colors.black),
                                 ),
                               ),
-                              child: const Text(
-                                'Complete Profile',
-                                style: TextStyle(
-                                    fontSize: 15, color: Colors.black),
+                            ),
+                          ],
+                        );
+                      }
+
+                      // If profile is complete but not verified
+                      return Container(
+                        decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(16)),
+                        padding: EdgeInsetsDirectional.all(16),
+                        child: Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/confetti.svg',
+                              height: 36,
+                              width: 36,
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              'You Completed Your Profile!',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 255, 255, 255),
                               ),
                             ),
-                          ),
-                        ],
+                            const Text(
+                              'Wait until your profile gets verified by our admin',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Color.fromARGB(255, 255, 255, 255),
+                              ),
+                            ),
+                          ],
+                        )),
                       );
-                    }
+                    }),
 
-                    // If profile is complete but not verified
-                    return Container(
-                      decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(16)),
-                      padding: EdgeInsetsDirectional.all(16),
-                      child: Center(
-                          child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/confetti.svg',
-                            height: 36,
-                            width: 36,
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            'You Completed Your Profile!',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 255, 255, 255),
-                            ),
-                          ),
-                          const Text(
-                            'Wait until your profile gets verified by our admin',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Color.fromARGB(255, 255, 255, 255),
-                            ),
-                          ),
-                        ],
-                      )),
-                    );
-                  }),
-
-                  const Spacer(),
-                ],
+                    const Spacer(),
+                  ],
+                ),
               ),
-            ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex:
-            _selectedIndex, // The selected index now starts at 0 (Home)
-        type: BottomNavigationBarType
-            .fixed, // Fixed type ensures white background
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xff87e64c),
-        unselectedItemColor: Colors.black,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event_available),
-            label: 'Availability',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            label: 'Bookings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Earnings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        onTap: _onItemTapped,
-      ),
-    );
+        bottomNavigationBar: Obx(() => TutorBottomNavigationBar(
+            selectedIndex: _selectedIndex,
+            onItemTapped: _onItemTapped,
+            pendingBookingsCount: controller.pendingBookingsCount.value)));
   }
 }

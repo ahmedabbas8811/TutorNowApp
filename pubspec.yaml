@@ -77,6 +77,8 @@ flutter:
     - assets/Ellipse1.png
     - assets/profile.jpg
     - assets/TutorImage.png
+    - assets/bookings.svg
+    - assets/bookingspresent.svg
 
 
 
