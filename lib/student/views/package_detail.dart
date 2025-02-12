@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/student/controllers/package_detail_controller.dart';
+import 'package:newifchaly/student/controllers/tutor_detail_controller.dart';
 
 import 'package:newifchaly/student/views/tutor_avaialbility.dart';
 
 class PackageDetailScreen extends StatelessWidget {
   final int packageId;
+  final String userId;
 
-  PackageDetailScreen({Key? key, required this.packageId}) : super(key: key);
+  PackageDetailScreen({Key? key, required this.packageId, required this.userId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final PackageDetailController _controller =
         Get.put(PackageDetailController(packageId: packageId));
+
+    final TutorDetailController tutorController =
+        Get.put(TutorDetailController(UserId: userId), tag: userId);
+
+    final profile = tutorController.profile.value;
 
     return Scaffold(
       appBar: AppBar(
@@ -40,11 +48,18 @@ class PackageDetailScreen extends StatelessWidget {
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.grey[300],
-                  child: Icon(Icons.person, size: 40, color: Colors.grey),
+                  backgroundImage: profile.profileImage != null &&
+                          profile.profileImage.isNotEmpty
+                      ? NetworkImage(profile.profileImage)
+                      : null,
+                  child: profile.profileImage == null ||
+                          profile.profileImage.isEmpty
+                      ? Icon(Icons.person, size: 40, color: Colors.grey)
+                      : null,
                 ),
                 SizedBox(height: 8),
                 Text(
-                  "package.tutorName",
+                  profile.name,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

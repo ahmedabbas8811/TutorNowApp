@@ -7,6 +7,7 @@ import 'package:newifchaly/student/views/package_detail.dart';
 class PackagesSection extends StatelessWidget {
   final List<PackageModel> packages;
   final bool isLoading;
+  final String userId;
 
   void _navigateToDetails(BuildContext context, int packageId) {
     Get.delete<PackageDetailController>();
@@ -16,7 +17,10 @@ class PackagesSection extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PackageDetailScreen(packageId: packageId),
+        builder: (context) => PackageDetailScreen(
+          packageId: packageId,
+          userId: userId,
+        ),
       ),
     );
   }
@@ -24,7 +28,7 @@ class PackagesSection extends StatelessWidget {
   const PackagesSection({
     Key? key,
     required this.packages,
-    required this.isLoading,
+    required this.isLoading, required this.userId,
   }) : super(key: key);
 
   @override

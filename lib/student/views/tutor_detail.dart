@@ -6,7 +6,6 @@ import 'package:newifchaly/student/views/chat_screen.dart';
 import 'package:newifchaly/student/views/widgets/about_tutor.dart';
 import 'package:newifchaly/student/views/widgets/packages.dart';
 import 'package:newifchaly/student/views/widgets/reviews.dart';
-import 'package:newifchaly/controllers/person_controller.dart';
 
 class TutorDetailScreen extends StatelessWidget {
   final String userId;
@@ -14,20 +13,24 @@ class TutorDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TutorDetailController _controller =
-        Get.put(TutorDetailController(UserId: userId));
+    // Ensure each tutor gets a unique controller instance using a tag
+    final TutorDetailController _controller = 
+        Get.put(TutorDetailController(UserId: userId), tag: userId);
+
     final PackagesController _Packagescontroller =
-        Get.put(PackagesController(UserId: userId));
+        Get.put(PackagesController(UserId: userId), tag: userId);
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Get.back();
+            Get.delete<TutorDetailController>(tag: userId); // Remove controller instance when back is pressed
+            Get.delete<PackagesController>(tag: userId);
           },
         ),
-        title: Text('tutor_detail', style: TextStyle(fontSize: 16)),
+        title: Text('Tutor Detail', style: TextStyle(fontSize: 16)),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -74,14 +77,14 @@ class TutorDetailScreen extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: 16),
-                    //tabs
+                    // Tabs
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children:
-                          List.generate(3, (index) => _buildTabButton(index)),
+                          List.generate(3, (index) => _buildTabButton(index, _controller)),
                     ),
                     SizedBox(height: 16),
-                    //dynamic content based on selected tab
+                    // Dynamic content based on selected tab
                     Obx(() {
                       switch (_controller.selectedTab.value) {
                         case 0:
@@ -94,7 +97,7 @@ class TutorDetailScreen extends StatelessWidget {
                         case 1:
                           return PackagesSection(
                             packages: _Packagescontroller.packages,
-                            isLoading: _Packagescontroller.isLoading.value,
+                            isLoading: _Packagescontroller.isLoading.value, userId: userId,
                           );
                         case 2:
                           return ReviewsSection();
@@ -107,7 +110,7 @@ class TutorDetailScreen extends StatelessWidget {
               }),
             ),
           ),
-          //chat with tutor button
+          // Chat with tutor button
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(16),
@@ -117,7 +120,7 @@ class TutorDetailScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
-                    const BoxShadow(
+                    BoxShadow(
                       color: Colors.black,
                       offset: Offset(2, 2),
                       blurRadius: 0,
@@ -137,7 +140,7 @@ class TutorDetailScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(color: Colors.black, width: 1.25))),
                   child: Obx(() {
-                    //fetching tutor name
+                    // Fetching tutor name
                     final profileName = _controller.profile.value.name;
                     return Text(
                       profileName.isNotEmpty
@@ -155,16 +158,13 @@ class TutorDetailScreen extends StatelessWidget {
     );
   }
 
-  //widget for building tab buttons
-  Widget _buildTabButton(int index) {
-    final TutorDetailController _controller =
-        Get.put(TutorDetailController(UserId: userId));
-
+  // Widget for building tab buttons
+  Widget _buildTabButton(int index, TutorDetailController controller) {
     return Obx(() {
-      bool isSelected = _controller.selectedTab.value == index;
+      bool isSelected = controller.selectedTab.value == index;
       return ElevatedButton(
         onPressed: () {
-          _controller.selectedTab.value = index;
+          controller.selectedTab.value = index;
         },
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.black,

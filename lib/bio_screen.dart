@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/location2_screen.dart';
-import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
-import 'package:newifchaly/views/widgets/snackbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../controllers/bio_controller.dart';
 import '../models/bio_model.dart';

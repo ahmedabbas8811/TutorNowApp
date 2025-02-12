@@ -28,7 +28,6 @@ class StudentHomeController {
     }
   }
 
-  // Method to fetch tutors for a specific education level
   // Method to fetch tutors for a specific education level with subjects
   Future<List<Tutor>> fetchTutorsForEducationLevel(
       String educationLevel) async {
@@ -78,11 +77,14 @@ class StudentHomeController {
 
       // Convert the Map to a list of Tutor objects with concatenated education levels and subjects
       final tutors = tutorData.entries.map((entry) {
+        final userId = entry.key; // Extract userId
         final user = entry.value['user'];
         final educationLevels =
             (entry.value['educationLevels'] as List<String>).join(', ');
         final subjects = (entry.value['subjects'] as List<String>).join(', ');
-        return Tutor.fromJson(user, educationLevels, subjects);
+
+        return Tutor.fromJson(
+            user, userId, educationLevels, subjects); // Pass userId
       }).toList();
 
       return tutors;

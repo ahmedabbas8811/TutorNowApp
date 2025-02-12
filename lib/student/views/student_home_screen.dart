@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/student/views/bookings.dart';
 import 'package:newifchaly/student/views/search_results.dart';
 import 'package:newifchaly/student/views/student_profile.dart';
+import 'package:newifchaly/student/views/tutor_detail.dart';
 import 'package:newifchaly/student/views/widgets/nav_bar.dart';
 import '../controllers/student_home_controller.dart';
-import '../models/student_home_model.dart';
-import 'search_screen.dart'; // Import the SearchScreen
+import '../models/student_home_model.dart';// Import the SearchScreen
 
 class StudentHomeScreen extends StatefulWidget {
   @override
@@ -149,74 +148,87 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   }
 
   Widget buildTutorCard(Tutor tutor) {
-    return Container(
-      width: 150,
-      margin: const EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
+    return GestureDetector(
+      onTap: () {
+        // Navigate to TutorDetailScreen with the tutor's userId
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TutorDetailScreen(userId: tutor.userId),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Tutor Image
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.network(
-              tutor.imageUrl,
-              height: 150,
-              width: 150,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  height: 150,
-                  width: 150,
-                  color: Colors.grey[300],
-                  child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                );
-              },
+        );
+      },
+      child: Container(
+        width: 150,
+        margin: const EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
             ),
-          ),
-          // Tutor Name
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              tutor.name,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Tutor Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                tutor.imageUrl,
+                height: 150,
+                width: 150,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 150,
+                    width: 150,
+                    color: Colors.grey[300],
+                    child:
+                        Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                  );
+                },
+              ),
             ),
-          ),
-          // Subjects Taught by the Tutor
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              tutor.subjects, // Display subjects instead of education levels
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+            // Tutor Name
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                tutor.name,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          // Star Ratings Row
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: [
-                Icon(Icons.star, size: 16, color: Colors.orange),
-                Icon(Icons.star, size: 16, color: Colors.orange),
-                Icon(Icons.star, size: 16, color: Colors.orange),
-                Icon(Icons.star, size: 16, color: Colors.orange),
-                Icon(Icons.star, size: 16, color: Colors.grey),
-              ],
+            // Subjects Taught by the Tutor
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                tutor.subjects, // Display subjects instead of education levels
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-        ],
+            const SizedBox(height: 4),
+            // Star Ratings Row
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                children: [
+                  Icon(Icons.star, size: 16, color: Colors.orange),
+                  Icon(Icons.star, size: 16, color: Colors.orange),
+                  Icon(Icons.star, size: 16, color: Colors.orange),
+                  Icon(Icons.star, size: 16, color: Colors.orange),
+                  Icon(Icons.star, size: 16, color: Colors.grey),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
