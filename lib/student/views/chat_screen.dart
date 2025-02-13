@@ -8,8 +8,9 @@ final supabase = Supabase.instance.client;
 
 class ChatScreen extends StatefulWidget {
   final String receiverId;
+  final String receiverName;
 
-  const ChatScreen({Key? key, required this.receiverId}) : super(key: key);
+  const ChatScreen({Key? key, required this.receiverId, required this.receiverName}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -91,7 +92,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 232, 245, 224),
       appBar: AppBar(
-        title: Text('Chat with Tutor'),
+        title: Text(widget.receiverName),
       ),
       body: SafeArea(
         child: Column(

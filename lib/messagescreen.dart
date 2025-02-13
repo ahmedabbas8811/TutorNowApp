@@ -169,14 +169,22 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
   }
 
   void _openChatScreen(String chatPartnerId) {
-    _markMessagesAsRead(chatPartnerId);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChatScreen(receiverId: chatPartnerId),
+  _markMessagesAsRead(chatPartnerId);
+
+  // Fetch the chat partner's name
+  final chatPartnerName = userMap[chatPartnerId]?['name'] ?? 'Unknown';
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ChatScreen(
+        receiverId: chatPartnerId,
+        receiverName: chatPartnerName, // Pass the name
       ),
-    ).then((_) => _fetchChatList()); // Refresh chat list on return
-  }
+    ),
+  ).then((_) => _fetchChatList()); // Refresh chat list on return
+}
+
 
   Future<void> _markMessagesAsRead(String chatPartnerId) async {
     final myUserId = supabase.auth.currentUser?.id;

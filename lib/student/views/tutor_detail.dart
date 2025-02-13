@@ -14,7 +14,7 @@ class TutorDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Ensure each tutor gets a unique controller instance using a tag
-    final TutorDetailController _controller = 
+    final TutorDetailController _controller =
         Get.put(TutorDetailController(UserId: userId), tag: userId);
 
     final PackagesController _Packagescontroller =
@@ -26,7 +26,8 @@ class TutorDetailScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             Get.back();
-            Get.delete<TutorDetailController>(tag: userId); // Remove controller instance when back is pressed
+            Get.delete<TutorDetailController>(
+                tag: userId); // Remove controller instance when back is pressed
             Get.delete<PackagesController>(tag: userId);
           },
         ),
@@ -80,8 +81,8 @@ class TutorDetailScreen extends StatelessWidget {
                     // Tabs
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children:
-                          List.generate(3, (index) => _buildTabButton(index, _controller)),
+                      children: List.generate(
+                          3, (index) => _buildTabButton(index, _controller)),
                     ),
                     SizedBox(height: 16),
                     // Dynamic content based on selected tab
@@ -97,7 +98,8 @@ class TutorDetailScreen extends StatelessWidget {
                         case 1:
                           return PackagesSection(
                             packages: _Packagescontroller.packages,
-                            isLoading: _Packagescontroller.isLoading.value, userId: userId,
+                            isLoading: _Packagescontroller.isLoading.value,
+                            userId: userId,
                           );
                         case 2:
                           return ReviewsSection();
@@ -130,7 +132,12 @@ class TutorDetailScreen extends StatelessWidget {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    Get.to(() => ChatScreen(receiverId: userId));
+                    final profileName =
+                        _controller.profile.value.name; 
+                    Get.to(() => ChatScreen(
+                          receiverId: userId,
+                          receiverName: profileName, 
+                        ));
                   },
                   style: ElevatedButton.styleFrom(
                       elevation: 0,
