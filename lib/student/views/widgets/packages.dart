@@ -31,7 +31,7 @@ class PackagesSection extends StatelessWidget {
     required this.isLoading, required this.userId,
   }) : super(key: key);
 
-  @override
+@override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,11 +58,35 @@ class PackagesSection extends StatelessWidget {
                 margin: EdgeInsets.only(bottom: 8),
                 child: Container(
                   decoration: BoxDecoration(
-                      color: Color.fromRGBO(0, 0, 0, 0.04),
-                      borderRadius: BorderRadius.circular(8)),
+                    color: Color.fromRGBO(0, 0, 0, 0.04),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: ListTile(
-                    title: Text(package.title),
-                    subtitle: Text(package.price.toString()),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(package.title, style: TextStyle(fontSize: 14)), // Package Name
+                        Text(
+                          '${package.price}/- PKR',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold), // Bold Price
+                        ),
+                      ],
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.calendar_today, size: 18), // Weeks Icon
+                          const SizedBox(width: 4),
+                          Text('${package.weeks} Weeks', style: TextStyle(fontSize: 14)), // Weeks
+                          const SizedBox(width: 16), // Spacing
+                          const Icon(Icons.repeat, size: 18), // Sessions Icon
+                          const SizedBox(width: 4),
+                          Text('${package.sessions}X / Week', style: TextStyle(fontSize: 14)), // Sessions
+                        ],
+                      ),
+                    ),
                     onTap: () => _navigateToDetails(context, package.id),
                   ),
                 ),
@@ -73,3 +97,4 @@ class PackagesSection extends StatelessWidget {
     );
   }
 }
+
