@@ -65,10 +65,10 @@ class PackagesSection extends StatelessWidget {
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(package.title, style: TextStyle(fontSize: 14)), // Package Name
+                        Text(package.title, style: TextStyle(fontSize: 14)), 
                         Text(
                           '${package.price}/- PKR',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold), // Bold Price
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold), 
                         ),
                       ],
                     ),
@@ -77,13 +77,13 @@ class PackagesSection extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Icon(Icons.calendar_today, size: 18), // Weeks Icon
+                          const Icon(Icons.calendar_today, size: 18), 
                           const SizedBox(width: 4),
-                          Text('${package.weeks} Weeks', style: TextStyle(fontSize: 14)), // Weeks
-                          const SizedBox(width: 16), // Spacing
-                          const Icon(Icons.repeat, size: 18), // Sessions Icon
+                          Text('${package.weeks} Weeks', style: TextStyle(fontSize: 14)), 
+                          const SizedBox(width: 16), 
+                          const Icon(Icons.repeat, size: 18), 
                           const SizedBox(width: 4),
-                          Text('${package.sessions}X / Week', style: TextStyle(fontSize: 14)), // Sessions
+                          Text('${package.sessions}X / Week', style: TextStyle(fontSize: 14)), 
                         ],
                       ),
                     ),
