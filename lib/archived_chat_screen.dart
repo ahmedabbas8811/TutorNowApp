@@ -1,31 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:newifchaly/archived_chat_screen.dart';
 import 'package:newifchaly/student/views/chat_screen.dart';
 import 'package:newifchaly/views/widgets/shimmer_chat_list.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
 
-class TutorChatListScreen extends StatefulWidget {
+class ArchivedChatsScreen extends StatefulWidget {
   @override
-  _TutorChatListScreenState createState() => _TutorChatListScreenState();
+  _ArchivedChatsScreenState createState() => _ArchivedChatsScreenState();
 }
 
-class _TutorChatListScreenState extends State<TutorChatListScreen> {
-  List<Map<String, dynamic>> chatList = [];
+class _ArchivedChatsScreenState extends State<ArchivedChatsScreen> {
+  List<Map<String, dynamic>> archivedChatList = [];
   Map<String, Map<String, String>> userMap = {};
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchChatList();
-    _listenForNewMessages();
+    _fetchArchivedChatList();
   }
 
-  Future<void> _fetchChatList() async {
+  Future<void> _fetchArchivedChatList() async {
     final myUserId = supabase.auth.currentUser?.id;
     if (myUserId == null) {
       Get.snackbar('Error', 'User not authenticated');
@@ -36,12 +34,12 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
         .from('messages')
         .select('sender_id, receiver_id, content, created_at, is_read, is_archived')
         .or('sender_id.eq.$myUserId,receiver_id.eq.$myUserId')
-        .eq('is_archived', false) // Add this filter
+        .eq('is_archived', true) // Fetch only archived chats
         .order('created_at', ascending: false);
 
     if (response == null) {
       setState(() {
-        chatList = [];
+        archivedChatList = [];
         isLoading = false;
       });
       return;
@@ -70,19 +68,9 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
     final userDetails = await _fetchMultipleUserDetails(userIdsToFetch);
 
     setState(() {
-      chatList = uniqueChats.values.toList();
+      archivedChatList = uniqueChats.values.toList();
       userMap = userDetails;
       isLoading = false;
-    });
-  }
-
-  void _listenForNewMessages() {
-    supabase
-        .from('messages')
-        .stream(primaryKey: ['id'])
-        .order('created_at', ascending: false)
-        .listen((_) {
-      _fetchChatList();
     });
   }
 
@@ -107,47 +95,32 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
     return userDetails;
   }
 
-  Future<void> _archiveChat(String chatPartnerId) async {
+  Future<void> _unarchiveChat(String chatPartnerId) async {
     final myUserId = supabase.auth.currentUser?.id;
     if (myUserId == null) return;
 
-    // Archive all messages with this chat partner
+    // Unarchive all messages with this chat partner
     await supabase
         .from('messages')
-        .update({'is_archived': true})
+        .update({'is_archived': false})
         .or('sender_id.eq.$myUserId,receiver_id.eq.$myUserId')
         .or('sender_id.eq.$chatPartnerId,receiver_id.eq.$chatPartnerId');
 
-    _fetchChatList(); // Refresh the list after archiving
+    _fetchArchivedChatList(); // Refresh the list after unarchiving
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Chats'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.archive),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ArchivedChatsScreen(),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: Text('Archived Chats')),
       body: isLoading
           ? ShimmerChatList()
-          : chatList.isEmpty
-              ? Center(child: Text('No chats yet.', style: TextStyle(color: Colors.grey)))
+          : archivedChatList.isEmpty
+              ? Center(child: Text('No archived chats.', style: TextStyle(color: Colors.grey)))
               : ListView.builder(
-                  itemCount: chatList.length,
+                  itemCount: archivedChatList.length,
                   itemBuilder: (context, index) {
-                    final chatUser = chatList[index];
+                    final chatUser = archivedChatList[index];
                     return _buildChatTile(chatUser);
                   },
                 ),
@@ -170,10 +143,10 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
               child: Wrap(
                 children: <Widget>[
                   ListTile(
-                    leading: Icon(Icons.archive),
-                    title: Text('Archive Chat'),
+                    leading: Icon(Icons.unarchive),
+                    title: Text('Unarchive Chat'),
                     onTap: () {
-                      _archiveChat(userId);
+                      _unarchiveChat(userId);
                       Navigator.pop(context);
                     },
                   ),
@@ -222,8 +195,6 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
   }
 
   void _openChatScreen(String chatPartnerId) {
-    _markMessagesAsRead(chatPartnerId);
-
     final chatPartnerName = userMap[chatPartnerId]?['name'] ?? 'Unknown';
 
     Navigator.push(
@@ -234,19 +205,7 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
           receiverName: chatPartnerName,
         ),
       ),
-    ).then((_) => _fetchChatList());
-  }
-
-  Future<void> _markMessagesAsRead(String chatPartnerId) async {
-    final myUserId = supabase.auth.currentUser?.id;
-    if (myUserId == null) return;
-
-    await supabase
-        .from('messages')
-        .update({'is_read': true})
-        .eq('sender_id', chatPartnerId)
-        .eq('receiver_id', myUserId)
-        .eq('is_read', false);
+    ).then((_) => _fetchArchivedChatList());
   }
 
   String _formatTimestamp(String timestamp) {
