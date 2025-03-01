@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,7 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
   List<Map<String, dynamic>> chatList = [];
   Map<String, Map<String, String>> userMap = {};
   bool isLoading = true;
+  late final StreamSubscription _messagesSubscription;
 
   @override
   void initState() {
@@ -25,64 +27,101 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
     _listenForNewMessages();
   }
 
+  @override
+  void dispose() {
+    // Cancel the subscription when the widget is disposed
+    _messagesSubscription.cancel();
+    super.dispose();
+  }
+
   Future<void> _fetchChatList() async {
-    final myUserId = supabase.auth.currentUser?.id;
-    if (myUserId == null) {
-      Get.snackbar('Error', 'User not authenticated');
-      return;
-    }
+  final myUserId = supabase.auth.currentUser?.id;
+  if (myUserId == null) {
+    Get.snackbar('Error', 'User not authenticated');
+    return;
+  }
 
-    final response = await supabase
-        .from('messages')
-        .select('sender_id, receiver_id, content, created_at, is_read, is_archived')
-        .or('sender_id.eq.$myUserId,receiver_id.eq.$myUserId')
-        .eq('is_archived', false) // Add this filter
-        .order('created_at', ascending: false);
+  final response = await supabase
+      .from('messages')
+      .select('sender_id, receiver_id, content, created_at, is_read, is_archived, pinned_by')
+      .or('sender_id.eq.$myUserId,receiver_id.eq.$myUserId')
+      .eq('is_archived', false)
+      .order('created_at', ascending: false);
 
-    if (response == null) {
+  if (response == null) {
+    if (mounted) {
       setState(() {
         chatList = [];
         isLoading = false;
       });
-      return;
     }
+    return;
+  }
 
-    Map<String, Map<String, dynamic>> uniqueChats = {};
-    Set<String> userIdsToFetch = {};
+  Map<String, Map<String, dynamic>> uniqueChats = {};
+  Set<String> userIdsToFetch = {};
 
-    for (var message in response) {
-      final String chatPartnerId = message['sender_id'] == myUserId
-          ? message['receiver_id']
-          : message['sender_id'];
+  for (var message in response) {
+    final String chatPartnerId = message['sender_id'] == myUserId
+        ? message['receiver_id']
+        : message['sender_id'];
 
-      if (!uniqueChats.containsKey(chatPartnerId)) {
-        uniqueChats[chatPartnerId] = {
-          'chat_partner_id': chatPartnerId,
-          'last_message': message['content'],
-          'created_at': message['created_at'],
-          'is_read': message['is_read'] ?? false,
-          'is_sender': message['sender_id'] == myUserId,
-        };
-        userIdsToFetch.add(chatPartnerId);
-      }
+    if (!uniqueChats.containsKey(chatPartnerId)) {
+      uniqueChats[chatPartnerId] = {
+        'chat_partner_id': chatPartnerId,
+        'last_message': message['content'],
+        'created_at': message['created_at'],
+        'is_read': message['is_read'] ?? false,
+        'is_sender': message['sender_id'] == myUserId,
+        'is_pinned': message['pinned_by'] == myUserId, // Check if the current user pinned the chat
+      };
+    } else {
+      // Update pin status if any message in the chat is pinned by the current user
+      uniqueChats[chatPartnerId]?['is_pinned'] = 
+          uniqueChats[chatPartnerId]?['is_pinned'] || (message['pinned_by'] == myUserId);
     }
+    userIdsToFetch.add(chatPartnerId);
+  }
 
-    final userDetails = await _fetchMultipleUserDetails(userIdsToFetch);
+  final userDetails = await _fetchMultipleUserDetails(userIdsToFetch);
 
+  // Separate pinned and unpinned chats
+  List<Map<String, dynamic>> pinnedChats = [];
+  List<Map<String, dynamic>> unpinnedChats = [];
+
+  uniqueChats.values.forEach((chat) {
+    if (chat['is_pinned']) {
+      pinnedChats.add(chat);
+    } else {
+      unpinnedChats.add(chat);
+    }
+  });
+
+  // Sort pinned chats by created_at (most recent first)
+  pinnedChats.sort((a, b) => b['created_at'].compareTo(a['created_at']));
+
+  // Sort unpinned chats by created_at (most recent first)
+  unpinnedChats.sort((a, b) => b['created_at'].compareTo(a['created_at']));
+
+  // Combine the lists with pinned chats at the top
+  if (mounted) {
     setState(() {
-      chatList = uniqueChats.values.toList();
+      chatList = [...pinnedChats, ...unpinnedChats]; // Pinned chats first, then unpinned chats
       userMap = userDetails;
       isLoading = false;
     });
   }
+}
 
   void _listenForNewMessages() {
-    supabase
+    _messagesSubscription = supabase
         .from('messages')
         .stream(primaryKey: ['id'])
         .order('created_at', ascending: false)
         .listen((_) {
-      _fetchChatList();
+      if (mounted) {
+        _fetchChatList();
+      }
     });
   }
 
@@ -107,18 +146,36 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
     return userDetails;
   }
 
+  Future<void> _togglePinChat(String chatPartnerId, bool isPinned) async {
+    final myUserId = supabase.auth.currentUser?.id;
+    if (myUserId == null) return;
+
+    // Update the pinned_by column for messages where the current user is involved
+    await supabase
+        .from('messages')
+        .update({'pinned_by': isPinned ? null : myUserId})
+        .or('sender_id.eq.$myUserId,receiver_id.eq.$myUserId')
+        .or('sender_id.eq.$chatPartnerId,receiver_id.eq.$chatPartnerId')
+        .eq('sender_id', myUserId); // Only update messages sent by the current user
+
+    if (mounted) {
+      _fetchChatList(); // Refresh the list after pinning/unpinning
+    }
+  }
+
   Future<void> _archiveChat(String chatPartnerId) async {
     final myUserId = supabase.auth.currentUser?.id;
     if (myUserId == null) return;
 
-    // Archive all messages with this chat partner
     await supabase
         .from('messages')
         .update({'is_archived': true})
         .or('sender_id.eq.$myUserId,receiver_id.eq.$myUserId')
         .or('sender_id.eq.$chatPartnerId,receiver_id.eq.$chatPartnerId');
 
-    _fetchChatList(); // Refresh the list after archiving
+    if (mounted) {
+      _fetchChatList(); // Refresh the list after archiving
+    }
   }
 
   @override
@@ -158,7 +215,7 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
     final userId = chatUser['chat_partner_id'];
     final userName = userMap[userId]?['name'] ?? 'Unknown';
     final userImage = userMap[userId]?['image_url'] ?? '';
-
+    final isPinned = chatUser['is_pinned'] ?? false;
     final isUnread = !chatUser['is_read'] && !chatUser['is_sender'];
 
     return GestureDetector(
@@ -169,6 +226,14 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
             return Container(
               child: Wrap(
                 children: <Widget>[
+                  ListTile(
+                    leading: Icon(Icons.push_pin),
+                    title: Text(isPinned ? 'Unpin Chat' : 'Pin Chat'),
+                    onTap: () {
+                      _togglePinChat(userId, isPinned);
+                      Navigator.pop(context);
+                    },
+                  ),
                   ListTile(
                     leading: Icon(Icons.archive),
                     title: Text('Archive Chat'),
@@ -195,13 +260,24 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
             fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
           ),
         ),
-        subtitle: Text(
-          chatUser['last_message'],
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
-          ),
+        subtitle: Row(
+          children: [
+            if (isPinned)
+              Padding(
+                padding: EdgeInsets.only(right: 4),
+                child: Icon(Icons.push_pin, size: 14, color: Colors.blue),
+              ),
+            Expanded(
+              child: Text(
+                chatUser['last_message'],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ),
+          ],
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -234,7 +310,11 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
           receiverName: chatPartnerName,
         ),
       ),
-    ).then((_) => _fetchChatList());
+    ).then((_) {
+      if (mounted) {
+        _fetchChatList();
+      }
+    });
   }
 
   Future<void> _markMessagesAsRead(String chatPartnerId) async {
