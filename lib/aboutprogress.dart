@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 class AboutProgress extends StatefulWidget {
   const AboutProgress({Key? key}) : super(key: key);
@@ -9,14 +9,14 @@ class AboutProgress extends StatefulWidget {
 }
 
 class _AboutProgressState extends State<AboutProgress> {
-  bool isAboutSelected = true;
+  bool isAboutSelected = false; // Default Progress selected
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -26,10 +26,10 @@ class _AboutProgressState extends State<AboutProgress> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CircleAvatar(radius: 50, backgroundColor: Colors.grey.shade300),
-            SizedBox(height: 10),
-            Text('Student Name', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            Text('Package Name', style: TextStyle(fontSize: 16, color: Colors.black)),
-            SizedBox(height: 20),
+          const  SizedBox(height: 10),
+            const Text('Student Name', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const  Text('Package Name', style: TextStyle(fontSize: 16, color: Colors.black)),
+          const  SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -41,18 +41,22 @@ class _AboutProgressState extends State<AboutProgress> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isAboutSelected ? Colors.green.shade300 : Colors.grey.shade200,
+                      backgroundColor: isAboutSelected ? const Color(0xff87e64c) : Colors.grey.shade200,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: isAboutSelected ? Colors.black : Colors.grey),
                       ),
                     ),
                     child: Text(
                       'About',
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: isAboutSelected ? Colors.black : Colors.grey,
+                        fontWeight: isAboutSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(width: 10),
+              const  SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
@@ -61,66 +65,75 @@ class _AboutProgressState extends State<AboutProgress> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isAboutSelected ? Colors.grey.shade200 : Colors.green.shade300,
+                      backgroundColor: !isAboutSelected ? const Color(0xff87e64c) : Colors.grey.shade200,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: !isAboutSelected ? Colors.black : Colors.grey),
                       ),
                     ),
                     child: Text(
                       'Progress',
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: !isAboutSelected ? Colors.black : Colors.grey,
+                        fontWeight: !isAboutSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+           const SizedBox(height: 20),
             isAboutSelected
                 ? Column(
                     children: [
                       Container(
-                        padding: EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.green.shade100,
+                          color: const Color(0xffeefbe5),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Column(
+                        child: const Column(
                           children: [
                             Row(
                               children: [
                                 Icon(Icons.timer, size: 20),
                                 SizedBox(width: 8),
-                                Text('1 Hour 30 Min / Session'),
+                                Text('1 Hour 30 Min / Session', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                               ],
                             ),
+                            SizedBox(height: 5,),
                             Row(
                               children: [
                                 Icon(Icons.repeat, size: 20),
                                 SizedBox(width: 8),
-                                Text('3X / Week'),
+                                Text('3X / Week', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                               ],
                             ),
+                            SizedBox(height: 5,),
                             Row(
                               children: [
                                 Icon(Icons.calendar_today, size: 20),
                                 SizedBox(width: 8),
-                                Text('8 Weeks'),
+                                Text('8 Weeks', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 10),
+                     const  SizedBox(height: 10),
                       Container(
-                        padding: EdgeInsets.all(12),
+                        width: 330,
+                        height: 100,
+                        padding:const  EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.green.shade100,
+                          color: const Color(0xffeefbe5),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Column(
+                        child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Monday    8:30 - 10', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text('Monday    8:30 - 10', style: TextStyle(fontWeight: FontWeight.bold)
+                            ),
                             Text('Tuesday    8:30 - 10', style: TextStyle(fontWeight: FontWeight.bold)),
                             Text('Wednesday  8:30 - 10', style: TextStyle(fontWeight: FontWeight.bold)),
                           ],
@@ -130,7 +143,7 @@ class _AboutProgressState extends State<AboutProgress> {
                   )
                 : GridView.builder(
                     shrinkWrap: true,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
@@ -141,11 +154,11 @@ class _AboutProgressState extends State<AboutProgress> {
                       return ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xfff7f7f7),
+                          backgroundColor: const Color(0xfff7f7f7),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          side: BorderSide(color: Colors.black),
+                          side: const BorderSide(color: Colors.black),
                         ),
-                        child: Text('Week ${index + 1}', style: TextStyle(color: Colors.black)),
+                        child: Text('Week ${index + 1}', style: const TextStyle(color: Colors.black)),
                       );
                     },
                   ),
