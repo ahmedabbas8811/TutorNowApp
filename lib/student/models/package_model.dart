@@ -7,28 +7,29 @@ class PackageModel {
   final int weeks;
   final int sessions;
   final int price;
+  final String user_id;
 
-  PackageModel({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.hours,
-    required this.minutes,
-    required this.weeks,
-    required this.sessions,
-    required this.price,
-  });
+  PackageModel(
+      {required this.id,
+      required this.title,
+      required this.description,
+      required this.hours,
+      required this.minutes,
+      required this.weeks,
+      required this.sessions,
+      required this.price,
+      required this.user_id});
 
   factory PackageModel.fromJson(Map<String, dynamic> json) {
     return PackageModel(
-      id: json['id'],
-      title: json['package_name'] ?? '',
-      description: json['package_description'] ?? '',
-      hours: json['hours_per_session'] ?? 0,
-      minutes: json['minutes_per_session'] ?? 0,
-      weeks: json['number_of_weeks'] ?? 0,
-      sessions: json['sessions_per_week'] ?? '',
-      price: json['price'] ?? '',
-    );
+        id: json['id'],
+        title: json['package_name'] ?? '',
+        description: json['package_description'] ?? '',
+        hours: json['hours_per_session'] ?? 0,
+        minutes: json['minutes_per_session'] ?? 0,
+        weeks: json['number_of_weeks'] ?? 0,
+        sessions: json['sessions_per_week'] ?? '',
+        price: json['price'] ?? '',
+        user_id: json['user_id'] ?? '');
   }
 }

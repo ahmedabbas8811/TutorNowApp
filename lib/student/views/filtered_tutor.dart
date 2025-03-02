@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/student/controllers/filter_controller.dart';
+import 'package:newifchaly/student/models/package_model.dart';
 import 'package:newifchaly/student/models/search_model.dart';
 import 'package:newifchaly/student/views/tutor_detail.dart';
 
@@ -91,11 +92,21 @@ class _FilteredTutorState extends State<FilteredTutor> {
               final item = items[index];
 
               if (widget.filter_name == "price_range") {
-                //display Packages
+                final packageData = item['package'] as PackageModel;
+                final tutorName = item['tutor_name'];
+                final tutorImage = item['tutor_image'];
+
                 return ListTile(
-                  title: Text("Package ID: ${item.id}"),
-                  subtitle:
-                      Text("Title: ${item.title} - Price: ${item.price} PKR"),
+                  onTap: () => _navigateToTutorDetail(packageData.user_id),
+                  leading: CircleAvatar(
+                    backgroundImage: tutorImage.isNotEmpty
+                        ? NetworkImage(tutorImage)
+                        : const AssetImage('assets/default_avatar.png')
+                            as ImageProvider,
+                  ),
+                  title: Text(tutorName),
+                  subtitle: Text(
+                      "Package: ${packageData.title} - Price: ${packageData.price} PKR"),
                 );
               } else {
                 //display Tutors

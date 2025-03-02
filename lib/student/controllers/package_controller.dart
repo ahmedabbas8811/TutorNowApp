@@ -15,26 +15,27 @@ class PackagesController extends GetxController {
   }
 
   var profile = PackageModel(
-    id: 0,
-    title: '',
-    price: 0,
-    description: '',
-    hours: 0,
-    minutes: 0,
-    weeks: 0,
-    sessions: 0,
-  ).obs;
+          id: 0,
+          title: '',
+          price: 0,
+          description: '',
+          hours: 0,
+          minutes: 0,
+          weeks: 0,
+          sessions: 0,
+          user_id: '')
+      .obs;
   void resetProfile() {
     profile.value = PackageModel(
-      id: 0,
-      title: '',
-      price: 0,
-      description: '',
-      hours: 0,
-      minutes: 0,
-      weeks: 0,
-      sessions: 0,
-    );
+        id: 0,
+        title: '',
+        price: 0,
+        description: '',
+        hours: 0,
+        minutes: 0,
+        weeks: 0,
+        sessions: 0,
+        user_id: '');
   }
 
   Future<void> fetchPackages(String userId) async {

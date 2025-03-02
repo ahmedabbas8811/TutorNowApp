@@ -15,7 +15,7 @@ class FilterController {
           .eq('education_level', level);
       final tutors =
           response.map<Tutor>((data) => Tutor.fromMap(data)).toList();
-      // Remove duplicate users based on user_id
+      //remove duplicate users based on userid
       final uniqueTutors =
           {for (var tutor in tutors) tutor.userId: tutor}.values.toList();
 
@@ -35,7 +35,6 @@ class FilterController {
       final tutors =
           response.map<Tutor>((data) => Tutor.fromMap(data)).toList();
 
-      // Remove duplicate users based on user_id
       final uniqueTutors =
           {for (var tutor in tutors) tutor.userId: tutor}.values.toList();
 
@@ -46,20 +45,24 @@ class FilterController {
     }
   }
 
-  Future<List<PackageModel>> getPackagesByPriceRange(
+  Future<List<Map<String, dynamic>>> getPackagesByPriceRange(
       int minPrice, int maxPrice) async {
     try {
-      // Fetch all packages within the given price range
       final response = await _supabase
           .from('packages')
-          .select('*')
-          .gte('price', minPrice) // Greater than or equal to minPrice
-          .lte('price', maxPrice); // Less than or equal to maxPrice
+          .select('*, users!inner(id, metadata, image_url)') //join users table
+          .gte('price', minPrice)
+          .lte('price', maxPrice);
 
-      // Convert the response to a list of PackageModel
-      final packages = response
-          .map<PackageModel>((data) => PackageModel.fromJson(data))
-          .toList();
+      //convert response into a list of maps
+      final packages = response.map((data) {
+        final userMetadata = data['users']['metadata'] ?? {};
+        return {
+          'package': PackageModel.fromJson(data),
+          'tutor_name': userMetadata['name'] ?? 'Unknown Tutor',
+          'tutor_image': data['users']['image_url'] ?? '',
+        };
+      }).toList();
 
       return packages;
     } catch (e) {
