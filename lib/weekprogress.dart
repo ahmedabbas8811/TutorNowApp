@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class WeekProgress extends StatefulWidget {
+  const WeekProgress({Key? key}) : super(key: key);
+
   @override
   _WeekProgressState createState() => _WeekProgressState();
 }
@@ -26,11 +28,13 @@ class _WeekProgressState extends State<WeekProgress> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Week 1 - Progress Report'),
+        title: const Text('Week 1 - Progress Report'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -39,59 +43,93 @@ class _WeekProgressState extends State<WeekProgress> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Weekly Progress Report", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            Text("Overall performance", style: TextStyle(fontSize: 16)),
+            const Text(
+              "Weekly Progress Report",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+
+            const Text("Overall performance", style: TextStyle(fontSize: 16)),
+
+            const SizedBox(height: 8),
+
             Wrap(
               spacing: 8.0,
-              children: performanceOptions.map((option) => ChoiceChip(
-                label: Text(option),
-                selected: selectedPerformance == option,
-                onSelected: (selected) {
-                  setState(() {
-                    selectedPerformance = selected ? option : null;
-                  });
-                },
-              )).toList(),
+              children: performanceOptions.map((option) {
+                return ChoiceChip(
+                  label: Text(option),
+                  selected: selectedPerformance == option,
+                  selectedColor: Colors.green.shade100,
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedPerformance = option;
+                    });
+                  },
+                );
+              }).toList(),
             ),
-            SizedBox(height: 20),
-            Text("Additional comments (if any)", style: TextStyle(fontSize: 16)),
+
+            const SizedBox(height: 20),
+
+            const Text("Additional comments (if any)", style: TextStyle(fontSize: 16)),
+
+            const SizedBox(height: 5),
+
             TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Write your comments here...",
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
-            SizedBox(height: 10),
+
+            const SizedBox(height: 10),
+
             Wrap(
               spacing: 8.0,
-              children: tags.map((tag) => FilterChip(
-                label: Text(tag),
-                selected: selectedTags.contains(tag),
-                onSelected: (selected) {
-                  setState(() {
-                    selected ? selectedTags.add(tag) : selectedTags.remove(tag);
-                  });
-                },
-              )).toList(),
+              children: tags.map((tag) {
+                return FilterChip(
+                  label: Text(tag),
+                  selected: selectedTags.contains(tag),
+                  selectedColor: Colors.green.shade100,
+                  onSelected: (selected) {
+                    setState(() {
+                      selected ? selectedTags.add(tag) : selectedTags.remove(tag);
+                    });
+                  },
+                );
+              }).toList(),
             ),
-            Spacer(),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-              ),
-              child: Text("Attach Images +", style: TextStyle(fontSize: 16)),
+
+            const Spacer(),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                  ),
+                  child: const Text("Attach Images +", style: TextStyle(fontSize: 16)),
+                ),
+              ],
             ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-              ),
-              child: Text("Save", style: TextStyle(fontSize: 16, color: Colors.white)),
+
+            const SizedBox(height: 10),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                  ),
+                  child: const Text("Save", style: TextStyle(fontSize: 16, color: Colors.white)),
+                ),
+              ],
             ),
           ],
         ),
