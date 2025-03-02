@@ -32,7 +32,7 @@ class _WeekProgressState extends State<WeekProgress> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Week 1 - Progress Report'),
+       
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -43,9 +43,17 @@ class _WeekProgressState extends State<WeekProgress> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+              const Text(
+              "Week 1 -Progress Report",
+              style: TextStyle(fontSize: 28,fontWeight:FontWeight.bold),
+            ),
+              const Text(
+              "Report",
+              style: TextStyle(fontSize: 28,fontWeight:FontWeight.bold),
+            ),
             const Text(
               "Weekly Progress Report",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18,),
             ),
             const SizedBox(height: 10),
 
@@ -69,20 +77,28 @@ class _WeekProgressState extends State<WeekProgress> {
               }).toList(),
             ),
 
-            const SizedBox(height: 20),
-
-            const Text("Additional comments (if any)", style: TextStyle(fontSize: 16)),
-
             const SizedBox(height: 5),
 
-            TextField(
-              decoration: const InputDecoration(
-                hintText: "Write your comments here...",
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: const Text("Additional comments (if any)", style: TextStyle(fontSize: 16)),
             ),
-
+            
+            Container(
+              width: 370,
+              height: 70,
+               child: const Padding(
+                  padding:   EdgeInsets.all(8.0),
+                  child: Text('Write your comment here and or select a template from below to get started',style: TextStyle(color: Colors.grey),),
+                ),
+               decoration: BoxDecoration(
+                color: const Color(0xfff3f3f3),
+                borderRadius: BorderRadius.circular(12),
+                
+              ),
+              
+            ),
+            
             const SizedBox(height: 10),
 
             Wrap(
