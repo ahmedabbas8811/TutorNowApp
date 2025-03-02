@@ -51,7 +51,11 @@ class _WeekProgressState extends State<WeekProgress> {
               spacing: 8.0,
               children: performanceOptions.map((option) {
                 return ChoiceChip(
-                  label: Text(option, overflow: TextOverflow.ellipsis),
+                  label: Text(
+                    option,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.normal), // Removed bold styling
+                  ),
                   selected: selectedPerformance == option,
                   selectedColor: Colors.green.shade100,
                   backgroundColor: const Color(0xfff3f3f3),
@@ -68,19 +72,24 @@ class _WeekProgressState extends State<WeekProgress> {
             const SizedBox(height: 8),
             Container(
               width: double.infinity,
-              height: 70,
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 color: const Color(0xfff3f3f3),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                commentText,
-                style: TextStyle(
-                  color: commentText.contains("Write your comment") ? Colors.grey : Colors.black,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      commentText,
+                      style: TextStyle(
+                        color: commentText.contains("Write your comment") ? Colors.grey : Colors.black,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 10),
@@ -97,12 +106,12 @@ class _WeekProgressState extends State<WeekProgress> {
                   padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
-                      side: const BorderSide(
-                      color: Colors.black,width: 1,
+                    side: const BorderSide(
+                      color: Colors.black, width: 1,
                     ),
                   ),
                 ),
-                child: const Text("Attach Images +", style: TextStyle(fontSize: 16,color: Colors.black)),
+                child: const Text("Attach Images +", style: TextStyle(fontSize: 16, color: Colors.black)),
               ),
             ),
             const SizedBox(height: 10),
@@ -114,8 +123,8 @@ class _WeekProgressState extends State<WeekProgress> {
                   padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 144),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
-                    side:const BorderSide(
-                      color: Colors.black,width: 1,
+                    side: const BorderSide(
+                      color: Colors.black, width: 1,
                     ),
                   ),
                 ),
