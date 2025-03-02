@@ -10,6 +10,7 @@ class WeekProgress extends StatefulWidget {
 class _WeekProgressState extends State<WeekProgress> {
   String? selectedPerformance;
   List<String> selectedTags = [];
+  String commentText = "Write your comment here or select a template from below to get started";
 
   final List<String> performanceOptions = [
     "😃 Excellent",
@@ -28,11 +29,8 @@ class _WeekProgressState extends State<WeekProgress> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       appBar: AppBar(
-       
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -43,31 +41,21 @@ class _WeekProgressState extends State<WeekProgress> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-              const Text(
-              "Week 1 -Progress Report",
-              style: TextStyle(fontSize: 28,fontWeight:FontWeight.bold),
-            ),
-              const Text(
-              "Report",
-              style: TextStyle(fontSize: 28,fontWeight:FontWeight.bold),
-            ),
             const Text(
-              "Weekly Progress Report",
-              style: TextStyle(fontSize: 18,),
+              "Week 1 - Progress Report",
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-
             const Text("Overall performance", style: TextStyle(fontSize: 16)),
-
             const SizedBox(height: 8),
-
             Wrap(
               spacing: 8.0,
               children: performanceOptions.map((option) {
                 return ChoiceChip(
-                  label: Text(option),
+                  label: Text(option, overflow: TextOverflow.ellipsis),
                   selected: selectedPerformance == option,
                   selectedColor: Colors.green.shade100,
+                  backgroundColor: const Color(0xfff3f3f3),
                   onSelected: (selected) {
                     setState(() {
                       selectedPerformance = option;
@@ -76,80 +64,93 @@ class _WeekProgressState extends State<WeekProgress> {
                 );
               }).toList(),
             ),
-
-            const SizedBox(height: 5),
-
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: const Text("Additional comments (if any)", style: TextStyle(fontSize: 16)),
-            ),
-            
+            const SizedBox(height: 10),
+            const Text("Additional comments (if any)", style: TextStyle(fontSize: 16)),
+            const SizedBox(height: 8),
             Container(
-              width: 370,
+              width: double.infinity,
               height: 70,
-               child: const Padding(
-                  padding:   EdgeInsets.all(8.0),
-                  child: Text('Write your comment here and or select a template from below to get started',style: TextStyle(color: Colors.grey),),
-                ),
-               decoration: BoxDecoration(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
                 color: const Color(0xfff3f3f3),
                 borderRadius: BorderRadius.circular(12),
-                
               ),
-              
+              child: Text(
+                commentText,
+                style: TextStyle(color: commentText.contains("Write your comment") ? Colors.grey : Colors.black),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            
             const SizedBox(height: 10),
-
             Wrap(
               spacing: 8.0,
-              children: tags.map((tag) {
-                return FilterChip(
-                  label: Text(tag),
-                  selected: selectedTags.contains(tag),
-                  selectedColor: Colors.green.shade100,
-                  onSelected: (selected) {
-                    setState(() {
-                      selected ? selectedTags.add(tag) : selectedTags.remove(tag);
-                    });
-                  },
-                );
-              }).toList(),
+              runSpacing: 8.0,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: _buildTag(tags[0])),
+                    const SizedBox(width: 8),
+                    Expanded(child: _buildTag(tags[1])),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(child: _buildTag(tags[2])),
+                    const SizedBox(width: 8),
+                    Expanded(child: _buildTag(tags[3])),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(child: _buildTag(tags[4])),
+                  ],
+                ),
+              ],
             ),
-
             const Spacer(),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                  ),
-                  child: const Text("Attach Images +", style: TextStyle(fontSize: 16)),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                 ),
-              ],
+                child: const Text("Attach Images +", style: TextStyle(fontSize: 16)),
+              ),
             ),
-
             const SizedBox(height: 10),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                  ),
-                  child: const Text("Save", style: TextStyle(fontSize: 16, color: Colors.white)),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                 ),
-              ],
+                child: const Text("Save", style: TextStyle(fontSize: 16, color: Colors.white)),
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTag(String tag) {
+    return FilterChip(
+      label: Text(tag, overflow: TextOverflow.ellipsis),
+      selected: selectedTags.contains(tag),
+      selectedColor: Colors.green.shade100,
+      onSelected: (selected) {
+        setState(() {
+          if (selected) {
+            selectedTags.add(tag);
+            commentText = tag; // Set comment box text to selected tag
+          } else {
+            selectedTags.remove(tag);
+            commentText = selectedTags.isNotEmpty ? selectedTags.last : "Write your comment here or select a template from below to get started";
+          }
+        });
+      },
     );
   }
 }
