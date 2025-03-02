@@ -40,16 +40,18 @@ class _SearchScreenState extends State<SearchScreen> {
         context,
         MaterialPageRoute(builder: (context) => StudentHomeScreen()),
       );
-    }else if (index == 3) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => StudentProfileScreen()),
-    );
-  }
+    } else if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => StudentProfileScreen()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    print(
+        "############################Search screen#############################");
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -72,11 +74,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       onChanged: (text) {
                         setState(() {});
                       },
-                      decoration:const  InputDecoration(
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Name, City, Qualification',
                         prefixIcon: Icon(Icons.search, color: Colors.grey),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 12.0),
                         hintMaxLines: 1,
                       ),
                       style: const TextStyle(
@@ -92,7 +95,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       ? () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => SearchResults()),
+                            MaterialPageRoute(
+                                builder: (context) => SearchResults()),
                           );
                         }
                       : null,
@@ -100,12 +104,15 @@ class _SearchScreenState extends State<SearchScreen> {
                     height: 48,
                     width: 48,
                     decoration: BoxDecoration(
-                      color: _isTextFieldNotEmpty() ? const Color(0xff87e64c) : Colors.grey[200],
+                      color: _isTextFieldNotEmpty()
+                          ? const Color(0xff87e64c)
+                          : Colors.grey[200],
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: Icon(
                       Icons.arrow_forward,
-                      color: _isTextFieldNotEmpty() ? Colors.black : Colors.grey,
+                      color:
+                          _isTextFieldNotEmpty() ? Colors.black : Colors.grey,
                     ),
                   ),
                 ),
@@ -143,7 +150,8 @@ class _SearchScreenState extends State<SearchScreen> {
         onTap: _onItemTapped,
         showSelectedLabels: true,
         showUnselectedLabels: true,
-        selectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        selectedLabelStyle:
+            const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
         unselectedLabelStyle: const TextStyle(fontSize: 12),
         items: const [
           BottomNavigationBarItem(
@@ -174,7 +182,8 @@ class _SearchScreenState extends State<SearchScreen> {
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.grey[200],
-        foregroundColor: _selectedQualification == text ? Colors.black : Colors.grey,
+        foregroundColor:
+            _selectedQualification == text ? Colors.black : Colors.grey,
         elevation: 0,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         shape: RoundedRectangleBorder(

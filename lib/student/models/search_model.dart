@@ -16,10 +16,10 @@ class Tutor {
 
   factory Tutor.fromMap(Map<String, dynamic> data) {
     return Tutor(
-      id: data['id'] as int,
-      userId: data['user_id'],
-      educationLevel: data['education_level'],
-      subject: data['subject'],
+      id: data['id'] as int ?? 0,
+      userId: data['user_id'] ?? "",
+      educationLevel: data['education_level'] ?? "unknown",
+      subject: data['subject'] ?? "unknown",
       name:
           data['users'] != null ? data['users']['metadata']['name'] : 'Unknown',
       imgurl: data['users'] != "null" ? data['users']['image_url'] : '',
