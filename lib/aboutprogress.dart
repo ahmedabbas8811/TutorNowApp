@@ -156,7 +156,7 @@ class _AboutProgressState extends State<AboutProgress> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => WeekProgress(weekNumber: index + 1),
+                                builder: (context) => WeekProgress(),
                               ),
                             );
                           },
