@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'weekprogress.dart'; // Ensure this file exists
 
 class AboutProgress extends StatefulWidget {
   const AboutProgress({Key? key}) : super(key: key);
@@ -9,7 +9,7 @@ class AboutProgress extends StatefulWidget {
 }
 
 class _AboutProgressState extends State<AboutProgress> {
-  bool isAboutSelected = false; // Default Progress selected
+  bool isAboutSelected = false; // Default: Progress selected
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +26,10 @@ class _AboutProgressState extends State<AboutProgress> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CircleAvatar(radius: 50, backgroundColor: Colors.grey.shade300),
-          const  SizedBox(height: 10),
+            const SizedBox(height: 10),
             const Text('Student Name', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const  Text('Package Name', style: TextStyle(fontSize: 16, color: Colors.black)),
-          const  SizedBox(height: 20),
+            const Text('Package Name', style: TextStyle(fontSize: 16, color: Colors.black)),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -56,7 +56,7 @@ class _AboutProgressState extends State<AboutProgress> {
                     ),
                   ),
                 ),
-              const  SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
@@ -82,7 +82,7 @@ class _AboutProgressState extends State<AboutProgress> {
                 ),
               ],
             ),
-           const SizedBox(height: 20),
+            const SizedBox(height: 20),
             isAboutSelected
                 ? Column(
                     children: [
@@ -98,33 +98,33 @@ class _AboutProgressState extends State<AboutProgress> {
                               children: [
                                 Icon(Icons.timer, size: 20),
                                 SizedBox(width: 8),
-                                Text('1 Hour 30 Min / Session', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
+                                Text('1 Hour 30 Min / Session', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                               ],
                             ),
-                            SizedBox(height: 5,),
+                            SizedBox(height: 5),
                             Row(
                               children: [
                                 Icon(Icons.repeat, size: 20),
                                 SizedBox(width: 8),
-                                Text('3X / Week', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
+                                Text('3X / Week', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                               ],
                             ),
-                            SizedBox(height: 5,),
+                            SizedBox(height: 5),
                             Row(
                               children: [
                                 Icon(Icons.calendar_today, size: 20),
                                 SizedBox(width: 8),
-                                Text('8 Weeks', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
+                                Text('8 Weeks', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ],
                         ),
                       ),
-                     const  SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Container(
                         width: 330,
                         height: 100,
-                        padding:const  EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: const Color(0xffeefbe5),
                           borderRadius: BorderRadius.circular(8),
@@ -132,8 +132,7 @@ class _AboutProgressState extends State<AboutProgress> {
                         child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Monday    8:30 - 10', style: TextStyle(fontWeight: FontWeight.bold)
-                            ),
+                            Text('Monday    8:30 - 10', style: TextStyle(fontWeight: FontWeight.bold)),
                             Text('Tuesday    8:30 - 10', style: TextStyle(fontWeight: FontWeight.bold)),
                             Text('Wednesday  8:30 - 10', style: TextStyle(fontWeight: FontWeight.bold)),
                           ],
@@ -141,26 +140,35 @@ class _AboutProgressState extends State<AboutProgress> {
                       ),
                     ],
                   )
-                : GridView.builder(
-                    shrinkWrap: true,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 2,
+                : Expanded(
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 2,
+                      ),
+                      itemCount: 7,
+                      itemBuilder: (context, index) {
+                        return ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WeekProgress(weekNumber: index + 1),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xfff7f7f7),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            side: const BorderSide(color: Colors.black),
+                          ),
+                          child: Text('Week ${index + 1}', style: const TextStyle(color: Colors.black)),
+                        );
+                      },
                     ),
-                    itemCount: 7,
-                    itemBuilder: (context, index) {
-                      return ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xfff7f7f7),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          side: const BorderSide(color: Colors.black),
-                        ),
-                        child: Text('Week ${index + 1}', style: const TextStyle(color: Colors.black)),
-                      );
-                    },
                   ),
           ],
         ),
