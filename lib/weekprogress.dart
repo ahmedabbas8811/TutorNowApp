@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:newifchaly/weekattachimages.dart';
 
-
-
 class WeekProgress extends StatefulWidget {
-  const WeekProgress({Key? key}) : super(key: key);
+  final int weekNumber;
+  const WeekProgress({Key? key, required this.weekNumber}) : super(key: key);
 
   @override
   _WeekProgressState createState() => _WeekProgressState();
 }
 
+
 class _WeekProgressState extends State<WeekProgress> {
   String? selectedPerformance;
   TextEditingController commentController = TextEditingController();
+
 
   final List<String> performanceOptions = [
     "😃 Excellent",
@@ -51,8 +52,8 @@ class _WeekProgressState extends State<WeekProgress> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Week 1 - Progress Report",
+              Text(
+                "Week ${widget.weekNumber} - Progress Report",
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
