@@ -19,8 +19,8 @@ class _WeekProgressState extends State<WeekProgress> {
   ];
 
   final List<Map<String, dynamic>> tags = [
-    {"text": "✅ Grasped the concepts", "color": const Color(0xffefffe7)},
-    {"text": "💡 Getting There! Needs Support", "color": const Color(0xffffe7e7)},
+    {"text": "✅ Grasped the concepts", "color": const Color(0xffefffe7)},{"text": "💡 Getting There! Needs Support", "color": const Color(0xffffe7e7)},
+
     {"text": "😟 Not performing well, needs improvement", "color": const Color(0xfffeffd3)},
     {"text": "📘 Revision week", "color": const Color(0xffe7f3ff)},
     {"text": "🏆 Excellent Progress!", "color": const Color(0xffffe7fc)},
@@ -44,25 +44,25 @@ class _WeekProgressState extends State<WeekProgress> {
               "Week 1 - Progress Report",
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 0),
             
             const Text("Weekly Progress Report", style: TextStyle(fontSize: 16)),
             const Text("Overall performance", style: TextStyle(fontSize: 16)),
-            const SizedBox(height: 8),
+            const SizedBox(height: 5),
            Wrap(
   spacing: 8.0,
   children: performanceOptions.map((option) {
     return ChoiceChip(
       label: Text(option, overflow: TextOverflow.ellipsis),
-      selected: false, // Always false, so no tick mark appears
-      backgroundColor: const Color(0xfff3f3f3), // Fixed background color
+      selected: false, 
+      backgroundColor: const Color(0xfff3f3f3), 
       shape: RoundedRectangleBorder(
-        side: const BorderSide(color: Colors.transparent), // No highlight border
+        side: const BorderSide(color: Colors.transparent), 
         borderRadius: BorderRadius.circular(20),
       ),
       onSelected: (selected) {
         setState(() {
-          selectedPerformance = option; // Only updates selectedPerformance
+          selectedPerformance = option; 
         });
       },
     );
@@ -91,11 +91,11 @@ class _WeekProgressState extends State<WeekProgress> {
             ),
             const SizedBox(height: 10),
             Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
+              spacing: 5.0,
+              runSpacing: 5.0,
               children: tags.map((tag) => _buildTag(tag)).toList(),
             ),
-            const Spacer(),
+         const    SizedBox(height: 14,),
             Center(
               child: ElevatedButton(
                 onPressed: () {},
@@ -111,7 +111,7 @@ class _WeekProgressState extends State<WeekProgress> {
                 child: const Text("Attach Images +", style: TextStyle(fontSize: 16,color: Colors.black)),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
             Center(
               child: ElevatedButton(
                 onPressed: () {},
