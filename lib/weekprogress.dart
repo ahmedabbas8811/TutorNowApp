@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:newifchaly/weekattachimages.dart';
+import 'package:newifchaly/controllers/progress_controller.dart';
+import 'package:newifchaly/models/progress_model.dart';
 
 class WeekProgress extends StatefulWidget {
   final int weekNumber;
-  const WeekProgress({Key? key, required this.weekNumber}) : super(key: key);
+  final String bookingId; // Changed to int for consistency
+  const WeekProgress({Key? key, required this.weekNumber, required this.bookingId}) : super(key: key);
 
   @override
   _WeekProgressState createState() => _WeekProgressState();
 }
 
-
 class _WeekProgressState extends State<WeekProgress> {
   String? selectedPerformance;
   TextEditingController commentController = TextEditingController();
+  final ProgressController progressController = ProgressController();
 
+  @override
+  void initState() {
+    super.initState();
+    debugPrint('Opened WeekProgress Screen for Booking ID: ${widget.bookingId}, Week Number: ${widget.weekNumber}');
+  }
 
   final List<String> performanceOptions = [
     "😃 Excellent",
@@ -37,6 +45,28 @@ class _WeekProgressState extends State<WeekProgress> {
     ],
   ];
 
+  void saveProgress() async {
+    if (selectedPerformance == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select overall performance")),
+      );
+      return;
+    }
+
+    ProgressModel report = ProgressModel(
+      week: widget.weekNumber,
+      overallPerformance: selectedPerformance!,
+      comments: commentController.text.trim(),
+      bookingId: widget.bookingId,
+    );
+
+    String result = await progressController.saveProgressReport(report);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +84,7 @@ class _WeekProgressState extends State<WeekProgress> {
             children: [
               Text(
                 "Week ${widget.weekNumber} - Progress Report",
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
 
@@ -128,7 +158,7 @@ class _WeekProgressState extends State<WeekProgress> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const  WeekAttachImages()),
+                      MaterialPageRoute(builder: (context) => const WeekAttachImages()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -147,7 +177,7 @@ class _WeekProgressState extends State<WeekProgress> {
 
               Center(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: saveProgress,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff87e64c),
                     padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 140),

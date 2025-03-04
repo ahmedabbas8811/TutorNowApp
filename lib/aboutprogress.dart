@@ -130,7 +130,7 @@ class _AboutProgressState extends State<AboutProgress> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => WeekProgress(weekNumber: weekNumber),
+                  builder: (context) => WeekProgress(weekNumber: weekNumber, bookingId: widget.booking.bookingId),
                 ),
               );
             },
