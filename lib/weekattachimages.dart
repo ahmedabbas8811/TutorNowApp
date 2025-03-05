@@ -10,16 +10,47 @@ class WeekAttachImages extends StatefulWidget {
 }
 
 class _WeekAttachImagesState extends State<WeekAttachImages> {
-  File? _image;
+  final List<File> _images = [];
+  final ImagePicker _picker = ImagePicker();
 
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+  Future<void> _pickImage(ImageSource source) async {
+    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null) {
       setState(() {
-        _image = File(pickedFile.path);
+        _images.addAll(pickedFiles.map((file) => File(file.path)));
       });
     }
+  }
+
+  void _showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.camera_alt),
+            title: const Text("Camera"),
+            onTap: () async {
+              Navigator.pop(context);
+              final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+              if (photo != null) {
+                setState(() {
+                  _images.add(File(photo.path));
+                });
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_library),
+            title: const Text("Gallery"),
+            onTap: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.gallery);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -51,30 +82,36 @@ class _WeekAttachImagesState extends State<WeekAttachImages> {
             ),
             const SizedBox(height: 12),
             GestureDetector(
-              onTap: _pickImage,
-              child: CustomPaint(
-                painter: DashedBorderPainter(),
-                child: Container(
-                  height: 150,
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8),
-                  child: _image == null
-                      ? const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.camera_alt, color: Colors.grey),
-                              SizedBox(height: 8),
-                              Text('Tap to upload image',
-                                  style: TextStyle(color: Colors.grey)),
-                            ],
-                          ),
-                        )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(_image!, fit: BoxFit.cover),
-                        ),
+              onTap: _showImageSourceDialog,
+              child: Container(
+                height: 150,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey, style: BorderStyle.solid),
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                child: _images.isEmpty
+                    ? const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.camera_alt, color: Colors.grey),
+                            SizedBox(height: 8),
+                            Text('Tap to upload images',
+                                style: TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                      )
+                    : Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _images.map((image) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(image, width: 100, height: 100, fit: BoxFit.cover),
+                          );
+                        }).toList(),
+                      ),
               ),
             ),
             const SizedBox(height: 22),
@@ -114,48 +151,4 @@ class _WeekAttachImagesState extends State<WeekAttachImages> {
       ),
     );
   }
-}
-
-class DashedBorderPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    const double dashWidth = 10, dashSpace = 5;
-    final Paint paint = Paint()
-      ..color = Colors.grey
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-
-    // Top border
-    double startX = 0;
-    while (startX < size.width) {
-      canvas.drawLine(Offset(startX, 0), Offset(startX + dashWidth, 0), paint);
-      startX += dashWidth + dashSpace;
-    }
-
-    // Left border
-    double startY = 0;
-    while (startY < size.height) {
-      canvas.drawLine(Offset(0, startY), Offset(0, startY + dashWidth), paint);
-      startY += dashWidth + dashSpace;
-    }
-
-    // Bottom border
-    startX = 0;
-    while (startX < size.width) {
-      canvas.drawLine(
-          Offset(startX, size.height), Offset(startX + dashWidth, size.height), paint);
-      startX += dashWidth + dashSpace;
-    }
-
-    // Right border
-    startY = 0;
-    while (startY < size.height) {
-      canvas.drawLine(
-          Offset(size.width, startY), Offset(size.width, startY + dashWidth), paint);
-      startY += dashWidth + dashSpace;
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
