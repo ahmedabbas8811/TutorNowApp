@@ -83,35 +83,37 @@ class _WeekAttachImagesState extends State<WeekAttachImages> {
             const SizedBox(height: 12),
             GestureDetector(
               onTap: _showImageSourceDialog,
-              child: Container(
-                height: 150,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey, style: BorderStyle.solid),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: _images.isEmpty
-                    ? const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.camera_alt, color: Colors.grey),
-                            SizedBox(height: 8),
-                            Text('Tap to upload images',
-                                style: TextStyle(color: Colors.grey)),
-                          ],
+              child: CustomPaint(
+                painter: DashedBorderPainter(),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(8),
+                  child: _images.isEmpty
+                      ? const SizedBox(
+                          height: 150,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.camera_alt, color: Colors.grey),
+                                SizedBox(height: 8),
+                                Text('Tap to upload images',
+                                    style: TextStyle(color: Colors.grey)),
+                              ],
+                            ),
+                          ),
+                        )
+                      : Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _images.map((image) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(image, width: 100, height: 100, fit: BoxFit.cover),
+                            );
+                          }).toList(),
                         ),
-                      )
-                    : Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: _images.map((image) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.file(image, width: 100, height: 100, fit: BoxFit.cover),
-                          );
-                        }).toList(),
-                      ),
+                ),
               ),
             ),
             const SizedBox(height: 22),
@@ -151,4 +153,31 @@ class _WeekAttachImagesState extends State<WeekAttachImages> {
       ),
     );
   }
+}
+
+class DashedBorderPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const double dashWidth = 8, dashSpace = 5;
+    final Paint paint = Paint()
+      ..color = Colors.grey
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+    
+    Path path = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        const Radius.circular(8),
+      ));
+    
+    double dashOffset = 0;
+    while (dashOffset < path.computeMetrics().first.length) {
+      final metric = path.computeMetrics().first;
+      canvas.drawPath(metric.extractPath(dashOffset, dashOffset + dashWidth), paint);
+      dashOffset += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
