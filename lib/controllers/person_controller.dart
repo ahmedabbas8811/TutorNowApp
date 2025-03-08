@@ -14,7 +14,7 @@ class PersonController extends GetxController {
           name: "",
           bio: "",
           isProfileComplete: false,
-          profileImage: "assets/Ellipse 1.png",
+          profileImage: "assets/Ellipse1.png",
           isVerified: false)
       .obs;
 
@@ -130,8 +130,10 @@ class PersonController extends GetxController {
             p?.profileImage = response['image_url']; // Update the profile model
           });
         } else {
-          print("Image url not found");
-        }
+        profile.update((p) {
+          p?.profileImage = 'assets/Ellipse1.png'; // Fall back to the local asset
+        });
+      }
       } catch (e) {
         print("Error fetching img url: $e");
       }
