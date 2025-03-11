@@ -1,60 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:newifchaly/attachimg_controller.dart';
 import 'dart:io';
 
-class WeekAttachImages extends StatefulWidget {
-  const WeekAttachImages({super.key});
+class WeekAttachImages extends StatelessWidget {
+  final String bookingId;
+  final int week;
 
-  @override
-  State<WeekAttachImages> createState() => _WeekAttachImagesState();
-}
-
-class _WeekAttachImagesState extends State<WeekAttachImages> {
-  final List<File> _images = [];
-  final ImagePicker _picker = ImagePicker();
-
-  Future<void> _pickImage(ImageSource source) async {
-    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles != null) {
-      setState(() {
-        _images.addAll(pickedFiles.map((file) => File(file.path)));
-      });
-    }
-  }
-
-  void _showImageSourceDialog() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Wrap(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.camera_alt),
-            title: const Text("Camera"),
-            onTap: () async {
-              Navigator.pop(context);
-              final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
-              if (photo != null) {
-                setState(() {
-                  _images.add(File(photo.path));
-                });
-              }
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.photo_library),
-            title: const Text("Gallery"),
-            onTap: () {
-              Navigator.pop(context);
-              _pickImage(ImageSource.gallery);
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  WeekAttachImages({required this.bookingId, required this.week, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final AttachImageController controller =
+        Get.put(AttachImageController(bookingId: bookingId, week: week));
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -82,40 +43,59 @@ class _WeekAttachImagesState extends State<WeekAttachImages> {
             ),
             const SizedBox(height: 12),
             GestureDetector(
-              onTap: _showImageSourceDialog,
-              child: CustomPaint(
-                painter: DashedBorderPainter(),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8),
-                  child: _images.isEmpty
-                      ? const SizedBox(
-                          height: 150,
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.camera_alt, color: Colors.grey),
-                                SizedBox(height: 8),
-                                Text('Tap to upload images',
-                                    style: TextStyle(color: Colors.grey)),
-                              ],
+                onTap: () => _showImageSourceDialog(controller),
+                child: CustomPaint(
+                  painter: DashedBorderPainter(),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(8),
+                    child: Obx(
+                      () => controller.selectedImages.isEmpty
+                          ? const SizedBox(
+                              height: 150,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.camera_alt, color: Colors.grey),
+                                    SizedBox(height: 8),
+                                    Text('Tap to upload images',
+                                        style: TextStyle(color: Colors.grey)),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: controller.selectedImages.map((image) {
+                                return Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.file(image,
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover),
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.close,
+                                            color: Colors.red),
+                                        onPressed: () => controller
+                                            .selectedImages
+                                            .remove(image),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
                             ),
-                          ),
-                        )
-                      : Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: _images.map((image) {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.file(image, width: 100, height: 100, fit: BoxFit.cover),
-                            );
-                          }).toList(),
-                        ),
-                ),
-              ),
-            ),
+                    ),
+                  ),
+                )),
             const SizedBox(height: 22),
             const Text(
               'Additional comments (if any)',
@@ -133,10 +113,12 @@ class _WeekAttachImagesState extends State<WeekAttachImages> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
+              onChanged: (value) => controller.comments.value =
+                  value, //bind comments to controller
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () => controller.saveProgress(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xff87e64c),
                 minimumSize: const Size(double.infinity, 50),
@@ -153,6 +135,32 @@ class _WeekAttachImagesState extends State<WeekAttachImages> {
       ),
     );
   }
+
+  void _showImageSourceDialog(AttachImageController controller) {
+    showModalBottomSheet(
+      context: Get.context!,
+      builder: (context) => Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.camera_alt),
+            title: const Text("Camera"),
+            onTap: () async {
+              Navigator.pop(context);
+              await controller.captureImage();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_library),
+            title: const Text("Gallery"),
+            onTap: () async {
+              Navigator.pop(context);
+              await controller.pickImages();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class DashedBorderPainter extends CustomPainter {
@@ -163,17 +171,18 @@ class DashedBorderPainter extends CustomPainter {
       ..color = Colors.grey
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
-    
+
     Path path = Path()
       ..addRRect(RRect.fromRectAndRadius(
         Rect.fromLTWH(0, 0, size.width, size.height),
         const Radius.circular(8),
       ));
-    
+
     double dashOffset = 0;
     while (dashOffset < path.computeMetrics().first.length) {
       final metric = path.computeMetrics().first;
-      canvas.drawPath(metric.extractPath(dashOffset, dashOffset + dashWidth), paint);
+      canvas.drawPath(
+          metric.extractPath(dashOffset, dashOffset + dashWidth), paint);
       dashOffset += dashWidth + dashSpace;
     }
   }

@@ -6,7 +6,9 @@ import 'package:newifchaly/models/progress_model.dart';
 class WeekProgress extends StatefulWidget {
   final int weekNumber;
   final String bookingId; // Changed to int for consistency
-  const WeekProgress({Key? key, required this.weekNumber, required this.bookingId}) : super(key: key);
+  const WeekProgress(
+      {Key? key, required this.weekNumber, required this.bookingId})
+      : super(key: key);
 
   @override
   _WeekProgressState createState() => _WeekProgressState();
@@ -20,7 +22,8 @@ class _WeekProgressState extends State<WeekProgress> {
   @override
   void initState() {
     super.initState();
-    debugPrint('Opened WeekProgress Screen for Booking ID: ${widget.bookingId}, Week Number: ${widget.weekNumber}');
+    debugPrint(
+        'Opened WeekProgress Screen for Booking ID: ${widget.bookingId}, Week Number: ${widget.weekNumber}');
   }
 
   final List<String> performanceOptions = [
@@ -33,10 +36,16 @@ class _WeekProgressState extends State<WeekProgress> {
   final List<List<Map<String, dynamic>>> groupedTags = [
     [
       {"text": "✅ Grasped the concepts", "color": const Color(0xffefffe7)},
-      {"text": "💡 Getting There! Needs Support", "color": const Color(0xffffe7e7)},
+      {
+        "text": "💡 Getting There! Needs Support",
+        "color": const Color(0xffffe7e7)
+      },
     ],
     [
-      {"text": "😟 Not performing well, need studies", "color": const Color(0xfffeffd3)},
+      {
+        "text": "😟 Not performing well, need studies",
+        "color": const Color(0xfffeffd3)
+      },
       {"text": "🏆 Excellent Progress!", "color": const Color(0xffffe7fc)},
     ],
     [
@@ -54,11 +63,12 @@ class _WeekProgressState extends State<WeekProgress> {
     }
 
     ProgressModel report = ProgressModel(
-      week: widget.weekNumber,
-      overallPerformance: selectedPerformance!,
-      comments: commentController.text.trim(),
-      bookingId: widget.bookingId,
-    );
+        week: widget.weekNumber,
+        overallPerformance: selectedPerformance!,
+        comments: commentController.text.trim(),
+        bookingId: widget.bookingId,
+        imageUrl: '',
+        imageId: '');
 
     String result = await progressController.saveProgressReport(report);
 
@@ -84,20 +94,22 @@ class _WeekProgressState extends State<WeekProgress> {
             children: [
               Text(
                 "Week ${widget.weekNumber} - Progress Report",
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-
-              const Text("Weekly Progress Report", style: TextStyle(fontSize: 16)),
+              const Text("Weekly Progress Report",
+                  style: TextStyle(fontSize: 16)),
               const SizedBox(height: 10),
               const Text("Overall performance", style: TextStyle(fontSize: 16)),
               const SizedBox(height: 5),
-
               Wrap(
                 spacing: 8.0,
                 children: performanceOptions.map((option) {
                   return ChoiceChip(
-                    label: Text(option, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.normal)),
+                    label: Text(option,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.normal)),
                     selected: selectedPerformance == option,
                     backgroundColor: const Color(0xfff3f3f3),
                     shape: RoundedRectangleBorder(
@@ -112,13 +124,13 @@ class _WeekProgressState extends State<WeekProgress> {
                   );
                 }).toList(),
               ),
-
               const SizedBox(height: 10),
-              const Text("Additional comments (if any)", style: TextStyle(fontSize: 16)),
+              const Text("Additional comments (if any)",
+                  style: TextStyle(fontSize: 16)),
               const SizedBox(height: 8),
-
               Container(
-                constraints: const BoxConstraints(minHeight: 50, maxHeight: 150),
+                constraints:
+                    const BoxConstraints(minHeight: 50, maxHeight: 150),
                 child: TextField(
                   controller: commentController,
                   maxLines: null,
@@ -127,7 +139,8 @@ class _WeekProgressState extends State<WeekProgress> {
                     hintText: "Write your comment here",
                     filled: true,
                     fillColor: const Color(0xfff3f3f3),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 14),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -135,58 +148,64 @@ class _WeekProgressState extends State<WeekProgress> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 10),
-
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: groupedTags.map((group) => Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: group.map((tag) => Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: _buildTag(tag),
-                    ),
-                  )).toList(),
-                )).toList(),
+                children: groupedTags
+                    .map((group) => Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: group
+                              .map((tag) => Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: _buildTag(tag),
+                                    ),
+                                  ))
+                              .toList(),
+                        ))
+                    .toList(),
               ),
-
               const SizedBox(height: 14),
-
               Center(
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const WeekAttachImages()),
+                      MaterialPageRoute(
+                          builder: (context) => WeekAttachImages(
+                                bookingId: widget.bookingId,
+                                week: widget.weekNumber,
+                              )),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 100),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                       side: const BorderSide(color: Colors.black, width: 1),
                     ),
                     backgroundColor: Colors.white,
                   ),
-                  child: const Text("Attach Images +", style: TextStyle(fontSize: 16, color: Colors.black)),
+                  child: const Text("Attach Images +",
+                      style: TextStyle(fontSize: 16, color: Colors.black)),
                 ),
               ),
-
               const SizedBox(height: 5),
-
               Center(
                 child: ElevatedButton(
                   onPressed: saveProgress,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff87e64c),
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 140),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 140),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                       side: const BorderSide(color: Colors.black, width: 1),
                     ),
                   ),
-                  child: const Text("Save", style: TextStyle(fontSize: 17, color: Colors.black)),
+                  child: const Text("Save",
+                      style: TextStyle(fontSize: 17, color: Colors.black)),
                 ),
               ),
             ],
