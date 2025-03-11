@@ -9,6 +9,7 @@ import 'package:newifchaly/availabilityscreen.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
+import 'package:newifchaly/views/widgets/booking_card_shimmer.dart';
 import 'package:newifchaly/views/widgets/nav_bar.dart';
 
 class SessionScreen extends StatefulWidget {
@@ -21,6 +22,7 @@ class _SessionScreenState extends State<SessionScreen> {
   int _selectedIndex = 2;
   List<BookingModel> pendingBookings = [];
   List<BookingModel> activeBookings = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -33,6 +35,7 @@ class _SessionScreenState extends State<SessionScreen> {
     setState(() {
       pendingBookings = bookingsData['pending']!;
       activeBookings = bookingsData['active']!;
+      _isLoading = false;
     });
   }
 
@@ -106,21 +109,20 @@ class _SessionScreenState extends State<SessionScreen> {
   }
 
   Widget buildBookingActiveSection(BuildContext context) {
-  return buildBookingSection(
-    title: 'Active',
-    bookings: activeBookings,
-    onTap: (booking) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AboutProgress(booking: booking),
-        ),
-      );
-    },
-    statusColor: Colors.green,
-  );
-}
-
+    return buildBookingSection(
+      title: 'Active',
+      bookings: activeBookings,
+      onTap: (booking) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AboutProgress(booking: booking),
+          ),
+        );
+      },
+      statusColor: Colors.green,
+    );
+  }
 
   Widget buildBookingSection({
     required String title,
@@ -140,28 +142,36 @@ class _SessionScreenState extends State<SessionScreen> {
         SizedBox(
           height: 170,
           width: double.infinity,
-          child: bookings.isEmpty
-              ? Center(child: Text("No $title found."))
-              : ListView.builder(
+          child: _isLoading // Check if data is loading
+              ? ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: bookings.length,
+                  itemCount: 3, // Number of shimmer cards to show
                   itemBuilder: (context, index) {
-                    var booking = bookings[index];
-                    return GestureDetector(
-                      onTap: () => onTap(booking),
-                      child: SwipeableSessionCard(
-                        name: booking.studentName,
-                        imageUrl: booking.studentImage,
-                        package: booking.packageName,
-                        time: "${booking.minutesPerSession} Min / Session",
-                        frequency: "${booking.sessionsPerWeek}X / Week",
-                        duration: "${booking.numberOfWeeks} Weeks",
-                        price: "${booking.price}/- PKR",
-                        statusColor: statusColor,
-                      ),
-                    );
+                    return BookingCardShimmer(); // Show shimmer effect
                   },
-                ),
+                )
+              : bookings.isEmpty
+                  ? Center(child: Text("No $title found."))
+                  : ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: bookings.length,
+                      itemBuilder: (context, index) {
+                        var booking = bookings[index];
+                        return GestureDetector(
+                          onTap: () => onTap(booking),
+                          child: SwipeableSessionCard(
+                            name: booking.studentName,
+                            imageUrl: booking.studentImage,
+                            package: booking.packageName,
+                            time: "${booking.minutesPerSession} Min / Session",
+                            frequency: "${booking.sessionsPerWeek}X / Week",
+                            duration: "${booking.numberOfWeeks} Weeks",
+                            price: "${booking.price}/- PKR",
+                            statusColor: statusColor,
+                          ),
+                        );
+                      },
+                    ),
         ),
       ],
     );

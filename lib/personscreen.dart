@@ -66,7 +66,11 @@ class _PersonScreenState extends State<PersonScreen> {
                   const SizedBox(height: 10),
                   CircleAvatar(
                     radius: 60,
-                    backgroundImage: NetworkImage(profile.profileImage),
+                    backgroundImage: profile.profileImage.startsWith('http')
+                        ? NetworkImage(
+                            profile.profileImage) // Use NetworkImage for URLs
+                        : AssetImage(profile.profileImage)
+                            as ImageProvider, // Use AssetImage for local assets
                   ),
                   const SizedBox(height: 10),
                   Row(

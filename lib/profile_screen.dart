@@ -6,11 +6,9 @@ import 'package:newifchaly/bio_screen.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/sessionscreen.dart';
-import 'package:newifchaly/splashscreen.dart';
 import 'package:newifchaly/views/widgets/nav_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../controllers/profile_controller.dart';
-import 'location_screen.dart';
 import 'messagescreen.dart';
 
 class ProfileScreen extends StatefulWidget {
