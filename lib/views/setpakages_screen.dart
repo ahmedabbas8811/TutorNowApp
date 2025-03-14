@@ -6,6 +6,7 @@ import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 
 import 'package:newifchaly/views/addnewpackages_screen.dart';
+import 'package:newifchaly/views/widgets/nav_bar.dart';
 
 class SetpakagesScreen extends StatefulWidget {
   const SetpakagesScreen({super.key});
@@ -133,38 +134,12 @@ class _SetpakagesScreenState extends State<SetpakagesScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed, // Fixed type ensures white background
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xff87e64c),
-        unselectedItemColor: Colors.black,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event_available),
-            label: 'Availability',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            label: 'Bookings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Earnings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        onTap: _onItemTapped,
-      ),
+   bottomNavigationBar: TutorBottomNavigationBar(
+  selectedIndex: _selectedIndex,
+  onItemTapped: _onItemTapped,
+  pendingBookingsCount: 3, // Replace with actual count if needed
+),
+
     );
   }
 }

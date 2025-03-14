@@ -23,7 +23,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
       items: [
         _buildNavBarItem('assets/home_icon.svg', 'Home', 0),
         _buildNavBarItem('assets/search_icon.svg', 'Search', 1),
-        _buildNavBarItem('assets/calendar_icon.svg', 'Bookings', 2),
+        _buildNavBarItem('assets/bookings.svg', 'Bookings', 2),
         _buildNavBarItem('assets/profile_icon.svg', 'Profile', 3),
       ],
     );
