@@ -127,7 +127,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     onTap: () {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const  ProgressreportStu ()), 
+        MaterialPageRoute(builder: (context) => const  ProgressReportStu ()), 
       );
     },
     child: Container(
