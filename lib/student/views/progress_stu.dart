@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:newifchaly/student/views/aboutprogress_stu.dart';
+import 'package:newifchaly/student/views/progressreport_stu.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -121,8 +122,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildWeekProgress(String week, String status, Color color, String emoji, Color textColor) {
-    return Container(
+ Widget _buildWeekProgress(String week, String status, Color color, String emoji, Color textColor) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const  ProgressreportStu ()), 
+      );
+    },
+    child: Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
       decoration: BoxDecoration(
@@ -148,6 +156,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
