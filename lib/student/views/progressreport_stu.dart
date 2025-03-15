@@ -36,7 +36,7 @@ class ProgressReportStu extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: const Row(
                     children: [
@@ -53,7 +53,7 @@ class ProgressReportStu extends StatelessWidget {
               style: TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 10),
-            const Text("\"Test taken on Monday\""),
+            const Text("\"Test taken on Monday\"",style: TextStyle(fontSize: 17),),
             const SizedBox(height: 10),
             SizedBox(
               height: 120,
@@ -65,13 +65,13 @@ class ProgressReportStu extends StatelessWidget {
                 )),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
             const Text(
               "Uploaded Monday, 16 Feb, 2025",
               style: TextStyle(color: Colors.grey),
             ),
-            const SizedBox(height: 10),
-            const Text("\"Bad handwriting in the assignment\""),
+            const SizedBox(height: 20),
+            const Text("\"Bad handwriting in the assignment\"",style: TextStyle(fontSize: 17),),
             const SizedBox(height: 10),
             SizedBox(
               height: 120,

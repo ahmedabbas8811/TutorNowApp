@@ -123,11 +123,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
  Widget _buildWeekProgress(String week, String status, Color color, String emoji, Color textColor) {
+  // Determine if the underline color should be white
+  bool isUnderlineWhite = week == 'Week 1' || week == 'Week 4';
+
   return GestureDetector(
     onTap: () {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const  ProgressReportStu ()), 
+        MaterialPageRoute(builder: (context) => const ProgressReportStu()),
       );
     },
     child: Container(
@@ -152,6 +155,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               fontWeight: FontWeight.bold,
               color: textColor,
               decoration: TextDecoration.underline,
+              decorationColor: isUnderlineWhite ? Colors.white : textColor, // Set underline color conditionally
             ),
           ),
         ],
