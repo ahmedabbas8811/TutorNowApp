@@ -317,6 +317,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/student/controllers/booking_controller.dart';
+import 'package:newifchaly/student/views/progress_stu.dart';
 import 'package:newifchaly/student/views/search_results.dart';
 import 'package:newifchaly/student/views/student_home_screen.dart';
 import 'package:newifchaly/student/views/student_profile.dart';
@@ -388,7 +389,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
               ),
               const SizedBox(height: 8),
 
-              // dynamic Pending Bookings Section
+              // Dynamic Pending Bookings Section
               Obx(() {
                 if (bookingController.pendingBookings.isEmpty) {
                   return const Center(child: Text("No pending bookings."));
@@ -444,6 +445,15 @@ class _BookingsScreenState extends State<BookingsScreen> {
                       price: "${booking.price}/- PKR",
                       rating: "4.8",
                       statusColor: Colors.orange,
+                      onTap: () {
+                        // Navigate to the progress screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProgressScreen(),
+                          ),
+                        );
+                      },
                     );
                   }).toList(),
                 );
@@ -524,6 +534,7 @@ class BookingCard extends StatelessWidget {
   final String price;
   final String rating;
   final Color statusColor;
+  final VoidCallback? onTap;
 
   const BookingCard({
     required this.name,
@@ -535,87 +546,113 @@ class BookingCard extends StatelessWidget {
     required this.price,
     required this.rating,
     required this.statusColor,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 280,
-      margin: const EdgeInsets.only(right: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xfff7f7f7),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black, width: 1),
-      ),
-      child: Card(
-        shape: RoundedRectangleBorder(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 280,
+        margin: const EdgeInsets.only(right: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xfff7f7f7),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.black, width: 1),
         ),
-        elevation: 0,
-        color: Colors.transparent,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: tutorImage.isNotEmpty &&
-                            Uri.tryParse(tutorImage)?.hasAbsolutePath == true
-                        ? NetworkImage(tutorImage)
-                        : const AssetImage('assets/Ellipse1.png') as ImageProvider,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(name,
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                        Text(package,
-                            style: const TextStyle(
-                                color: Colors.grey, fontSize: 14)),
-                      ],
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 0,
+          color: Colors.transparent,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: tutorImage.isNotEmpty &&
+                              Uri.tryParse(tutorImage)?.hasAbsolutePath == true
+                          ? NetworkImage(tutorImage)
+                          : const AssetImage('assets/Ellipse1.png') as ImageProvider,
                     ),
-                  ),
-                  CircleAvatar(radius: 4, backgroundColor: statusColor),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(children: [
-                    const Icon(Icons.timer, size: 18),
-                    Text(time)
-                  ]),
-                  Row(children: [
-                    const Icon(Icons.refresh, size: 18),
-                    Text(frequency)
-                  ]),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(children: [
-                    const Icon(Icons.calendar_today, size: 18),
-                    Text(duration)
-                  ]),
-                  Row(children: [
-                    const Icon(Icons.attach_money, size: 18),
-                    Text(price)
-                  ]),
-                ],
-              ),
-            ],
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(name,
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text(package,
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 14)),
+                        ],
+                      ),
+                    ),
+                    CircleAvatar(radius: 4, backgroundColor: statusColor),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(children: [
+                      const Icon(Icons.timer, size: 18),
+                      Text(time)
+                    ]),
+                    Row(children: [
+                      const Icon(Icons.refresh, size: 18),
+                      Text(frequency)
+                    ]),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(children: [
+                      const Icon(Icons.calendar_today, size: 18),
+                      Text(duration)
+                    ]),
+                    Row(children: [
+                      const Icon(Icons.attach_money, size: 18),
+                      Text(price)
+                    ]),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+
+
+class Booking {
+  final String tutorName;
+  final String tutorImage;
+  final String packageName;
+  final int minutesPerSession;
+  final int sessionsPerWeek;
+  final int numberOfWeeks;
+  final int price;
+
+  Booking({
+    required this.tutorName,
+    required this.tutorImage,
+    required this.packageName,
+    required this.minutesPerSession,
+    required this.sessionsPerWeek,
+    required this.numberOfWeeks,
+    required this.price,
+  });
 }
