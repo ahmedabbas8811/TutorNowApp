@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/student/views/aboutprogress_stu.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -42,13 +43,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildTabButton('About', !isProgressSelected, () {
-                  setState(() => isProgressSelected = false);
+                _buildTabButton('About', false, () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AboutScreenStu()),
+                  );
                 }),
                 const SizedBox(width: 8),
-                _buildTabButton('Progress', isProgressSelected, () {
-                  setState(() => isProgressSelected = true);
-                }),
+                _buildTabButton('Progress', true, () {}),
               ],
             ),
             const SizedBox(height: 16),
