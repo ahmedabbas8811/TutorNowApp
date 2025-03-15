@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:newifchaly/student/views/aboutprogress_stu.dart';
 import 'package:newifchaly/student/views/progressreport_stu.dart';
 
 class ProgressScreen extends StatefulWidget {
@@ -44,24 +43,22 @@ class _ProgressScreenState extends State<ProgressScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildTabButton('About', false, () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AboutScreenStu()),
-                  );
+                _buildTabButton('About', !isProgressSelected, () {
+                  setState(() {
+                    isProgressSelected = false;
+                  });
                 }),
                 const SizedBox(width: 8),
-                _buildTabButton('Progress', true, () {}),
+                _buildTabButton('Progress', isProgressSelected, () {
+                  setState(() {
+                    isProgressSelected = true;
+                  });
+                }),
               ],
             ),
             const SizedBox(height: 16),
-            _buildPerformanceRow('Overall Performance', 'Average', Colors.black),
-            const SizedBox(height: 16),
-            _buildWeekProgress('Week 1', 'Struggling', const Color(0xffe64b4b), '😟', Colors.white),
-            _buildWeekProgress('Week 2', 'Excellent', const Color(0xff87e64c), '😃', Colors.black),
-            _buildWeekProgress('Week 3', 'Good', const Color(0xffdbf8c9), '🙂', Colors.black),
-            _buildWeekProgress('Week 4', 'Struggling', const Color(0xffe64b4b), '😟', Colors.white),
-            _buildWeekProgress('Week 5', 'Average', const Color.fromARGB(255, 157, 149, 75), '😐', Colors.black),
+            if (!isProgressSelected) _buildAboutContent(),
+            if (isProgressSelected) _buildProgressContent(),
           ],
         ),
       ),
@@ -90,6 +87,96 @@ class _ProgressScreenState extends State<ProgressScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAboutContent() {
+    return Column(
+      children: [
+        _buildInfoCard([
+          _buildInfoRow(Icons.timer, '60 Min / Session'),
+          _buildInfoRow(Icons.repeat, '3X / Week'),
+          _buildInfoRow(Icons.calendar_today, '8 Weeks'),
+        ]),
+        const SizedBox(height: 20),
+        _buildTimeSlotsCard(),
+      ],
+    );
+  }
+
+  Widget _buildInfoCard(List<Widget> children) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xffeefbe5),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 20),
+        const SizedBox(width: 8),
+        Text(text,
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget _buildTimeSlotsCard() {
+    return Container(
+      width: 330,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xffeefbe5),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTimeSlotRow('Monday', '8:30 - 10'),
+          _buildTimeSlotRow('Tuesday', '8:30 - 10'),
+          _buildTimeSlotRow('Wednesday', '8:30 - 10'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeSlotRow(String day, String time) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Text(
+            day,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(width: 16.0),
+          Text(
+            time,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressContent() {
+    return Column(
+      children: [
+        _buildPerformanceRow('Overall Performance', 'Average', Colors.black),
+        const SizedBox(height: 16),
+        _buildWeekProgress('Week 1', 'Struggling', const Color(0xffe64b4b), '😟', Colors.white),
+        _buildWeekProgress('Week 2', 'Excellent', const Color(0xff87e64c), '😃', Colors.black),
+        _buildWeekProgress('Week 3', 'Good', const Color(0xffdbf8c9), '🙂', Colors.black),
+        _buildWeekProgress('Week 4', 'Struggling', const Color(0xffe64b4b), '😟', Colors.white),
+        _buildWeekProgress('Week 5', 'Average', const Color(0xfffdfdfd), '😐', Colors.black),
+      ],
     );
   }
 
@@ -122,45 +209,42 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
- Widget _buildWeekProgress(String week, String status, Color color, String emoji, Color textColor) {
-  // Determine if the underline color should be white
-  bool isUnderlineWhite = week == 'Week 1' || week == 'Week 4';
-
-  return GestureDetector(
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ProgressReportStu()),
-      );
-    },
-    child: Container(
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black),
-      ),
-      child: Row(
-        children: [
-          Text(
-            '$week: $status $emoji',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor),
-          ),
-          const Spacer(),
-          Text(
-            'See More →',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-              decoration: TextDecoration.underline,
-              decorationColor: isUnderlineWhite ? Colors.white : textColor, // Set underline color conditionally
+  Widget _buildWeekProgress(String week, String status, Color color, String emoji, Color textColor) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProgressReportStu()),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.black),
+        ),
+        child: Row(
+          children: [
+            Text(
+              '$week: $status $emoji',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor),
             ),
-          ),
-        ],
+            const Spacer(),
+            Text(
+              'See More →',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+                decoration: TextDecoration.underline,
+                decorationColor: textColor,
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

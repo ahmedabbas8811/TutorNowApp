@@ -31,7 +31,6 @@ class ProgressReportStu extends StatelessWidget {
             const SizedBox(height: 5),
             Row(
               children: [
-                
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
@@ -61,7 +60,17 @@ class ProgressReportStu extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 children: List.generate(5, (index) => Padding(
                   padding: const EdgeInsets.only(right: 8.0),
-                  child: Image.asset('assets/progress.jpg', width: 100),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ImageViewer(imagePath: 'assets/progress.jpg'),
+                        ),
+                      );
+                    },
+                    child: Image.asset('assets/progress.jpg', width: 100),
+                  ),
                 )),
               ),
             ),
@@ -79,12 +88,43 @@ class ProgressReportStu extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 children: List.generate(5, (index) => Padding(
                   padding: const EdgeInsets.only(right: 8.0),
-                  child: Image.asset('assets/progress.jpg', width: 100),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ImageViewer(imagePath: 'assets/progress.jpg'),
+                        ),
+                      );
+                    },
+                    child: Image.asset('assets/progress.jpg', width: 100),
+                  ),
                 )),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ImageViewer extends StatelessWidget {
+  final String imagePath;
+
+  const ImageViewer({super.key, required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Center(
+        child: Image.asset(imagePath),
       ),
     );
   }
