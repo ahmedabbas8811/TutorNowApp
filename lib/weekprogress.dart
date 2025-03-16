@@ -5,7 +5,7 @@ import 'package:newifchaly/models/progress_model.dart';
 
 class WeekProgress extends StatefulWidget {
   final int weekNumber;
-  final String bookingId; // Changed to int for consistency
+  final String bookingId; 
   const WeekProgress(
       {Key? key, required this.weekNumber, required this.bookingId})
       : super(key: key);

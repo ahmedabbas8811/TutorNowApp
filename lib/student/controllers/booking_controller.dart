@@ -24,7 +24,7 @@ class BookingController extends GetxController {
     try {
       final response = await Supabase.instance.client
           .from('bookings')
-          .select('id, user_id, package_id, tutor_id, status')
+          .select('id, user_id, package_id, tutor_id, time_slots, status')
           .eq('user_id', user.id);
 
       if (response.isNotEmpty) {

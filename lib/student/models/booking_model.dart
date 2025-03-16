@@ -12,6 +12,7 @@ class BookingModel {
   String sessionsPerWeek;
   String numberOfWeeks;
   String price;
+  Map<String, dynamic> timeSlots;
 
   BookingModel({
     required this.bookingId,
@@ -25,6 +26,7 @@ class BookingModel {
     this.sessionsPerWeek = '0',
     this.numberOfWeeks = '0',
     this.price = '0',
+    this.timeSlots = const {}, 
   });
 
   // Factory method to create BookingModel from JSON
@@ -35,6 +37,9 @@ class BookingModel {
       packageId:
           json['package_id'] != null ? json['package_id'].toString() : '',
       tutorId: json['tutor_id'] ?? '',
+      timeSlots: json['time_slots'] != null 
+    ? Map<String, dynamic>.from(json['time_slots'])  // Convert JSONB to Map
+    : {},
     );
   }
 

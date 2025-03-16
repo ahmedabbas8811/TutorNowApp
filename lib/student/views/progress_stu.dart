@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/student/models/booking_model.dart';
 import 'package:newifchaly/student/views/progressreport_stu.dart';
 
 class ProgressScreen extends StatefulWidget {
-  const ProgressScreen({super.key});
+  final BookingModel booking;
+
+  const ProgressScreen({super.key, required this.booking});
 
   @override
   _ProgressScreenState createState() => _ProgressScreenState();
@@ -26,18 +29,21 @@ class _ProgressScreenState extends State<ProgressScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.grey,
+              backgroundImage: widget.booking.tutorImage.isNotEmpty &&
+                      Uri.tryParse(widget.booking.tutorImage)?.hasAbsolutePath == true
+                  ? NetworkImage(widget.booking.tutorImage)
+                  : const AssetImage('assets/Ellipse1.png') as ImageProvider,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Tutor Name',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              widget.booking.tutorName,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const Text(
-              'Package Name',
-              style: TextStyle(fontSize: 14, color: Colors.black),
+            Text(
+              widget.booking.packageName,
+              style: const TextStyle(fontSize: 14, color: Colors.black),
             ),
             const SizedBox(height: 16),
             Row(
@@ -94,9 +100,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
     return Column(
       children: [
         _buildInfoCard([
-          _buildInfoRow(Icons.timer, '60 Min / Session'),
-          _buildInfoRow(Icons.repeat, '3X / Week'),
-          _buildInfoRow(Icons.calendar_today, '8 Weeks'),
+          _buildInfoRow(Icons.timer, '${widget.booking.minutesPerSession} Min / Session'),
+          _buildInfoRow(Icons.repeat, '${widget.booking.sessionsPerWeek}X / Week'),
+          _buildInfoRow(Icons.calendar_today, '${widget.booking.numberOfWeeks} Weeks'),
         ]),
         const SizedBox(height: 20),
         _buildTimeSlotsCard(),
@@ -137,31 +143,28 @@ class _ProgressScreenState extends State<ProgressScreen> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTimeSlotRow('Monday', '8:30 - 10'),
-          _buildTimeSlotRow('Tuesday', '8:30 - 10'),
-          _buildTimeSlotRow('Wednesday', '8:30 - 10'),
-        ],
-      ),
-    );
-  }
+        children: widget.booking.timeSlots.entries.map((entry) {
+          final day = entry.value["day"] ?? "N/A"; 
+          final time = entry.value["time"] ?? "N/A"; 
 
-  Widget _buildTimeSlotRow(String day, String time) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Text(
-            day,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(width: 16.0),
-          Text(
-            time,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ],
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0), 
+            child: Row(
+              children: [
+                Text(
+                  day,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(width: 16.0), 
+                Text(
+                  time,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:newifchaly/attachimg_controller.dart';
-import 'dart:io';
 
 class WeekAttachImages extends StatelessWidget {
   final String bookingId;
@@ -13,6 +11,10 @@ class WeekAttachImages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Delete existing controller instance if it exists
+    if (Get.isRegistered<AttachImageController>()) {
+      Get.delete<AttachImageController>();
+    }
     final AttachImageController controller =
         Get.put(AttachImageController(bookingId: bookingId, week: week));
 
@@ -28,8 +30,8 @@ class WeekAttachImages extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Week 1 - Progress',
+            Text(
+              'Week $week - Progress',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const Text(
