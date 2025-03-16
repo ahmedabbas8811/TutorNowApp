@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/controllers/addpackage_controller.dart';
+import 'package:newifchaly/controllers/profile_controller.dart';
 import 'package:newifchaly/models/addpackage_model.dart';
+import 'package:newifchaly/views/widgets/nav_bar.dart';
 import 'package:newifchaly/views/widgets/snackbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:newifchaly/availabilityscreen.dart';
@@ -192,6 +194,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ProfileController profileController = Get.put(ProfileController());
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -300,38 +303,10 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
               ),
             ),
           ),
-          BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.white,
-            selectedItemColor: const Color(0xff87e64c),
-            unselectedItemColor: Colors.black,
-            showSelectedLabels: true,
-            showUnselectedLabels: true,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.event_available),
-                label: 'Availability',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.group),
-                label: 'Bookings',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.attach_money),
-                label: 'Earnings',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
-            onTap: _onItemTapped,
-          ),
+          Obx(() => TutorBottomNavigationBar(
+          selectedIndex: _selectedIndex,
+          onItemTapped: _onItemTapped,
+          pendingBookingsCount: profileController.pendingBookingsCount.value)),
         ],
       ),
     );

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:newifchaly/controllers/booking_controller.dart';
+import 'package:newifchaly/controllers/profile_controller.dart';
 import 'package:newifchaly/models/tutor_booking_model.dart';
 import 'package:newifchaly/availabilityscreen.dart';
 import 'package:newifchaly/earningscreen.dart';
@@ -68,6 +72,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
 
   @override
 Widget build(BuildContext context) {
+  final ProfileController profileController = Get.put(ProfileController());
   return Scaffold(
     body: Stack(
       children: [
@@ -219,11 +224,10 @@ Widget build(BuildContext context) {
         ),
       ],
     ),
-    bottomNavigationBar: TutorBottomNavigationBar(
-      selectedIndex: _selectedIndex,
-      onItemTapped: _onItemTapped,
-      pendingBookingsCount: 3, // Replace with actual pending bookings count
-    ),
+    bottomNavigationBar: Obx(() => TutorBottomNavigationBar(
+          selectedIndex: _selectedIndex,
+          onItemTapped: _onItemTapped,
+          pendingBookingsCount: profileController.pendingBookingsCount.value)),
   );
 }
 }
