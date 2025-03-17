@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/student/controllers/progress_controller.dart';
 import 'package:newifchaly/student/models/booking_model.dart';
+import 'package:newifchaly/student/models/progress_model.dart';
 import 'package:newifchaly/student/views/progressreport_stu.dart';
 
 class ProgressScreen extends StatefulWidget {
@@ -13,6 +15,15 @@ class ProgressScreen extends StatefulWidget {
 
 class _ProgressScreenState extends State<ProgressScreen> {
   bool isProgressSelected = true;
+  late Future<List<ProgressReportModel>> _progressReportsFuture;
+  final ProgressReportController _progressReportController = ProgressReportController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch progress reports when the screen is initialized
+    _progressReportsFuture = _progressReportController.fetchProgressReports(widget.booking.bookingId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,17 +181,76 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildProgressContent() {
-    return Column(
-      children: [
-        _buildPerformanceRow('Overall Performance', 'Average', Colors.black),
-        const SizedBox(height: 16),
-        _buildWeekProgress('Week 1', 'Struggling', const Color(0xffe64b4b), '😟', Colors.white),
-        _buildWeekProgress('Week 2', 'Excellent', const Color(0xff87e64c), '😃', Colors.black),
-        _buildWeekProgress('Week 3', 'Good', const Color(0xffdbf8c9), '🙂', Colors.black),
-        _buildWeekProgress('Week 4', 'Struggling', const Color(0xffe64b4b), '😟', Colors.white),
-        _buildWeekProgress('Week 5', 'Average', const Color(0xfffdfdfd), '😐', Colors.black),
-      ],
+    return FutureBuilder<List<ProgressReportModel>>(
+      future: _progressReportsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No progress reports available.'));
+        } else {
+          final progressReports = snapshot.data!;
+          final overallPerformance = _calculateOverallPerformance(progressReports);
+
+          // Debug: Print extracted performance categories
+          for (var report in progressReports) {
+            final performance = _extractPerformanceCategory(report.overallPerformance);
+            print('Week ${report.week}: $performance');
+          }
+
+          return Column(
+            children: [
+              _buildPerformanceRow('Overall Performance', overallPerformance, Colors.black),
+              const SizedBox(height: 16),
+              ...progressReports.map((report) => _buildWeekProgress(
+                'Week ${report.week}',
+                report.overallPerformance,
+                _getPerformanceColor(report.overallPerformance),
+                _getPerformanceEmoji(report.overallPerformance),
+                _getPerformanceTextColor(report.overallPerformance),
+              )).toList(),
+            ],
+          );
+        }
+      },
     );
+  }
+
+  String _calculateOverallPerformance(List<ProgressReportModel> reports) {
+    if (reports.isEmpty) return 'No Data';
+
+    // Map performance categories to numerical values
+    final performanceValues = reports.map((report) {
+      final performance = _extractPerformanceCategory(report.overallPerformance);
+      switch (performance.toLowerCase()) {
+        case 'excellent':
+          return 4;
+        case 'good':
+          return 3;
+        case 'average':
+          return 2;
+        case 'struggling':
+          return 1;
+        default:
+          return 0; // Unknown performance
+      }
+    }).toList();
+
+    // Calculate the average performance value
+    final average = performanceValues.reduce((a, b) => a + b) / performanceValues.length;
+
+    // Map the average back to a performance category
+    if (average >= 3.5) {
+      return 'Excellent';
+    } else if (average >= 2.5) {
+      return 'Good';
+    } else if (average >= 1.5) {
+      return 'Average';
+    } else {
+      return 'Struggling';
+    }
   }
 
   Widget _buildPerformanceRow(String title, String status, Color textColor) {
@@ -204,7 +274,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor),
               ),
               const SizedBox(width: 4),
-              const Text('😐'),
+              Text(_getPerformanceEmoji(status)),
             ],
           ),
         ),
@@ -212,7 +282,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildWeekProgress(String week, String status, Color color, String emoji, Color textColor) {
+  Widget _buildWeekProgress(String week, String performanceWithEmoji, Color color, String emoji, Color textColor) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -231,7 +301,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         child: Row(
           children: [
             Text(
-              '$week: $status $emoji',
+              '$week: ${_extractPerformanceCategory(performanceWithEmoji)} $emoji',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor),
             ),
             const Spacer(),
@@ -249,5 +319,57 @@ class _ProgressScreenState extends State<ProgressScreen> {
         ),
       ),
     );
+  }
+
+  String _extractPerformanceCategory(String performanceWithEmoji) {
+    // Split the string by spaces and take the last part (e.g., "😃 Excellent" → "Excellent")
+    final parts = performanceWithEmoji.split(' ');
+    return parts.last;
+  }
+
+  Color _getPerformanceColor(String performanceWithEmoji) {
+    final performance = _extractPerformanceCategory(performanceWithEmoji);
+    switch (performance.toLowerCase()) {
+      case 'excellent':
+        return const Color(0xff87e64c); // Green
+      case 'good':
+        return const Color(0xffdbf8c9); // Light Green
+      case 'average':
+        return const Color(0xfffdfdfd); // White
+      case 'struggling':
+        return const Color(0xffe64b4b); // Red
+      default:
+        return Colors.grey; // Default for unknown values
+    }
+  }
+
+  String _getPerformanceEmoji(String performanceWithEmoji) {
+  final performance = _extractPerformanceCategory(performanceWithEmoji);
+  switch (performance.toLowerCase()) {
+    case 'excellent':
+      return '😃'; // Smiling face with open mouth
+    case 'good':
+      return '🙂'; // Slightly smiling face
+    case 'average':
+      return '😐'; // Neutral face
+    case 'struggling':
+      return '😟'; // Worried face
+    default:
+      return '😐'; // Default to neutral face
+  }
+}
+
+  Color _getPerformanceTextColor(String performanceWithEmoji) {
+    final performance = _extractPerformanceCategory(performanceWithEmoji);
+    switch (performance.toLowerCase()) {
+      case 'excellent':
+      case 'good':
+      case 'average':
+        return Colors.black;
+      case 'struggling':
+        return Colors.white;
+      default:
+        return Colors.black;
+    }
   }
 }
