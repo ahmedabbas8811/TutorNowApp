@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ProgressReportStu extends StatelessWidget {
-  const ProgressReportStu({super.key});
+  final String week;
+  final String performance;
+  final String comments;
+
+  const ProgressReportStu({
+    super.key,
+    required this.week,
+    required this.performance,
+    required this.comments,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +26,9 @@ class ProgressReportStu extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Week 1 - Progress Report",
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            Text(
+              "$week - Progress Report",
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 15),
             const Text(
@@ -37,9 +46,12 @@ class ProgressReportStu extends StatelessWidget {
                     color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Text("😟 Struggling"),
+                      Text(
+                        "${_getPerformanceEmoji(performance)} $performance",
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                 ),
@@ -47,31 +59,37 @@ class ProgressReportStu extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text("Additional comments"),
-            const Text(
-              "Not performing well, need extra support",
-              style: TextStyle(color: Colors.grey),
+            Text(
+              comments,
+              style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 10),
-            const Text("\"Test taken on Monday\"",style: TextStyle(fontSize: 17),),
+            const Text(
+              "\"Test taken on Monday\"",
+              style: TextStyle(fontSize: 17),
+            ),
             const SizedBox(height: 10),
             SizedBox(
               height: 120,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: List.generate(5, (index) => Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ImageViewer(imagePath: 'assets/progress.jpg'),
-                        ),
-                      );
-                    },
-                    child: Image.asset('assets/progress.jpg', width: 100),
+                children: List.generate(
+                  5,
+                  (index) => Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImageViewer(imagePath: 'assets/progress.jpg'),
+                          ),
+                        );
+                      },
+                      child: Image.asset('assets/progress.jpg', width: 100),
+                    ),
                   ),
-                )),
+                ),
               ),
             ),
             const SizedBox(height: 5),
@@ -80,32 +98,54 @@ class ProgressReportStu extends StatelessWidget {
               style: TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 20),
-            const Text("\"Bad handwriting in the assignment\"",style: TextStyle(fontSize: 17),),
+            const Text(
+              "\"Bad handwriting in the assignment\"",
+              style: TextStyle(fontSize: 17),
+            ),
             const SizedBox(height: 10),
             SizedBox(
               height: 120,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: List.generate(5, (index) => Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ImageViewer(imagePath: 'assets/progress.jpg'),
-                        ),
-                      );
-                    },
-                    child: Image.asset('assets/progress.jpg', width: 100),
+                children: List.generate(
+                  5,
+                  (index) => Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImageViewer(imagePath: 'assets/progress.jpg'),
+                          ),
+                        );
+                      },
+                      child: Image.asset('assets/progress.jpg', width: 100),
+                    ),
                   ),
-                )),
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  // Helper method to get the emoji for the performance
+  String _getPerformanceEmoji(String performance) {
+    switch (performance.toLowerCase()) {
+      case 'excellent':
+        return '😃';
+      case 'good':
+        return '🙂';
+      case 'average':
+        return '😐';
+      case 'struggling':
+        return '😟';
+      default:
+        return '😐';
+    }
   }
 }
 

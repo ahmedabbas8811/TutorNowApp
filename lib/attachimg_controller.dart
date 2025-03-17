@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/progress_model.dart';
 
 class AttachImageController extends GetxController {
   final SupabaseClient supabase = Supabase.instance.client;

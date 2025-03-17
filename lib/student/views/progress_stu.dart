@@ -210,6 +210,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 _getPerformanceColor(report.overallPerformance),
                 _getPerformanceEmoji(report.overallPerformance),
                 _getPerformanceTextColor(report.overallPerformance),
+                report.comments,
+
               )).toList(),
             ],
           );
@@ -282,12 +284,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildWeekProgress(String week, String performanceWithEmoji, Color color, String emoji, Color textColor) {
+  Widget _buildWeekProgress(String week, String performanceWithEmoji, Color color, String emoji, Color textColor, String comments) {
+    final performance = _extractPerformanceCategory(performanceWithEmoji);
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const ProgressReportStu()),
+          MaterialPageRoute(builder: (context) => ProgressReportStu(
+            week: week,
+            performance: performance,
+            comments: comments,
+          )),
         );
       },
       child: Container(
