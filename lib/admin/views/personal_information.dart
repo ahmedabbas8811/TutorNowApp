@@ -189,23 +189,28 @@ class _PersonalInformationState extends State<PersonalInformation> {
         onFocusChange: (hasFocus) {
           // Change border color dynamically when focused
         },
-        child: TextField(
-          controller: reasonController,
-          decoration: InputDecoration(
-            hintText: "Enter reason",
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.grey), // Default grey border
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.black, width: 2), // Bold black on focus
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          ),
-          style: const TextStyle(fontSize: 14),
-        ),
+       child: TextField(
+  controller: reasonController,
+  decoration: InputDecoration(
+    hintText: "Enter reason",
+    hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: Colors.grey.shade400), 
+    ),
+    enabledBorder: OutlineInputBorder(  // Border when TextField is not focused
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: Colors.grey.shade400), 
+    ),
+    focusedBorder: OutlineInputBorder(  // Border when TextField is focused
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: Colors.black), 
+    ),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+  ),
+  style: const TextStyle(fontSize: 14),
+),
+
       ),
     ),
   ],
