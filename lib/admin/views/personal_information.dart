@@ -159,129 +159,151 @@ class _PersonalInformationState extends State<PersonalInformation> {
   }
 
   void _showRejectDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          contentPadding: const EdgeInsets.all(16),
-          title: const Text(
-            "Add Reason For Rejection",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 8),
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        contentPadding: const EdgeInsets.all(16),
+        title: const Text(
+          "Add Reason For Rejection",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 8),
 
-              // Fixed Reason Input Layout
-              Row(
-  children: [
-    const Text(
-      "Your profile was rejected due to ",
-      style: TextStyle(color: Colors.grey, fontSize: 14),
-    ),
-    Expanded(
-      child: Focus(
-        onFocusChange: (hasFocus) {
-          // Change border color dynamically when focused
-        },
-       child: TextField(
-  controller: reasonController,
-  decoration: InputDecoration(
-    hintText: "Enter reason",
-    hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: Colors.grey.shade400), 
-    ),
-    enabledBorder: OutlineInputBorder(  // Border when TextField is not focused
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: Colors.grey.shade400), 
-    ),
-    focusedBorder: OutlineInputBorder(  // Border when TextField is focused
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: Colors.black), 
-    ),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-  ),
-  style: const TextStyle(fontSize: 14),
-),
+            // Fixed Reason Input Layout
+            Row(
+              children: [
+                const Text(
+                  "Your profile was rejected due to ",
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                Expanded(
+                  child: Focus(
+                    onFocusChange: (hasFocus) {
+                      // Change border color dynamically when focused
+                    },
+                    child: TextField(
+                      cursorColor: Colors.grey.shade400,
+                      controller: reasonController,
+                      decoration: InputDecoration(
+                        hintText: "Invalid CNIC",
+                        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey.shade400),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey.shade400),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.black),
+                    ),
+                  ),
+                ),
+              ],
+            ),
 
-      ),
-    ),
-  ],
-),
+            const SizedBox(height: 16),
 
-              const SizedBox(height: 16),
-
-              // Step Selection UI
-              const Text(
-                "Select steps for user to redo:",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8.0,
+            // Step Selection UI
+            const Text(
+              "Select steps for user to redo:",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildChip("Profile image"),
+                  SizedBox(width: 10), // Add space between chips
                   _buildChip("Location"),
+                  SizedBox(width: 10),
                   _buildChip("CNIC"),
+                  SizedBox(width: 10),
                   _buildChip("Qualification"),
+                  SizedBox(width: 10),
                   _buildChip("Experience"),
                 ],
               ),
+            ),
 
-              const SizedBox(height: 16),
-            ],
-          ),
-          actions: [
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  print("Rejected for: ${reasonController.text}");
-                  print("Steps to redo: $redoSteps");
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  "Reject Profile",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+            const SizedBox(height: 16),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                print("Rejected for: ${reasonController.text}");
+                print("Steps to redo: $redoSteps");
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
+              child: const Text(
+                "Reject Profile",
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
             ),
-          ],
-        );
-      },
-    );
-  }
+          ),
+        ],
+      );
+    },
+  );
+}
 
-  Widget _buildChip(String label) {
-    return FilterChip(
-      label: Text(label),
-      selected: redoSteps.contains(label),
-      onSelected: (bool selected) {
-        setState(() {
-          if (selected) {
-            redoSteps.add(label);
-          } else {
-            redoSteps.remove(label);
-          }
-        });
-      },
-    );
-  }
-
+Widget _buildChip(String label) {
+  return FilterChip(
+    label: Text(
+      label,
+      style: TextStyle(
+        color: redoSteps.contains(label) ? Colors.black : Colors.grey.shade400,
+      ),
+    ),
+    selected: redoSteps.contains(label),
+    onSelected: (bool selected) {
+      setState(() {
+        if (selected) {
+          redoSteps.add(label);
+          reasonController.text = "Invalid $label"; // Update the text field with "Invalid [label]"
+        } else {
+          redoSteps.remove(label);
+          reasonController.text = "Invalid"; // Reset to "Invalid" if no chip is selected
+        }
+      });
+    },
+    selectedColor: const Color(0xff87e64c),
+    checkmarkColor: Colors.black,
+    backgroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      side: BorderSide(
+        color: redoSteps.contains(label) ? Colors.black : Colors.grey.shade400,
+      ),
+      borderRadius: BorderRadius.circular(10),
+    ),
+  );
+}
   BoxDecoration _boxDecoration() {
     return BoxDecoration(
       color: Colors.grey[200],
