@@ -38,28 +38,32 @@ class AttachImageController extends GetxController {
     }
 
     try {
-      // Upload each image
-      for (File image in selectedImages) {
+      // Upload all images and collect their URLs
+      final Map<String, String> imageUrls = {};
+      for (int i = 0; i < selectedImages.length; i++) {
         final String fileName =
-            'progress_img/${DateTime.now().millisecondsSinceEpoch}.jpg';
+            'progress_img/${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
 
         // Upload to Supabase Storage
         await supabase.storage
             .from('progress_report_images')
-            .upload(fileName, image);
+            .upload(fileName, selectedImages[i]);
 
         final String imageUrl = supabase.storage
             .from('progress_report_images')
             .getPublicUrl(fileName);
 
-        // Save to Database
-        await supabase.from('progress_report_images').insert({
-          'image_url': imageUrl,
-          'booking_id': bookingId,
-          'week': week,
-          'comment': comments.value, // Save comments
-        });
+        // Add the image URL to the map
+        imageUrls[(i + 1).toString()] = imageUrl;
       }
+
+      // Save to Database
+      await supabase.from('progress_report_images').insert({
+        'booking_id': bookingId,
+        'week': week,
+        'comment': comments.value, // Save comments
+        'images': imageUrls, // Save image URLs as JSONB
+      });
 
       Get.snackbar('Success', 'Progress saved successfully!');
       selectedImages.clear(); // Clear selected images after saving

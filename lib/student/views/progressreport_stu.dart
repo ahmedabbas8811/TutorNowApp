@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/student/models/progress_model.dart';
+import 'package:newifchaly/student/models/progress_images_model.dart';
+import 'package:newifchaly/student/controllers/progress_images_controller.dart';
 
 class ProgressReportStu extends StatelessWidget {
-  final String week;
-  final String performance;
-  final String comments;
+  final ProgressReportModel report;
+  final ProgressImagesController _controller = ProgressImagesController();
 
-  const ProgressReportStu({
+  ProgressReportStu({
     super.key,
-    required this.week,
-    required this.performance,
-    required this.comments,
+    required this.report,
   });
 
   @override
   Widget build(BuildContext context) {
+    final performance = _extractPerformanceCategory(report.overallPerformance);
+    final emoji = _getPerformanceEmoji(performance);
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -21,112 +24,145 @@ class ProgressReportStu extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "$week - Progress Report",
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 15),
-            const Text(
-              "Weekly Progress Report",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const Text("Overall performance"),
-            const SizedBox(height: 5),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        "${_getPerformanceEmoji(performance)} $performance",
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            const Text("Additional comments"),
-            Text(
-              comments,
-              style: const TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              "\"Test taken on Monday\"",
-              style: TextStyle(fontSize: 17),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 120,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: List.generate(
-                  5,
-                  (index) => Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ImageViewer(imagePath: 'assets/progress.jpg'),
-                          ),
-                        );
-                      },
-                      child: Image.asset('assets/progress.jpg', width: 100),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Week ${report.week} - Progress Report",
+                style:
+                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 15),
+              const Text(
+                "Weekly Progress Report",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              const Text("Overall performance"),
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          "$emoji $performance",
+                          style: const TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                   ),
-                ),
+                ],
               ),
-            ),
-            const SizedBox(height: 5),
-            const Text(
-              "Uploaded Monday, 16 Feb, 2025",
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "\"Bad handwriting in the assignment\"",
-              style: TextStyle(fontSize: 17),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 120,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: List.generate(
-                  5,
-                  (index) => Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ImageViewer(imagePath: 'assets/progress.jpg'),
+              const SizedBox(height: 10),
+              const Text("Additional comments"),
+              Text(
+                report.comments,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 10),
+              FutureBuilder<List<ProgressImagesModel>>(
+                future: _controller.fetchProgressImages(
+                  bookingId:
+                      int.parse(report.bookingId), // Convert to int if needed
+                  week: report.week,
+                ),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('No progress entries found');
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: snapshot.data!.map((entry) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 10),
+                          Text(
+                            "\"${entry.comment}\"",
+                            style: const TextStyle(fontSize: 17),
+                            overflow: TextOverflow
+                                .ellipsis, // Truncate if text is too long
+                            maxLines: 2, // Limit to 2 lines
                           ),
-                        );
-                      },
-                      child: Image.asset('assets/progress.jpg', width: 100),
-                    ),
-                  ),
-                ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            height: 120, // Fixed height for the image gallery
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: (entry.images ?? []).map((imageUrl) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ImageViewer(imageUrl: imageUrl),
+                                        ),
+                                      );
+                                    },
+                                    child: Image.network(
+                                      imageUrl,
+                                      width: 100,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child; // Image is fully loaded
+                                        return Container(
+                                          width: 100,
+                                          color: Colors.grey[300],
+                                          child: const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (_, __, ___) => Container(
+                                        width: 100,
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.broken_image),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            "Uploaded ${entry.formattedDate}",
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      );
+                    }).toList(),
+                  );
+                },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -147,12 +183,18 @@ class ProgressReportStu extends StatelessWidget {
         return '😐';
     }
   }
+
+  // Helper method to extract the performance category
+  String _extractPerformanceCategory(String performanceWithEmoji) {
+    final parts = performanceWithEmoji.split(' ');
+    return parts.last;
+  }
 }
 
 class ImageViewer extends StatelessWidget {
-  final String imagePath;
+  final String imageUrl;
 
-  const ImageViewer({super.key, required this.imagePath});
+  const ImageViewer({super.key, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +206,7 @@ class ImageViewer extends StatelessWidget {
         ),
       ),
       body: Center(
-        child: Image.asset(imagePath),
+        child: Image.network(imageUrl),
       ),
     );
   }

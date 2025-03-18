@@ -16,13 +16,15 @@ class ProgressScreen extends StatefulWidget {
 class _ProgressScreenState extends State<ProgressScreen> {
   bool isProgressSelected = true;
   late Future<List<ProgressReportModel>> _progressReportsFuture;
-  final ProgressReportController _progressReportController = ProgressReportController();
+  final ProgressReportController _progressReportController =
+      ProgressReportController();
 
   @override
   void initState() {
     super.initState();
     // Fetch progress reports when the screen is initialized
-    _progressReportsFuture = _progressReportController.fetchProgressReports(widget.booking.bookingId);
+    _progressReportsFuture = _progressReportController
+        .fetchProgressReports(widget.booking.bookingId);
   }
 
   @override
@@ -43,7 +45,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
             CircleAvatar(
               radius: 50,
               backgroundImage: widget.booking.tutorImage.isNotEmpty &&
-                      Uri.tryParse(widget.booking.tutorImage)?.hasAbsolutePath == true
+                      Uri.tryParse(widget.booking.tutorImage)
+                              ?.hasAbsolutePath ==
+                          true
                   ? NetworkImage(widget.booking.tutorImage)
                   : const AssetImage('assets/Ellipse1.png') as ImageProvider,
             ),
@@ -91,7 +95,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xff87e64c) : Colors.grey[300],
             borderRadius: BorderRadius.circular(8),
-            border: isSelected ? Border.all(color: Colors.black) : Border.all(color: Colors.transparent),
+            border: isSelected
+                ? Border.all(color: Colors.black)
+                : Border.all(color: Colors.transparent),
           ),
           alignment: Alignment.center,
           child: Text(
@@ -111,9 +117,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
     return Column(
       children: [
         _buildInfoCard([
-          _buildInfoRow(Icons.timer, '${widget.booking.minutesPerSession} Min / Session'),
-          _buildInfoRow(Icons.repeat, '${widget.booking.sessionsPerWeek}X / Week'),
-          _buildInfoRow(Icons.calendar_today, '${widget.booking.numberOfWeeks} Weeks'),
+          _buildInfoRow(
+              Icons.timer, '${widget.booking.minutesPerSession} Min / Session'),
+          _buildInfoRow(
+              Icons.repeat, '${widget.booking.sessionsPerWeek}X / Week'),
+          _buildInfoRow(
+              Icons.calendar_today, '${widget.booking.numberOfWeeks} Weeks'),
         ]),
         const SizedBox(height: 20),
         _buildTimeSlotsCard(),
@@ -155,11 +164,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: widget.booking.timeSlots.entries.map((entry) {
-          final day = entry.value["day"] ?? "N/A"; 
-          final time = entry.value["time"] ?? "N/A"; 
+          final day = entry.value["day"] ?? "N/A";
+          final time = entry.value["time"] ?? "N/A";
 
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0), 
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Row(
               children: [
                 Text(
@@ -167,7 +176,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                const SizedBox(width: 16.0), 
+                const SizedBox(width: 16.0),
                 Text(
                   time,
                   style: const TextStyle(fontSize: 16),
@@ -192,27 +201,31 @@ class _ProgressScreenState extends State<ProgressScreen> {
           return const Center(child: Text('No progress reports available.'));
         } else {
           final progressReports = snapshot.data!;
-          final overallPerformance = _calculateOverallPerformance(progressReports);
+          final overallPerformance =
+              _calculateOverallPerformance(progressReports);
 
           // Debug: Print extracted performance categories
           for (var report in progressReports) {
-            final performance = _extractPerformanceCategory(report.overallPerformance);
+            final performance =
+                _extractPerformanceCategory(report.overallPerformance);
             print('Week ${report.week}: $performance');
           }
 
           return Column(
             children: [
-              _buildPerformanceRow('Overall Performance', overallPerformance, Colors.black),
+              _buildPerformanceRow(
+                  'Overall Performance', overallPerformance, Colors.black),
               const SizedBox(height: 16),
-              ...progressReports.map((report) => _buildWeekProgress(
-                'Week ${report.week}',
-                report.overallPerformance,
-                _getPerformanceColor(report.overallPerformance),
-                _getPerformanceEmoji(report.overallPerformance),
-                _getPerformanceTextColor(report.overallPerformance),
-                report.comments,
-
-              )).toList(),
+              ...progressReports
+                  .map((report) => _buildWeekProgress(
+                        'Week ${report.week}',
+                        report.overallPerformance,
+                        _getPerformanceColor(report.overallPerformance),
+                        _getPerformanceEmoji(report.overallPerformance),
+                        _getPerformanceTextColor(report.overallPerformance),
+                        report.comments,
+                      ))
+                  .toList(),
             ],
           );
         }
@@ -225,7 +238,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
     // Map performance categories to numerical values
     final performanceValues = reports.map((report) {
-      final performance = _extractPerformanceCategory(report.overallPerformance);
+      final performance =
+          _extractPerformanceCategory(report.overallPerformance);
       switch (performance.toLowerCase()) {
         case 'excellent':
           return 4;
@@ -241,7 +255,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
     }).toList();
 
     // Calculate the average performance value
-    final average = performanceValues.reduce((a, b) => a + b) / performanceValues.length;
+    final average =
+        performanceValues.reduce((a, b) => a + b) / performanceValues.length;
 
     // Map the average back to a performance category
     if (average >= 3.5) {
@@ -273,7 +288,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
             children: [
               Text(
                 status,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: textColor),
               ),
               const SizedBox(width: 4),
               Text(_getPerformanceEmoji(status)),
@@ -284,17 +302,24 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildWeekProgress(String week, String performanceWithEmoji, Color color, String emoji, Color textColor, String comments) {
+  Widget _buildWeekProgress(String week, String performanceWithEmoji,
+      Color color, String emoji, Color textColor, String comments) {
     final performance = _extractPerformanceCategory(performanceWithEmoji);
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ProgressReportStu(
-            week: week,
-            performance: performance,
-            comments: comments,
-          )),
+          MaterialPageRoute(
+            builder: (context) => ProgressReportStu(
+              report: ProgressReportModel(
+                bookingId: widget.booking.bookingId,
+                week: int.parse(
+                    week.split(' ')[1]), // Extract week number from "Week X"
+                overallPerformance: performanceWithEmoji,
+                comments: comments,
+              ),
+            ),
+          ),
         );
       },
       child: Container(
@@ -308,8 +333,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
         child: Row(
           children: [
             Text(
-              '$week: ${_extractPerformanceCategory(performanceWithEmoji)} $emoji',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor),
+              '$week: $performance $emoji',
+              style: TextStyle(
+                  fontSize: 14, fontWeight: FontWeight.bold, color: textColor),
             ),
             const Spacer(),
             Text(
@@ -351,20 +377,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   String _getPerformanceEmoji(String performanceWithEmoji) {
-  final performance = _extractPerformanceCategory(performanceWithEmoji);
-  switch (performance.toLowerCase()) {
-    case 'excellent':
-      return '😃'; // Smiling face with open mouth
-    case 'good':
-      return '🙂'; // Slightly smiling face
-    case 'average':
-      return '😐'; // Neutral face
-    case 'struggling':
-      return '😟'; // Worried face
-    default:
-      return '😐'; // Default to neutral face
+    final performance = _extractPerformanceCategory(performanceWithEmoji);
+    switch (performance.toLowerCase()) {
+      case 'excellent':
+        return '😃'; // Smiling face with open mouth
+      case 'good':
+        return '🙂'; // Slightly smiling face
+      case 'average':
+        return '😐'; // Neutral face
+      case 'struggling':
+        return '😟'; // Worried face
+      default:
+        return '😐'; // Default to neutral face
+    }
   }
-}
 
   Color _getPerformanceTextColor(String performanceWithEmoji) {
     final performance = _extractPerformanceCategory(performanceWithEmoji);
