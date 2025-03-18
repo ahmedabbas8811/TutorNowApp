@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-class PersonalInformation extends StatelessWidget {
+class PersonalInformation extends StatefulWidget {
   final String userId;
   final String userName;
   final String userMail;
@@ -9,8 +8,9 @@ class PersonalInformation extends StatelessWidget {
   final String userLocation;
   final VoidCallback onDownloadPressed;
   final VoidCallback onApprovePressed;
-  const PersonalInformation(
-    {super.key,
+
+  const PersonalInformation({
+    super.key,
     required this.userId,
     required this.userName,
     required this.userMail,
@@ -18,7 +18,15 @@ class PersonalInformation extends StatelessWidget {
     required this.userLocation,
     required this.onDownloadPressed,
     required this.onApprovePressed,
-    });
+  });
+
+  @override
+  _PersonalInformationState createState() => _PersonalInformationState();
+}
+
+class _PersonalInformationState extends State<PersonalInformation> {
+  final TextEditingController reasonController = TextEditingController();
+  final List<String> redoSteps = [];
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +35,6 @@ class PersonalInformation extends StatelessWidget {
       child: _buildPersonalInfo(context),
     );
   }
-
-
-
-
-  
 
   Widget _buildSectionContainer({required String title, required Widget child}) {
     return Column(
@@ -58,21 +61,21 @@ class PersonalInformation extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           CircleAvatar(
+          CircleAvatar(
             radius: 40,
-            backgroundImage: NetworkImage(img_Url),
+            backgroundImage: NetworkImage(widget.img_Url),
           ),
           const SizedBox(height: 16),
-          _buildInfoRow('Name', userName),
-          _buildInfoRow('Email', userMail),
-          _buildInfoRow('Location', userLocation),
+          _buildInfoRow('Name', widget.userName),
+          _buildInfoRow('Email', widget.userMail),
+          _buildInfoRow('Location', widget.userLocation),
           const Text(
             'CNIC:',
             style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 8),
           ElevatedButton(
-            onPressed: onDownloadPressed,
+            onPressed: widget.onDownloadPressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               shape: const RoundedRectangleBorder(
@@ -117,7 +120,7 @@ class PersonalInformation extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ElevatedButton.icon(
-          onPressed: onApprovePressed,
+          onPressed: widget.onApprovePressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xff87e64c),
             shape: const RoundedRectangleBorder(
@@ -134,24 +137,143 @@ class PersonalInformation extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        // ElevatedButton.icon(
-        //   onPressed: (){},
-        //   style: ElevatedButton.styleFrom(
-        //     backgroundColor: Colors.red,
-        //     shape: const RoundedRectangleBorder(
-        //       borderRadius: BorderRadius.zero,
-        //     ),
-        //   ),
-        //   label: const Text(
-        //     'Reject Tutor',
-        //     style: TextStyle(color: Colors.white),
-        //   ),
-        //   icon: const Icon(
-        //     Icons.close,
-        //     color: Colors.white,
-        //   ),
-        // ),
+        ElevatedButton.icon(
+          onPressed: () => _showRejectDialog(context),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+          ),
+          label: const Text(
+            'Reject Tutor',
+            style: TextStyle(color: Colors.white),
+          ),
+          icon: const Icon(
+            Icons.close,
+            color: Colors.white,
+          ),
+        ),
       ],
+    );
+  }
+
+  void _showRejectDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          contentPadding: const EdgeInsets.all(16),
+          title: const Text(
+            "Add Reason For Rejection",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+
+              // Fixed Reason Input Layout
+              Row(
+  children: [
+    const Text(
+      "Your profile was rejected due to ",
+      style: TextStyle(color: Colors.grey, fontSize: 14),
+    ),
+    Expanded(
+      child: Focus(
+        onFocusChange: (hasFocus) {
+          // Change border color dynamically when focused
+        },
+        child: TextField(
+          controller: reasonController,
+          decoration: InputDecoration(
+            hintText: "Enter reason",
+            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.grey), // Default grey border
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.black, width: 2), // Bold black on focus
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+          style: const TextStyle(fontSize: 14),
+        ),
+      ),
+    ),
+  ],
+),
+
+              const SizedBox(height: 16),
+
+              // Step Selection UI
+              const Text(
+                "Select steps for user to redo:",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8.0,
+                children: [
+                  _buildChip("Profile image"),
+                  _buildChip("Location"),
+                  _buildChip("CNIC"),
+                  _buildChip("Qualification"),
+                  _buildChip("Experience"),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+            ],
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  print("Rejected for: ${reasonController.text}");
+                  print("Steps to redo: $redoSteps");
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "Reject Profile",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildChip(String label) {
+    return FilterChip(
+      label: Text(label),
+      selected: redoSteps.contains(label),
+      onSelected: (bool selected) {
+        setState(() {
+          if (selected) {
+            redoSteps.add(label);
+          } else {
+            redoSteps.remove(label);
+          }
+        });
+      },
     );
   }
 
