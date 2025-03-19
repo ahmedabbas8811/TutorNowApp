@@ -26,8 +26,7 @@ class PersonalInformation extends StatefulWidget {
 
 class _PersonalInformationState extends State<PersonalInformation> {
   final TextEditingController reasonController = TextEditingController();
-  final List<String> redoSteps = [];
-  String? selectedChip;
+  String? selectedChip; // Tracks selected chip
   bool isReasonFocused = false;
 
   @override
@@ -151,10 +150,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
             'Reject Tutor',
             style: TextStyle(color: Colors.white),
           ),
-          icon: const Icon(
-            Icons.close,
-            color: Colors.white,
-          ),
+         
         ),
       ],
     );
@@ -164,158 +160,164 @@ class _PersonalInformationState extends State<PersonalInformation> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          contentPadding: const EdgeInsets.all(16),
-          title: const Text(
-            "Add Reason For Rejection",
-            style: TextStyle(fontSize: 18,),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 8),
-
-              // Fixed Reason Input Layout
-              Row(
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              contentPadding: const EdgeInsets.all(16),
+              title: const Text(
+                "Add Reason For Rejection",
+                style: TextStyle(fontSize: 20),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Your profile was rejected due to ",
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                  Expanded(
-                    child: Focus(
-                      onFocusChange: (hasFocus) {
-                        setState(() {
-                          isReasonFocused = hasFocus;
-                        });
-                      },
-                      child: TextField(
-                        cursorColor: Colors.grey.shade400,
-                        controller: reasonController,
-                        decoration: InputDecoration(
-                          hintText: selectedChip != null ? "Invalid $selectedChip" : "Invalid CNIC",
-                          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                                color: isReasonFocused ? Colors.black : Colors.grey.shade400),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                                color: isReasonFocused ? Colors.black : Colors.grey.shade400),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(color: Colors.black),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                        ),
-                        style: TextStyle(fontSize: 14, color: Colors.black),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Text(
+                        "Your profile was rejected due to ",
+                        style: TextStyle(color: Colors.grey, fontSize: 15),
                       ),
+                      Expanded(
+                        child: Focus(
+                          onFocusChange: (hasFocus) {
+                            setStateDialog(() {
+                              isReasonFocused = hasFocus;
+                            });
+                          },
+                          child: TextField(
+                            cursorColor: Colors.grey.shade400,
+                            controller: reasonController,
+                            decoration: InputDecoration(
+                              hintText: selectedChip != null
+                                  ? "Invalid $selectedChip"
+                                  : "Invalid CNIC",
+                              hintStyle: TextStyle(
+                                  color: Colors.grey.shade400, fontSize: 14),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: (isReasonFocused || selectedChip != null)
+                                      ? Colors.black
+                                      : Colors.grey.shade400,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: (isReasonFocused || selectedChip != null)
+                                      ? Colors.black
+                                      : Colors.grey.shade400,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Colors.black),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                            ),
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Select steps for user to redo",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildChip("Profile image", setStateDialog),
+                        const SizedBox(width: 10),
+                        _buildChip("Location", setStateDialog),
+                        const SizedBox(width: 10),
+                        _buildChip("CNIC", setStateDialog),
+                        const SizedBox(width: 10),
+                        _buildChip("Qualification", setStateDialog),
+                        const SizedBox(width: 10),
+                        _buildChip("Experience", setStateDialog),
+                      ],
                     ),
                   ),
+                  const SizedBox(height: 16),
                 ],
               ),
-
-              const SizedBox(height: 16),
-
-              // Step Selection UI
-              const Text(
-                "Select steps for user to redo:",
-                style: TextStyle(fontSize: 16,),
-              ),
-              const SizedBox(height: 8),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildChip("Profile image"),
-                    const SizedBox(width: 10),
-                    _buildChip("Location"),
-                    const SizedBox(width: 10),
-                    _buildChip("CNIC"),
-                    const SizedBox(width: 10),
-                    _buildChip("Qualification"),
-                    const SizedBox(width: 10),
-                    _buildChip("Experience"),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-            ],
-          ),
-          actions: [
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  print("Reject Profile button tapped");
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      print("Reject Profile button tapped");
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      "Reject Profile",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
-                child: const Text(
-                  "Reject Profile",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         );
       },
     );
   }
 
- Widget _buildChip(String label) {
-  return StatefulBuilder(
-    builder: (context, setState) {
-      final bool isSelected = redoSteps.contains(label);
-      return FilterChip(
-        label: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.grey.shade400,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
+  Widget _buildChip(String label, void Function(void Function()) setStateDialog) {
+    final bool isSelected = selectedChip == label;
+
+    return FilterChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? Colors.black : Colors.grey.shade400,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
-        selected: isSelected,
-        onSelected: (bool selected) {
-          setState(() {
-            // Clear the list before adding the new selection
-            redoSteps.clear();
-            if (selected) {
-              redoSteps.add(label);
-            }
-          });
-          this.setState(() {
+      ),
+      selected: isSelected,
+      onSelected: (bool selected) {
+        setStateDialog(() {
+          if (selected) {
+            selectedChip = label;
             reasonController.text = "Invalid $label";
-            });
-        },
-        selectedColor: const Color(0xff87e64c), // Green background when selected
-        showCheckmark: false,
-        backgroundColor: Colors.white, // White background when not selected
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-            color: isSelected ? Colors.black : Colors.grey.shade400, // Black border when selected, grey when not
-          ),
-          borderRadius: BorderRadius.circular(10),
+          } else {
+            selectedChip = null;
+            reasonController.clear();
+          }
+        });
+      },
+      selectedColor: const Color(0xff87e64c),
+      showCheckmark: false,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(
+          color: isSelected ? Colors.black : Colors.grey.shade400,
         ),
-      );
-    },
-  );
-}
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+  }
+
   BoxDecoration _boxDecoration() {
     return BoxDecoration(
       color: Colors.grey[200],
