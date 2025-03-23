@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:newifchaly/admin/controllers/tutor_confirmation_controller.dart';
 
 class PersonalInformation extends StatefulWidget {
   final String userId;
@@ -37,7 +39,8 @@ class _PersonalInformationState extends State<PersonalInformation> {
     );
   }
 
-  Widget _buildSectionContainer({required String title, required Widget child}) {
+  Widget _buildSectionContainer(
+      {required String title, required Widget child}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -150,13 +153,14 @@ class _PersonalInformationState extends State<PersonalInformation> {
             'Reject Tutor',
             style: TextStyle(color: Colors.white),
           ),
-         
         ),
       ],
     );
   }
 
   void _showRejectDialog(BuildContext context) {
+    List<String> selectedSteps = [];
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -201,17 +205,19 @@ class _PersonalInformationState extends State<PersonalInformation> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
-                                  color: (isReasonFocused || selectedChip != null)
-                                      ? Colors.black
-                                      : Colors.grey.shade400,
+                                  color:
+                                      (isReasonFocused || selectedChip != null)
+                                          ? Colors.black
+                                          : Colors.grey.shade400,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
-                                  color: (isReasonFocused || selectedChip != null)
-                                      ? Colors.black
-                                      : Colors.grey.shade400,
+                                  color:
+                                      (isReasonFocused || selectedChip != null)
+                                          ? Colors.black
+                                          : Colors.grey.shade400,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
@@ -240,15 +246,17 @@ class _PersonalInformationState extends State<PersonalInformation> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildChip("Profile image", setStateDialog),
+                        _buildChip(
+                            "Profile image", selectedSteps, setStateDialog),
                         const SizedBox(width: 10),
-                        _buildChip("Location", setStateDialog),
+                        _buildChip("Location", selectedSteps, setStateDialog),
                         const SizedBox(width: 10),
-                        _buildChip("CNIC", setStateDialog),
+                        _buildChip("CNIC", selectedSteps, setStateDialog),
                         const SizedBox(width: 10),
-                        _buildChip("Qualification", setStateDialog),
+                        _buildChip(
+                            "Qualification", selectedSteps, setStateDialog),
                         const SizedBox(width: 10),
-                        _buildChip("Experience", setStateDialog),
+                        _buildChip("Experience", selectedSteps, setStateDialog),
                       ],
                     ),
                   ),
@@ -259,8 +267,18 @@ class _PersonalInformationState extends State<PersonalInformation> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      print("Reject Profile button tapped");
+                    onPressed: () async {
+                      final controller =
+                          Get.find<TutorConfirmationController>();
+
+                      // Reject the tutor with selected steps
+                      await controller.rejectTutor(widget.userId,
+                          reasonController.text, selectedSteps, context);
+
+                      // Close dialog safely
+                      if (mounted && Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
@@ -283,8 +301,9 @@ class _PersonalInformationState extends State<PersonalInformation> {
     );
   }
 
-  Widget _buildChip(String label, void Function(void Function()) setStateDialog) {
-    final bool isSelected = selectedChip == label;
+  Widget _buildChip(String label, List<String> selectedSteps,
+      void Function(void Function()) setStateDialog) {
+    final bool isSelected = selectedSteps.contains(label);
 
     return FilterChip(
       label: Text(
@@ -298,11 +317,9 @@ class _PersonalInformationState extends State<PersonalInformation> {
       onSelected: (bool selected) {
         setStateDialog(() {
           if (selected) {
-            selectedChip = label;
-            reasonController.text = "Invalid $label";
+            selectedSteps.add(label);
           } else {
-            selectedChip = null;
-            reasonController.clear();
+            selectedSteps.remove(label);
           }
         });
       },
@@ -324,6 +341,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
         BoxShadow(
+          // ignore: deprecated_member_use
           color: Colors.grey.withOpacity(0.2),
           spreadRadius: 1,
           blurRadius: 5,

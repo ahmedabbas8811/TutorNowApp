@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:newifchaly/admin/views/approve_tutors.dart';
-import 'package:newifchaly/admin/views/confirmation_screen.dart';
 import 'package:newifchaly/views/widgets/snackbar.dart';
 import '../models/tutor_confirmation_model.dart';
 import '../models/supabase_service_tutor_confirmation.dart';
@@ -65,6 +63,27 @@ class TutorConfirmationController extends GetxController {
       }
     } catch (e) {
       Get.snackbar('Error', 'Error opening CNIC: $e');
+    }
+  }
+
+  Future<void> rejectTutor(String tutorId, String reason,
+      List<String> selectedSteps, BuildContext context) async {
+    try {
+      // Check if tutor exists in the profile_completion_steps table
+      final existingRecord = await _service.getTutorProfileStep(tutorId);
+
+      if (existingRecord == null) {
+        await _service.insertRejectionReason(tutorId, reason);
+      } else {
+        await _service.updateRejectionReason(tutorId, reason);
+      }
+
+      // Update profile completion steps
+      await _service.updateProfileCompletionSteps(tutorId, selectedSteps);
+
+      showCustomSnackBar(context, "Tutor Rejected Successfully");
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
     }
   }
 }
