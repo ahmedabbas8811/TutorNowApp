@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:newifchaly/views/widgets/snackbar.dart';
 import '../models/tutor_confirmation_model.dart';
 import '../models/supabase_service_tutor_confirmation.dart';
-
 import 'package:url_launcher/url_launcher.dart';
 
 class TutorConfirmationController extends GetxController {
@@ -16,20 +15,12 @@ class TutorConfirmationController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Fetch tutor details from the 'users' table
       final fetchedTutor = await _service.fetchTutorDetails(tutorId);
-
-      // Fetch location details from the 'location' table
       final location = await _service.fetchLocation(tutorId);
-
-      // Combine location data into a single string
       final formattedLocation =
           '${location['city']}, ${location['state']}, ${location['country']}';
 
-      // Update the tutor object with the location
       fetchedTutor.location = formattedLocation;
-
-      // Update the reactive tutor variable
       tutor.value = fetchedTutor;
     } catch (e) {
       Get.snackbar('Error', e.toString());
@@ -69,19 +60,20 @@ class TutorConfirmationController extends GetxController {
   Future<void> rejectTutor(String tutorId, String reason,
       List<String> selectedSteps, BuildContext context) async {
     try {
-      // Check if tutor exists in the profile_completion_steps table
-      final existingRecord = await _service.getTutorProfileStep(tutorId);
-
-      if (existingRecord == null) {
-        await _service.insertRejectionReason(tutorId, reason);
-      } else {
-        await _service.updateRejectionReason(tutorId, reason);
-      }
-
-      // Update profile completion steps
+      await _service.insertRejectionReason(tutorId, reason);
       await _service.updateProfileCompletionSteps(tutorId, selectedSteps);
-
       showCustomSnackBar(context, "Tutor Rejected Successfully");
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
+    }
+  }
+
+  Future<void> fetchRejectionReasons(String tutorId) async {
+    try {
+      final rejectionReasons = await _service.getAllRejectionReasons(tutorId);
+      rejectionReasons.forEach((reason) {
+        print("Reason: ${reason['reason']}, Timestamp: ${reason['timestamp']}");
+      });
     } catch (e) {
       Get.snackbar('Error', e.toString());
     }

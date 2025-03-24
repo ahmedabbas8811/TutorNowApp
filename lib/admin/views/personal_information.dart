@@ -26,6 +26,8 @@ class PersonalInformation extends StatefulWidget {
   _PersonalInformationState createState() => _PersonalInformationState();
 }
 
+
+
 class _PersonalInformationState extends State<PersonalInformation> {
   final TextEditingController reasonController = TextEditingController();
   String? selectedChip; // Tracks selected chip
@@ -157,6 +159,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
       ],
     );
   }
+  
 
   void _showRejectDialog(BuildContext context) {
     List<String> selectedSteps = [];
