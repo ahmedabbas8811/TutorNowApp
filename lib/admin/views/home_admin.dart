@@ -1,46 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/admin/views/approve_tutors.dart';
 
-class SideMenu extends StatelessWidget {
+class HomeAdmin extends StatelessWidget {
+  const HomeAdmin({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return 
-    // Container(
-    //   width: 200,
-    //   color: Colors.white,
-    //   child: Column(
-    //     children: [
-    //       ListTile(
-    //         leading: Image.asset(
-    //           'assets/ali.png',
-    //           width: 28,
-    //           height: 28,
-    //           fit: BoxFit.contain,
-    //         ),
-    //       ),
-    //       const SizedBox(height: 5),
-    //       Container(
-    //         color: const Color(0xfffafafa),
-    //         child: const ListTile(
-    //           leading: Icon(Icons.home, color: Colors.black),
-    //           title: Text('Home'),
-    //         ),
-    //       ),
-    //       const SizedBox(height: 5),
-    //       Container(
-    //         color: const Color(0xff87e64c),
-    //         child: const ListTile(
-    //           leading: Icon(Icons.check_circle, color: Colors.black),
-    //           title: Text(
-    //             'Approve Tutors',
-    //             style: TextStyle(color: Colors.black),
-    //           ),
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    // );
-
-      Container(
+    return Scaffold(
+      backgroundColor: Colors.grey,
+      body: Row(
+        children: [
+          // Sidebar
+          Container(
             width: 200,
             color: Colors.white,
             child: Column(
@@ -59,7 +30,7 @@ class SideMenu extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   padding: const EdgeInsets.symmetric(vertical: 1),
                   decoration: BoxDecoration(
-                    color:const Color(0xfffafafa),
+                    color:const Color(0xff87e64c),
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
@@ -75,7 +46,7 @@ class SideMenu extends StatelessWidget {
                       'Home',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    
+                 
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -84,11 +55,11 @@ class SideMenu extends StatelessWidget {
   margin: const EdgeInsets.symmetric(horizontal: 3),
   padding: const EdgeInsets.symmetric(vertical: 3),
   decoration: BoxDecoration(
-    color: const Color(0xff87e64c), // Green BG
+    color: const Color(0xfffafafa), // Green BG
     borderRadius: BorderRadius.circular(30),
   ),
   child: ListTile(
-    leading: const Icon(Icons.check_circle, color: Colors.black),
+    leading: const Icon(Icons.home, color: Colors.black),
     title: const Text(
       'Approve Tutors',
       style: TextStyle(
@@ -96,12 +67,22 @@ class SideMenu extends StatelessWidget {
         fontSize: 16,
       ),
     ),
-   
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ApproveTutorsScreen()),
+      );
+    },
   ),
 ),
 
+
               ],
             ),
-          );
+          ),
+        ],
+      ),
+      
+    );
   }
 }
