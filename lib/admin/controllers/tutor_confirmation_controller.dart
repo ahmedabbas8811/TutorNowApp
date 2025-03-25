@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/views/widgets/snackbar.dart';
 import '../models/tutor_confirmation_model.dart';
@@ -10,15 +10,14 @@ class TutorConfirmationController extends GetxController {
 
   var tutor = Rxn<Tutor>();
   var isLoading = false.obs;
+  var rejectionReasons = <Map<String, dynamic>>[].obs; // Add this line
 
   Future<void> fetchTutorDetails(String tutorId) async {
     try {
       isLoading.value = true;
-
       final fetchedTutor = await _service.fetchTutorDetails(tutorId);
       final location = await _service.fetchLocation(tutorId);
-      final formattedLocation =
-          '${location['city']}, ${location['state']}, ${location['country']}';
+      final formattedLocation = '${location['city']}, ${location['state']}, ${location['country']}';
 
       fetchedTutor.location = formattedLocation;
       tutor.value = fetchedTutor;
@@ -43,12 +42,10 @@ class TutorConfirmationController extends GetxController {
       Get.snackbar('Error', 'CNIC URL not available');
       return;
     }
-
     try {
       final publicUrl = cnicUrl;
       if (await canLaunchUrl(Uri.parse(publicUrl))) {
-        await launchUrl(Uri.parse(publicUrl),
-            mode: LaunchMode.externalApplication);
+        await launchUrl(Uri.parse(publicUrl), mode: LaunchMode.externalApplication);
       } else {
         throw 'Could not launch $publicUrl';
       }
@@ -63,6 +60,7 @@ class TutorConfirmationController extends GetxController {
       await _service.insertRejectionReason(tutorId, reason);
       await _service.updateProfileCompletionSteps(tutorId, selectedSteps);
       showCustomSnackBar(context, "Tutor Rejected Successfully");
+      await fetchRejectionReasons(tutorId); // Refresh the list after rejection
     } catch (e) {
       Get.snackbar('Error', e.toString());
     }
@@ -70,11 +68,10 @@ class TutorConfirmationController extends GetxController {
 
   Future<void> fetchRejectionReasons(String tutorId) async {
     try {
-      final rejectionReasons = await _service.getAllRejectionReasons(tutorId);
-      rejectionReasons.forEach((reason) {
-        print("Reason: ${reason['reason']}, Timestamp: ${reason['timestamp']}");
-      });
+      final reasons = await _service.getAllRejectionReasons(tutorId);
+      rejectionReasons.assignAll(reasons); // Update the observable list
     } catch (e) {
+      rejectionReasons.clear();
       Get.snackbar('Error', e.toString());
     }
   }

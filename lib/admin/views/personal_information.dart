@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:newifchaly/admin/controllers/tutor_confirmation_controller.dart';
+import 'package:newifchaly/views/widgets/snackbar.dart';
 
 class PersonalInformation extends StatefulWidget {
   final String userId;
@@ -26,12 +28,30 @@ class PersonalInformation extends StatefulWidget {
   _PersonalInformationState createState() => _PersonalInformationState();
 }
 
-
-
 class _PersonalInformationState extends State<PersonalInformation> {
   final TextEditingController reasonController = TextEditingController();
-  String? selectedChip; // Tracks selected chip
+  String? selectedChip;
   bool isReasonFocused = false;
+  final TutorConfirmationController controller = Get.put(TutorConfirmationController());
+  bool _isMounted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isMounted = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_isMounted) {
+        controller.fetchRejectionReasons(widget.userId);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _isMounted = false;
+    reasonController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +61,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
     );
   }
 
-  Widget _buildSectionContainer(
-      {required String title, required Widget child}) {
+  Widget _buildSectionContainer({required String title, required Widget child}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -121,45 +140,97 @@ class _PersonalInformationState extends State<PersonalInformation> {
     );
   }
 
-  Widget _buildApprovalButtons() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ElevatedButton.icon(
-          onPressed: widget.onApprovePressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xff87e64c),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-          ),
-          label: const Text(
-            'Approve Tutor',
-            style: TextStyle(color: Colors.black),
-          ),
-          icon: const Icon(
-            Icons.check,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 8),
-        ElevatedButton.icon(
-          onPressed: () => _showRejectDialog(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-          ),
-          label: const Text(
-            'Reject Tutor',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ],
-    );
-  }
+Widget _buildApprovalButtons() {
+  final controller = Get.find<TutorConfirmationController>();
   
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      ElevatedButton.icon(
+        onPressed: widget.onApprovePressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xff87e64c),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+        ),
+        label: const Text(
+          'Approve Tutor',
+          style: TextStyle(color: Colors.black),
+        ),
+        icon: const Icon(
+          Icons.check,
+          color: Colors.black,
+        ),
+      ),
+      const SizedBox(height: 8),
+      ElevatedButton.icon(
+        onPressed: () => _showRejectDialog(context),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+        ),
+        label: const Text(
+          'Reject Tutor',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+      // Rejection History Section
+      Obx(() {
+        if (controller.rejectionReasons.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Text(
+                'Rejection History:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            ...controller.rejectionReasons.map((reason) {
+              DateTime? timestamp;
+              try {
+                timestamp = DateTime.parse(reason['timestamp']);
+              } catch (e) {
+                timestamp = DateTime.now();
+              }
+              final formattedDate = DateFormat('MMM dd, yyyy - hh:mm a').format(timestamp);
+              
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      reason['reason'] ?? 'No reason provided',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    Text(
+                      formattedDate,
+                      style: const TextStyle(
+                        fontSize: 12, 
+                        color: Colors.grey
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ],
+        );
+      }),
+    ],
+  );
+}
 
   void _showRejectDialog(BuildContext context) {
     List<String> selectedSteps = [];
@@ -208,25 +279,22 @@ class _PersonalInformationState extends State<PersonalInformation> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
-                                  color:
-                                      (isReasonFocused || selectedChip != null)
-                                          ? Colors.black
-                                          : Colors.grey.shade400,
+                                  color: (isReasonFocused || selectedChip != null)
+                                      ? Colors.black
+                                      : Colors.grey.shade400,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
-                                  color:
-                                      (isReasonFocused || selectedChip != null)
-                                          ? Colors.black
-                                          : Colors.grey.shade400,
+                                  color: (isReasonFocused || selectedChip != null)
+                                      ? Colors.black
+                                      : Colors.grey.shade400,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide:
-                                    const BorderSide(color: Colors.black),
+                                borderSide: const BorderSide(color: Colors.black),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 8),
@@ -271,15 +339,14 @@ class _PersonalInformationState extends State<PersonalInformation> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
-                      final controller =
-                          Get.find<TutorConfirmationController>();
-
-                      // Reject the tutor with selected steps
-                      await controller.rejectTutor(widget.userId,
-                          reasonController.text, selectedSteps, context);
-
-                      // Close dialog safely
-                      if (mounted && Navigator.canPop(context)) {
+                      await controller.rejectTutor(
+                        widget.userId,
+                        reasonController.text,
+                        selectedSteps,
+                        context,
+                      );
+                      if (_isMounted) {
+                        await controller.fetchRejectionReasons(widget.userId);
                         Navigator.pop(context);
                       }
                     },
@@ -344,7 +411,6 @@ class _PersonalInformationState extends State<PersonalInformation> {
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
         BoxShadow(
-          // ignore: deprecated_member_use
           color: Colors.grey.withOpacity(0.2),
           spreadRadius: 1,
           blurRadius: 5,

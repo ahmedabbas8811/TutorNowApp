@@ -85,7 +85,7 @@ class SupabaseService {
       if (selectedSteps.contains("Location")) updates["location"] = false;
       if (selectedSteps.contains("CNIC")) updates["cnic"] = false;
       if (selectedSteps.contains("Qualification")) updates["qualification"] = false;
-      if (selectedSteps.contains("Experience")) updates["experience"] = false;
+      if (selectedSteps.contains("Experience")) updates["exp"] = false;
 
       if (updates.isNotEmpty) {
         await _client
