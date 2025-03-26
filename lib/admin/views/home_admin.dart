@@ -10,234 +10,252 @@ class HomeAdmin extends StatefulWidget {
 }
 
 class _HomeAdminState extends State<HomeAdmin> {
-  String? selectedTimeFrame;
+  String selectedTimeFrame = 'In 24 Hours'; 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfffafafa),
-      body: Row(
-        children: [
-          // Sidebar
-          Container(
-            width: 200,
-            color: Colors.white,
-            child: Column(
-              children: [
-                const SizedBox(height: 15),
-                Image.asset(
-                  'assets/ali.png',
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 15),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding: const EdgeInsets.symmetric(vertical: 1),
-                  decoration: BoxDecoration(
-                    color: const Color(0xff87e64c),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 0,
-                        spreadRadius: 1,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          
+          return Row(
+            children: [
+                                                                               // Sidebar 
+              Container(
+                width: 200,
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 15),
+                    Image.asset(
+                      'assets/ali.png',
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(height: 15),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.symmetric(vertical: 1),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff87e64c),
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 0,
+                            spreadRadius: 1,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: const ListTile(
-                    leading: Icon(Icons.home, color: Colors.black),
-                    title: Text(
-                      'Home',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  decoration: BoxDecoration(
-                    color: const Color(0xfffafafa),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Icons.home, color: Colors.black),
-                    title: const Text(
-                      'Approve Tutors',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ApproveTutorsScreen()),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16.0, top: 5.0),
-                    child: Text(
-                      'Dashboard',
-                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16.0, top: 5.0, right: 16.0),
-                    child: Row(
-                      children: [
-                        _buildPlatformEngagementCard(),
-                        const SizedBox(width: 20),
-                        _buildProfileRequestsCard(),
-                        const SizedBox(width: 20),
-                        _buildBookingRequestsCard(),
-                      ],
-                    ),
-                  ),
-                  
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            _buildQualificationChart(),
-                            const SizedBox(width: 20),
-                            _buildExperienceChart(),
-                          ],
+                      child: const ListTile(                                 //Home
+                        leading: Icon(Icons.home, color: Colors.black),
+                        title: Text(
+                          'Home',
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 20),
-                        
-                        Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.3),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: const Offset(0, 3),
-                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xfffafafa),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: ListTile(
+                        leading: const Icon(Icons.home, color: Colors.black),
+                        title: const Text(                                            // Approve Tutor
+                          'Approve Tutors',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ApproveTutorsScreen()),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+                                                                                    // Main content - flexible
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 16.0, top: 5.0),
+                        child: Text(
+                          'Dashboard',
+                          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      
+                     
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16.0, top: 5.0, right: 16.0),
+                          child: Row(
+                            children: [
+                              _buildPlatformEngagementCard(),
+                              const SizedBox(width: 20),
+                              _buildProfileRequestsCard(),
+                              const SizedBox(width: 20),
+                              _buildBookingRequestsCard(),
                             ],
                           ),
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Upcoming Sessions',
-                                style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ),
+                      ),
+                      
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                           
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
                                 children: [
-                                  _SessionCard(
-                                    timeFrame: 'In 24 Hours', 
-                                    count: '3',
-                                    isSelected: selectedTimeFrame == 'In 24 Hours',
-                                    onTap: () => setState(() => selectedTimeFrame = 'In 24 Hours'),
-                                  ),
-                                  _SessionCard(
-                                    timeFrame: 'In 7 Days', 
-                                    count: '16',
-                                    isSelected: selectedTimeFrame == 'In 7 Days',
-                                    onTap: () => setState(() => selectedTimeFrame = 'In 7 Days'),
-                                  ),
-                                  _SessionCard(
-                                    timeFrame: 'In 15 Days', 
-                                    count: '25',
-                                    isSelected: selectedTimeFrame == 'In 15 Days',
-                                    onTap: () => setState(() => selectedTimeFrame = 'In 15 Days'),
-                                  ),
-                                  _SessionCard(
-                                    timeFrame: 'In 30 Days', 
-                                    count: '45',
-                                    isSelected: selectedTimeFrame == 'In 30 Days',
-                                    onTap: () => setState(() => selectedTimeFrame = 'In 30 Days'),
+                                  _buildQualificationChart(),
+                                  const SizedBox(width: 20),
+                                  _buildExperienceChart(),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            
+                                                                                        // Upcoming sessions
+                            Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.3),
+                                    spreadRadius: 2,
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 3),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 20),
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xff87e64c),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text('Tutor Name', 
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Upcoming Sessions',
+                                    style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 20),
+                                
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        _SessionCard(
+                                          timeFrame: 'In 24 Hours', 
+                                          count: '3',
+                                          isSelected: selectedTimeFrame == 'In 24 Hours',
+                                          onTap: () => setState(() => selectedTimeFrame = 'In 24 Hours'),
+                                        ),
+                                        _SessionCard(
+                                          timeFrame: 'In 7 Days', 
+                                          count: '16',
+                                          isSelected: selectedTimeFrame == 'In 7 Days',
+                                          onTap: () => setState(() => selectedTimeFrame = 'In 7 Days'),
+                                        ),
+                                        _SessionCard(
+                                          timeFrame: 'In 15 Days', 
+                                          count: '25',
+                                          isSelected: selectedTimeFrame == 'In 15 Days',
+                                          onTap: () => setState(() => selectedTimeFrame = 'In 15 Days'),
+                                        ),
+                                        _SessionCard(
+                                          timeFrame: 'In 30 Days', 
+                                          count: '45',
+                                          isSelected: selectedTimeFrame == 'In 30 Days',
+                                          onTap: () => setState(() => selectedTimeFrame = 'In 30 Days'),
+                                        ),
+                                      ],
                                     ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text('Student Name', 
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xff87e64c),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    Expanded(
-                                      child: Text('Date', 
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
+                                    child: const Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          flex: 2,
+                                          child: Text('Tutor Name', 
+                                              style: TextStyle(fontWeight: FontWeight.bold)),
+                                        ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: Text('Student Name', 
+                                              style: TextStyle(fontWeight: FontWeight.bold)),
+                                        ),
+                                        Expanded(
+                                          child: Text('Date', 
+                                              style: TextStyle(fontWeight: FontWeight.bold)),
+                                        ),
+                                        Expanded(
+                                          child: Text('Time', 
+                                              style: TextStyle(fontWeight: FontWeight.bold)),
+                                        ),
+                                      ],
                                     ),
-                                    Expanded(
-                                      child: Text('Time', 
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  _SessionRow(
+                                    tutorName: 'Muhammad Ali', 
+                                    studentName: 'Bilal Jan', 
+                                    date: '24-05-2025', 
+                                    time: '1:00 PM'
+                                  ),
+                                  _SessionRow(
+                                    tutorName: 'Kashif Sarwar', 
+                                    studentName: 'Hanzala Khan', 
+                                    date: '24-5-2025', 
+                                    time: '3:00 PM'
+                                  ),
+                                  _SessionRow(
+                                    tutorName: 'Sami Ullah', 
+                                    studentName: 'Akif Imtiaz', 
+                                    date: '25-5-2025', 
+                                    time: '9:00 PM'
+                                  ),
+                                ],
                               ),
-                              _SessionRow(
-                                tutorName: 'Muhammad Ali', 
-                                studentName: 'Bilal Jan', 
-                                date: '24-05-2025', 
-                                time: '1:00 PM'
-                              ),
-                              _SessionRow(
-                                tutorName: 'Kashif Sarwar', 
-                                studentName: 'Hanzala Khan', 
-                                date: '24-5-2025', 
-                                time: '3:00 PM'
-                              ),
-                              _SessionRow(
-                                tutorName: 'Sami Ullah', 
-                                studentName: 'Akif Imtiaz', 
-                                date: '25-5-2025', 
-                                time: '9:00 PM'
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
-
+                                                          // 'Platform Engagement',            
   Widget _buildPlatformEngagementCard() {
     return Container(
       width: 300,
@@ -294,7 +312,7 @@ class _HomeAdminState extends State<HomeAdmin> {
       ),
     );
   }
-
+//                                                                         'Profile Requests',
   Widget _buildProfileRequestsCard() {
     return Container(
       width: 300,
@@ -412,6 +430,7 @@ class _HomeAdminState extends State<HomeAdmin> {
       ),
     );
   }
+                                                                          // 'Booking Requests',
 
   Widget _buildBookingRequestsCard() {
     return Container(
@@ -531,8 +550,8 @@ class _HomeAdminState extends State<HomeAdmin> {
     );
   }
 
-  Widget _buildQualificationChart() {
-    return Container(
+  Widget _buildQualificationChart() {                                       //'Tutors Qualification',
+    return Container( 
       width: 300,
       height: 310,
       decoration: BoxDecoration(
@@ -616,7 +635,7 @@ class _HomeAdminState extends State<HomeAdmin> {
   }
 
   Widget _buildExperienceChart() {
-    return Container(
+    return Container(                                                //'Tutors Experience', 
       width: 620,
       height: 310,
       decoration: BoxDecoration(
