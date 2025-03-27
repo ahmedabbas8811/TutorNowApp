@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
@@ -98,7 +100,6 @@ class _HomeAdminState extends State<HomeAdmin> {
                           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      
                      
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
@@ -256,62 +257,73 @@ class _HomeAdminState extends State<HomeAdmin> {
     );
   }
                                                           // 'Platform Engagement',            
-  Widget _buildPlatformEngagementCard() {
-    return Container(
-      width: 300,
-      height: 300,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey, width: 2.0),
-        borderRadius: BorderRadius.circular(10),
+Widget _buildPlatformEngagementCard() {
+  return Container(
+    width: 300,
+    height: 300,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(
+        color: Colors.grey[300]!,
+        width: 1.0,
       ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(height: 10),
-          Text(
-            'Platform Engagement',
-            style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 15),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _EngagementCard(
-                icon: Icons.person,
-                color: Color(0xff87e64c),
-                value: '47',
-                label: 'New User Sign Ups',
-              ),
-              _EngagementCard(
-                icon: Icons.check_circle,
-                color: Colors.blue,
-                value: '344',
-                label: 'Session done',
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _EngagementCard(
-                icon: Icons.school,
-                color: Colors.yellow,
-                value: '132',
-                label: 'Active Tutors',
-              ),
-              _EngagementCard(
-                icon: Icons.person_outline,
-                color: Colors.purple,
-                value: '285',
-                label: 'Active Students',
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(height: 10),
+        const Text(
+          'Platform Engagement',
+          style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 15),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _EngagementCard(
+              icon: Icons.person,
+              circleColor: const Color(0xff87e64c), // Green circle
+              iconColor: Colors.black, // Black icon
+              value: '47',
+              label: 'New User Sign Ups',
+              iconSize: 20,
+            ),
+            _EngagementCard(
+              icon: Icons.check_circle,
+              circleColor: Colors.blue,
+              iconColor: Colors.white,
+              value: '344',
+              label: 'Session done',
+              iconSize: 20,
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _EngagementCard(
+              icon: Icons.school,
+              circleColor: Colors.yellow,
+              iconColor: Colors.black,
+              value: '132',
+              label: 'Active Tutors',
+              iconSize: 20,
+            ),
+            _EngagementCard(
+              icon: Icons.person_outline,
+              circleColor: Colors.purple,
+              iconColor: Colors.white,
+              value: '285',
+              label: 'Active Students',
+              iconSize: 20,
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
 //                                                                         'Profile Requests',
   Widget _buildProfileRequestsCard() {
     return Container(
@@ -319,7 +331,7 @@ class _HomeAdminState extends State<HomeAdmin> {
       height: 300,
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.grey, width: 2.0),
+        border: Border.all(color: const Color(0xffebebeb), width: 1.0), // Changed border color and width
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -438,7 +450,7 @@ class _HomeAdminState extends State<HomeAdmin> {
       height: 300,
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.grey, width: 2.0),
+        border: Border.all(color: const Color(0xffebebeb), width: 1.0), 
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -550,13 +562,13 @@ class _HomeAdminState extends State<HomeAdmin> {
     );
   }
 
-  Widget _buildQualificationChart() {                                       //'Tutors Qualification',
+   Widget _buildQualificationChart() {                                       //'Tutors Qualification',
     return Container( 
       width: 300,
       height: 310,
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.grey, width: 2.0),
+        border: Border.all(color: const Color(0xffebebeb), width: 1.0),
         borderRadius: BorderRadius.circular(10),
       ),
       padding: const EdgeInsets.all(16.0),
@@ -609,19 +621,19 @@ class _HomeAdminState extends State<HomeAdmin> {
                 barGroups: [
                   BarChartGroupData(
                     x: 0,
-                    barRods: [BarChartRodData(toY: 15, color: Colors.black)],
+                    barRods: [BarChartRodData(toY: 15, color: Colors.black,width: 18)],
                   ),
                   BarChartGroupData(
                     x: 1,
-                    barRods: [BarChartRodData(toY: 75, color: const Color(0xff87e64c))],
+                    barRods: [BarChartRodData(toY: 75, color: const Color(0xff87e64c,),width: 18)],
                   ),
                   BarChartGroupData(
                     x: 2,
-                    barRods: [BarChartRodData(toY: 50, color: Colors.black)],
+                    barRods: [BarChartRodData(toY: 50, color: Colors.black,width: 18)],
                   ),
                   BarChartGroupData(
                     x: 3,
-                    barRods: [BarChartRodData(toY: 70, color: const Color(0xff87e64c))],
+                    barRods: [BarChartRodData(toY: 70, color: const Color(0xff87e64c),width: 18)],
                   ),
                 ],
                 gridData: FlGridData(show: true),
@@ -633,14 +645,13 @@ class _HomeAdminState extends State<HomeAdmin> {
       ),
     );
   }
-
   Widget _buildExperienceChart() {
     return Container(                                                //'Tutors Experience', 
       width: 620,
       height: 310,
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.grey, width: 2.0),
+        border: Border.all(color: const Color(0xffebebeb), width: 1.0), 
         borderRadius: BorderRadius.circular(10),
       ),
       padding: const EdgeInsets.all(16.0),
@@ -696,15 +707,78 @@ class _HomeAdminState extends State<HomeAdmin> {
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: [
-                  BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 10, color: Colors.black)]),
-                  BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 75, color: const Color(0xff87e64c))]),
-                  BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 50, color: Colors.black)]),
-                  BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 70, color: const Color(0xff87e64c))]),
-                  BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 45, color: Colors.black)]),
-                  BarChartGroupData(x: 5, barRods: [BarChartRodData(toY: 30, color: const Color(0xff87e64c))]),
-                  BarChartGroupData(x: 6, barRods: [BarChartRodData(toY: 40, color: Colors.black)]),
-                  BarChartGroupData(x: 7, barRods: [BarChartRodData(toY: 25, color: const Color(0xff87e64c))]),
-                  BarChartGroupData(x: 8, barRods: [BarChartRodData(toY: 5, color: Colors.black)]),
+                  BarChartGroupData(
+                    x: 0, 
+                    barRods: [BarChartRodData(
+                      toY: 10, 
+                      color: Colors.black,
+                      width: 18, 
+                    )]
+                  ),
+                  BarChartGroupData(
+                    x: 1, 
+                    barRods: [BarChartRodData(
+                      toY: 75, 
+                      color: const Color(0xff87e64c),
+                      width: 18, 
+                    )]
+                  ),
+                  BarChartGroupData(
+                    x: 2, 
+                    barRods: [BarChartRodData(
+                      toY: 50, 
+                      color: Colors.black,
+                      width: 18, 
+                    )]
+                  ),
+                  BarChartGroupData(
+                    x: 3, 
+                    barRods: [BarChartRodData(
+                      toY: 70, 
+                      color: const Color(0xff87e64c),
+                      width: 18, 
+                    )]
+                  ),
+                  BarChartGroupData(
+                    x: 4, 
+                    barRods: [BarChartRodData(
+                      toY: 45, 
+                      color: Colors.black,
+                      width: 18, 
+                    )]
+                  ),
+                  BarChartGroupData(
+                    x: 5, 
+                    barRods: [BarChartRodData(
+                      toY: 30, 
+                      color: const Color(0xff87e64c),
+                      width: 18, 
+                    )]
+                  ),
+                  BarChartGroupData(
+                    x: 6, 
+                    barRods: [BarChartRodData(
+                      toY: 40, 
+                      color: Colors.black,
+                      width: 18, 
+                    )]
+                  ),
+                  BarChartGroupData(
+                    x: 7, 
+                    barRods: [BarChartRodData(
+                      toY: 25, 
+                      color: const Color(0xff87e64c),
+                      width: 18, 
+                    )]
+                  ),
+                  BarChartGroupData(
+                    x: 8, 
+                    barRods: [BarChartRodData(
+                      toY: 5, 
+                      color: Colors.black,
+                      width: 18, 
+                    )]
+                  ),
                 ],
                 gridData: FlGridData(show: true),
               ),
@@ -718,15 +792,19 @@ class _HomeAdminState extends State<HomeAdmin> {
 
 class _EngagementCard extends StatelessWidget {
   final IconData icon;
-  final Color color;
+  final Color circleColor;
+  final Color iconColor;
   final String value;
   final String label;
+  final double iconSize;
 
   const _EngagementCard({
     required this.icon,
-    required this.color,
+    required this.circleColor,
+    required this.iconColor,
     required this.value,
     required this.label,
+    this.iconSize = 20,
   });
 
   @override
@@ -745,13 +823,24 @@ class _EngagementCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: 15,
-                backgroundColor: color,
-                child: Icon(icon, color: Colors.white, size: 15),
+                radius: 18,
+                backgroundColor: circleColor,
+                child: Icon(
+                  icon,
+                  color: iconColor,
+                  size: iconSize,
+                ),
               ),
               const SizedBox(height: 8),
-              Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              Text(label, 
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                label,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 12),
               ),
@@ -762,7 +851,6 @@ class _EngagementCard extends StatelessWidget {
     );
   }
 }
-
 class _StatusCard extends StatelessWidget {
   final Color color;
   final IconData icon;
@@ -825,10 +913,10 @@ class _SessionCard extends StatelessWidget {
         height: 100,
         margin: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.grey[200] : Colors.white,
+          color: isSelected ? const Color(0xffedfbe4) : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isSelected ? const Color(0xff87e64c) : Colors.grey,
+            color: isSelected ? const Color(0xff87e64c) : const Color(0xffedfbe4),
             width: 2.0,
           ),
         ),
