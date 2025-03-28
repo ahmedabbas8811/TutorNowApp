@@ -13,7 +13,7 @@ class ApproveTutorsScreen extends StatelessWidget {
       backgroundColor: Colors.grey,
       body: Row(
         children: [
-          // Sidebar 
+          // Sidebar
           Container(
             width: 200,
             color: Colors.white,
@@ -80,7 +80,8 @@ class ApproveTutorsScreen extends StatelessWidget {
           // Main Content
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
               color: const Color.fromARGB(255, 243, 242, 242),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,12 +98,13 @@ class ApproveTutorsScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+                      border: Border(
+                          bottom: BorderSide(color: Colors.grey.shade300)),
                     ),
                     child: const Row(
                       children: [
                         Expanded(
-                          flex: 3, 
+                          flex: 3,
                           child: Padding(
                             padding: EdgeInsets.only(left: 16.0),
                             child: Text(
@@ -115,7 +117,7 @@ class ApproveTutorsScreen extends StatelessWidget {
                           ),
                         ),
                         Expanded(
-                          flex: 4, 
+                          flex: 4,
                           child: Text(
                             'Qualification',
                             style: TextStyle(
@@ -125,7 +127,7 @@ class ApproveTutorsScreen extends StatelessWidget {
                           ),
                         ),
                         Expanded(
-                          flex: 2, 
+                          flex: 2,
                           child: Text(
                             'Status',
                             style: TextStyle(
@@ -136,8 +138,8 @@ class ApproveTutorsScreen extends StatelessWidget {
                           ),
                         ),
                         Expanded(
-                          flex: 2, 
-                          child: SizedBox(), 
+                          flex: 2,
+                          child: SizedBox(),
                         ),
                       ],
                     ),
@@ -192,22 +194,24 @@ class ApproveTutorsScreen extends StatelessWidget {
                                   child: Center(
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 8),
+                                          vertical: 8, horizontal: 12),
                                       decoration: BoxDecoration(
                                         color: _getStatusColor(tutor.status),
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(24),
                                       ),
                                       child: Text(
                                         tutor.status.toUpperCase(),
-                                        style: const TextStyle(
-                                          fontSize: 12, 
+                                        style: TextStyle(
+                                          fontSize: 12,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                          color: _getTextColor(tutor
+                                              .status), 
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
+
                                 // View Details Button
                                 Expanded(
                                   flex: 2,
@@ -215,11 +219,13 @@ class ApproveTutorsScreen extends StatelessWidget {
                                     alignment: Alignment.centerRight,
                                     child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xff87e64c),
+                                        backgroundColor:
+                                            const Color(0xff87e64c),
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 16, vertical: 8),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
                                         ),
                                       ),
                                       onPressed: () {
@@ -256,13 +262,22 @@ class ApproveTutorsScreen extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status) {
       case 'approved':
-        return Colors.green;
+        return Color(0xFF87E64B);
       case 'rejected':
-        return Colors.red;
+        return Color(0xFFE64B4B);
       case 'pending':
-        return Colors.orange;
+        return Color(0xFFFC9B00);
+
       default:
         return Colors.grey;
+    }
+  }
+
+  Color _getTextColor(String status) {
+    if (status.toLowerCase() == 'rejected') {
+      return Colors.white; // White text for green background
+    } else {
+      return Colors.black; // Black text for red and orange
     }
   }
 }

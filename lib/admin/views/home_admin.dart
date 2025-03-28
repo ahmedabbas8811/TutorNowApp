@@ -80,7 +80,8 @@ class _HomeAdminState extends State<HomeAdmin> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => ApproveTutorsScreen()),
+                            MaterialPageRoute(
+                                builder: (context) => ApproveTutorsScreen()),
                           );
                         },
                       ),
@@ -98,20 +99,22 @@ class _HomeAdminState extends State<HomeAdmin> {
                         padding: EdgeInsets.only(left: 16.0, top: 5.0),
                         child: Text(
                           'Dashboard',
-                          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                       ),
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 16.0, top: 5.0, right: 16.0),
+                          padding: const EdgeInsets.only(
+                              left: 16.0, top: 5.0, right: 16.0),
                           child: Row(
                             children: [
-                              DashboardCards.buildPlatformEngagementCard(),
+                              DashboardCards.platformEngagementCard(),
                               const SizedBox(width: 20),
-                              DashboardCards.buildProfileRequestsCard(),
+                              DashboardCards.profileRequestsCard(),
                               const SizedBox(width: 20),
-                              DashboardCards.buildBookingRequestsCard(),
+                              DashboardCards.bookingRequestsCard(),
                             ],
                           ),
                         ),
@@ -152,7 +155,9 @@ class _HomeAdminState extends State<HomeAdmin> {
                                 children: [
                                   const Text(
                                     'Upcoming Sessions',
-                                    style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                        fontSize: 21,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 20),
                                   SingleChildScrollView(
@@ -162,26 +167,35 @@ class _HomeAdminState extends State<HomeAdmin> {
                                         SessionCard(
                                           timeFrame: 'In 24 Hours',
                                           count: '3',
-                                          isSelected: selectedTimeFrame == 'In 24 Hours',
-                                          onTap: () => setState(() => selectedTimeFrame = 'In 24 Hours'),
+                                          isSelected: selectedTimeFrame ==
+                                              'In 24 Hours',
+                                          onTap: () => setState(() =>
+                                              selectedTimeFrame =
+                                                  'In 24 Hours'),
                                         ),
                                         SessionCard(
                                           timeFrame: 'In 7 Days',
                                           count: '16',
-                                          isSelected: selectedTimeFrame == 'In 7 Days',
-                                          onTap: () => setState(() => selectedTimeFrame = 'In 7 Days'),
+                                          isSelected:
+                                              selectedTimeFrame == 'In 7 Days',
+                                          onTap: () => setState(() =>
+                                              selectedTimeFrame = 'In 7 Days'),
                                         ),
                                         SessionCard(
                                           timeFrame: 'In 15 Days',
                                           count: '25',
-                                          isSelected: selectedTimeFrame == 'In 15 Days',
-                                          onTap: () => setState(() => selectedTimeFrame = 'In 15 Days'),
+                                          isSelected:
+                                              selectedTimeFrame == 'In 15 Days',
+                                          onTap: () => setState(() =>
+                                              selectedTimeFrame = 'In 15 Days'),
                                         ),
                                         SessionCard(
                                           timeFrame: 'In 30 Days',
                                           count: '45',
-                                          isSelected: selectedTimeFrame == 'In 30 Days',
-                                          onTap: () => setState(() => selectedTimeFrame = 'In 30 Days'),
+                                          isSelected:
+                                              selectedTimeFrame == 'In 30 Days',
+                                          onTap: () => setState(() =>
+                                              selectedTimeFrame = 'In 30 Days'),
                                         ),
                                       ],
                                     ),

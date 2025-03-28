@@ -1,71 +1,119 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:newifchaly/admin/controllers/tutor_controller.dart';
 import '../widgets/engagement_card.dart';
 import '../widgets/status_card.dart';
+import '../controllers/dashboard_controller.dart';
+import '../models/dashboard_model.dart';
 
 class DashboardCards {
-  static Widget buildPlatformEngagementCard() {
-    return Container(
-      width: 300,
-      height: 300,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(height: 10),
-          Text(
-            'Platform Engagement',
-            style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 15),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              EngagementCard(
-                icon: Icons.person,
-                circleColor: Color(0xff87e64c),
-                iconColor: Colors.black,
-                value: '47',
-                label: 'New User Sign Ups',
-              ),
-              EngagementCard(
-                icon: Icons.check_circle,
-                circleColor: Colors.blue,
-                iconColor: Colors.white,
-                value: '344',
-                label: 'Session done',
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              EngagementCard(
-                icon: Icons.school,
-                circleColor: Colors.yellow,
-                iconColor: Colors.black,
-                value: '132',
-                label: 'Active Tutors',
-              ),
-              EngagementCard(
-                icon: Icons.person_outline,
-                circleColor: Colors.purple,
-                iconColor: Colors.white,
-                value: '285',
-                label: 'Active Students',
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+  static Widget platformEngagementCard() {
+    return PlatformEngagementCard();
   }
 
-  static Widget buildProfileRequestsCard() {
-    return Container(
+  static Widget profileRequestsCard() {
+    return ProfileRequestsCard();
+  }
+
+  static Widget bookingRequestsCard() {
+    return const BookingRequestsCard();
+  }
+}
+
+class PlatformEngagementCard extends StatefulWidget {
+  PlatformEngagementCard({super.key});
+
+  @override
+  State<PlatformEngagementCard> createState() => _PlatformEngagementCardState();
+}
+
+class _PlatformEngagementCardState extends State<PlatformEngagementCard> {
+  final DashboardController _controller = DashboardController();
+  late Future<DashboardStats> _statsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _statsFuture = _controller.fetchPlatformEngagement();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<DashboardStats>(
+      future: _statsFuture,
+      builder: (context, snapshot) {
+        final stats = snapshot.data ?? DashboardStats.empty();
+        
+        return Container(
+          width: 300,
+          height: 300,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.grey[300]!),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 10),
+              const Text(
+                'Platform Engagement',
+                style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  EngagementCard(
+                    icon: Icons.person,
+                    circleColor: const Color(0xff87e64c),
+                    iconColor: Colors.black,
+                    value: stats.newUsers.toString(),
+                    label: 'New User Sign Ups',
+                  ),
+                  EngagementCard(
+                    icon: Icons.check_circle,
+                    circleColor: Colors.blue,
+                    iconColor: Colors.white,
+                    value: stats.completedSessions.toString(),
+                    label: 'Session done',
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  EngagementCard(
+                    icon: Icons.school,
+                    circleColor: Colors.yellow,
+                    iconColor: Colors.black,
+                    value: stats.activeTutors.toString(),
+                    label: 'Active Tutors',
+                  ),
+                  EngagementCard(
+                    icon: Icons.person_outline,
+                    circleColor: Colors.purple,
+                    iconColor: Colors.white,
+                    value: stats.activeStudents.toString(),
+                    label: 'Active Students',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class ProfileRequestsCard extends StatelessWidget {
+  final TutorController controller = Get.find<TutorController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => Container(
       width: 300,
       height: 300,
       decoration: BoxDecoration(
@@ -82,18 +130,18 @@ class DashboardCards {
             style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.all(18.0),
+                padding: const EdgeInsets.all(18.0),
                 child: Text(
-                  '75%',
-                  style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+                  '${controller.reviewedPercentage.toStringAsFixed(0)}%',
+                  style: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
                 ),
               ),
-              SizedBox(width: 1),
-              Column(
+              const SizedBox(width: 1),
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Profiles', style: TextStyle(fontSize: 10)),
@@ -119,7 +167,9 @@ class DashboardCards {
                             borderRadius: BorderRadius.circular(10)),
                         ),
                         const SizedBox(height: 5),
-                        const Text('32%', style: TextStyle(fontSize: 12)),
+                        Text(
+                          '${controller.pendingPercentage.toStringAsFixed(0)}%',
+                          style: const TextStyle(fontSize: 12)),
                       ],
                     ),
                     Column(
@@ -132,7 +182,9 @@ class DashboardCards {
                             borderRadius: BorderRadius.circular(10)),
                         ),
                         const SizedBox(height: 5),
-                        const Text('41%', style: TextStyle(fontSize: 12)),
+                        Text(
+                          '${controller.approvedPercentage.toStringAsFixed(0)}%',
+                          style: const TextStyle(fontSize: 12)),
                       ],
                     ),
                     Column(
@@ -145,7 +197,9 @@ class DashboardCards {
                             borderRadius: BorderRadius.circular(10)),
                         ),
                         const SizedBox(height: 5),
-                        const Text('24%', style: TextStyle(fontSize: 12)),
+                        Text(
+                          '${controller.rejectedPercentage.toStringAsFixed(0)}%',
+                          style: const TextStyle(fontSize: 12)),
                       ],
                     ),
                   ],
@@ -154,35 +208,40 @@ class DashboardCards {
             ),
           ),
           const SizedBox(height: 15),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               StatusCard(
                 color: Colors.orange,
                 icon: Icons.access_time,
-                value: '12',
+                value: controller.pendingCount.value.toString(),
                 label: 'Pending',
               ),
               StatusCard(
-                color: Color(0xff87e64c),
+                color: const Color(0xff87e64c),
                 icon: Icons.check_circle,
-                value: '16',
+                value: controller.approvedCount.value.toString(),
                 label: 'Approved',
               ),
               StatusCard(
                 color: Colors.red,
                 icon: Icons.cancel,
-                value: '8',
+                value: controller.rejectedCount.value.toString(),
                 label: 'Rejected',
               ),
             ],
           ),
         ],
       ),
-    );
+    ));
   }
+}
 
-  static Widget buildBookingRequestsCard() {
+class BookingRequestsCard extends StatelessWidget {
+  const BookingRequestsCard();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: 300,
       height: 300,
