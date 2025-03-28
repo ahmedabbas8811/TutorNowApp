@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'engagement_card.dart';
-import 'status_card.dart';
+import '../widgets/engagement_card.dart';
+import '../widgets/status_card.dart';
 
 class DashboardCards {
   static Widget buildPlatformEngagementCard() {

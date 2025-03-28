@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
-import 'package:newifchaly/admin/widgets/dashboard_cards.dart';
+import 'package:newifchaly/admin/views/dashboard_cards.dart';
 import 'package:newifchaly/admin/widgets/qualification_chart.dart';
 import 'package:newifchaly/admin/widgets/experience_chart.dart';
 import 'package:newifchaly/admin/widgets/session_card.dart';
