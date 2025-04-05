@@ -7,7 +7,7 @@ class ExperienceChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 620,
+      width: 820,
       height: 310,
       decoration: BoxDecoration(
         color: Colors.white,

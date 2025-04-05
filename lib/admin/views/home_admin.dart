@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/admin/views/dashboard_cards.dart';
-import 'package:newifchaly/admin/widgets/qualification_chart.dart';
+import 'package:newifchaly/admin/views/qualification_chart.dart';
 import 'package:newifchaly/admin/widgets/experience_chart.dart';
 import 'package:newifchaly/admin/widgets/session_card.dart';
 import 'package:newifchaly/admin/widgets/session_row.dart';
@@ -201,6 +201,36 @@ class _HomeAdminState extends State<HomeAdmin> {
                                     ),
                                   ),
                                   const SizedBox(height: 20),
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xff87e64c),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          flex: 2,
+                                          child: Text('Tutor Name', 
+                                              style: TextStyle(fontWeight: FontWeight.bold)),
+                                        ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: Text('Student Name', 
+                                              style: TextStyle(fontWeight: FontWeight.bold)),
+                                        ),
+                                        Expanded(
+                                          child: Text('Date', 
+                                              style: TextStyle(fontWeight: FontWeight.bold)),
+                                        ),
+                                        Expanded(
+                                          child: Text('Time', 
+                                              style: TextStyle(fontWeight: FontWeight.bold)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   const SessionRow(
                                     tutorName: 'Muhammad Ali',
                                     studentName: 'Bilal Jan',

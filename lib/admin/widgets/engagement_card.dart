@@ -20,29 +20,31 @@ class EngagementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Fixed height to match other cards (same as StatusCard)
+    const fixedHeight = 103.0; // Adjusted to match your layout
+    
     return SizedBox(
       width: 140,
-      height: 120,
+      height: fixedHeight,
       child: Card(
         elevation: 2,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10), // Matches your dashboard style
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               CircleAvatar(
-                radius: 18,
+                radius: 16, // Slightly smaller to prevent overflow
                 backgroundColor: circleColor,
                 child: Icon(
                   icon,
                   color: iconColor,
-                  size: iconSize,
+                  size: iconSize.clamp(16, 20), // Ensures icon stays within bounds
                 ),
               ),
-              const SizedBox(height: 8),
               Text(
                 value,
                 style: const TextStyle(
@@ -53,7 +55,11 @@ class EngagementCard extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 12),
+                style: const TextStyle(
+                  fontSize: 12,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
