@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:newifchaly/admin/controllers/tutor_controller.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
+import 'package:newifchaly/admin/views/home_admin.dart';
 import 'package:newifchaly/login_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/storage_service.dart';
@@ -61,7 +63,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
         // Redirect based on user type
         if (userType == 'Admin') {
-          Get.offAll(() => ApproveTutorsScreen());
+          Get.lazyPut(() => TutorController()); // Initialize the controller
+          Get.offAll(() => const HomeAdmin());
         } else if (userType == 'Student') {
           Get.offAll(() => StudentHomeScreen());
         } else if (userType == 'Tutor') {

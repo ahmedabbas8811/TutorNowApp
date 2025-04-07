@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/admin/views/dashboard_cards.dart';
 import 'package:newifchaly/admin/views/qualification_chart.dart';
-import 'package:newifchaly/admin/widgets/experience_chart.dart';
+import 'package:newifchaly/admin/views/experience_chart.dart';
 import 'package:newifchaly/admin/widgets/session_card.dart';
 import 'package:newifchaly/admin/widgets/session_row.dart';
 
@@ -69,7 +69,7 @@ class _HomeAdminState extends State<HomeAdmin> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: ListTile(
-                        leading: const Icon(Icons.home, color: Colors.black),
+                        leading: const Icon(Icons.check_circle, color: Colors.black),
                         title: const Text(
                           'Approve Tutors',
                           style: TextStyle(

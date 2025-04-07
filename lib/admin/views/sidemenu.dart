@@ -24,7 +24,7 @@ class SideMenu extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xfffafafa),
               borderRadius: BorderRadius.circular(30),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 0,
@@ -49,9 +49,9 @@ class SideMenu extends StatelessWidget {
               color: const Color(0xff87e64c), // Green BG
               borderRadius: BorderRadius.circular(30),
             ),
-            child: ListTile(
-              leading: const Icon(Icons.check_circle, color: Colors.black),
-              title: const Text(
+            child: const ListTile(
+              leading: Icon(Icons.check_circle, color: Colors.black),
+              title: Text(
                 'Approve Tutors',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,

@@ -64,7 +64,7 @@ class ApproveTutorsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: const ListTile(
-                    leading: Icon(Icons.home, color: Colors.black),
+                    leading: Icon(Icons.check_circle, color: Colors.black),
                     title: Text(
                       'Approve Tutors',
                       style: TextStyle(
