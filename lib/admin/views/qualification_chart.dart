@@ -9,14 +9,37 @@ class QualificationChart extends StatefulWidget {
   State<QualificationChart> createState() => _QualificationChartState();
 }
 
-class _QualificationChartState extends State<QualificationChart> {
+class _QualificationChartState extends State<QualificationChart> with SingleTickerProviderStateMixin {
   final DashboardController _controller = DashboardController();
   late Future<List<int>> _qualificationData;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
     _qualificationData = _loadQualificationData();
+    
+    // Initialize animation controller
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500), // Animation duration
+    );
+    
+    _animation = CurvedAnimation(
+  parent: _animationController,
+  curve: Curves.fastOutSlowIn,
+  reverseCurve: Curves.easeOutQuad,
+);
+    
+    // Start the animation
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<List<int>> _loadQualificationData() async {
@@ -51,98 +74,113 @@ class _QualificationChartState extends State<QualificationChart> {
               ),
               const SizedBox(height: 10),
               Expanded(
-                child: BarChart(
-                  BarChartData(
-                    minY: 0,
-                    maxY: maxY + interval, 
-                    barTouchData: BarTouchData(
-                      enabled: true,
-                      touchTooltipData: BarTouchTooltipData(
-                        tooltipBgColor: Colors.transparent,
-                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                          return BarTooltipItem(
-                            data[groupIndex].toString(),
-                            TextStyle(
-                              color: rod.color, 
-                              fontSize: 14, 
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        },
-                      ),
-                      touchCallback: (FlTouchEvent event, barTouchResponse) {},
-                    ),
-                    titlesData: FlTitlesData(
-                      show: true,
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          interval: interval, 
-                          reservedSize: 45, 
-                          getTitlesWidget: (value, meta) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Text(
-                                value.toInt().toString(),
-                                style: const TextStyle(fontSize: 12, color: Colors.black),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            const style = TextStyle(fontSize: 12);
-                            String text;
-                            switch (value.toInt()) {
-                              case 0: text = 'Under Matric'; break;
-                              case 1: text = 'Matric'; break;
-                              case 2: text = 'FSc'; break;
-                              case 3: text = 'Bachelors'; break;
-                              case 4: text = 'Masters'; break;
-                              case 5: text = 'PhD'; break;
-                              default: text = '';
-                            }
-                            return SideTitleWidget(
-                              axisSide: meta.axisSide,
-                              child: Text(text, style: style),
-                            );
-                          },
-                        ),
-                      ),
-                      rightTitles: const AxisTitles(),
-                      topTitles: const AxisTitles(),
-                    ),
-                    borderData: FlBorderData(show: false),
-                    barGroups: List.generate(data.length, (index) {
-                      final barColor = index % 2 == 0 ? Colors.black : const Color(0xff87e64c);
-                      return BarChartGroupData(
-                        x: index,
-                        barRods: [
-                          BarChartRodData(
-                            toY: data[index].toDouble(),
-                            color: barColor,
-                            width: 18,
-                            borderRadius: BorderRadius.circular(4),
+                child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return BarChart(
+                      BarChartData(
+                        minY: 0,
+                        maxY: maxY + interval,
+                        barTouchData: BarTouchData(
+                          enabled: true,
+                          touchTooltipData: BarTouchTooltipData(
+                            tooltipBgColor: Colors.transparent,
+                            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                              return BarTooltipItem(
+                                data[groupIndex].toString(),
+                                const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            },
                           ),
-                        ],
-                        showingTooltipIndicators: [0],
-                      );
-                    }),
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      getDrawingHorizontalLine: (value) {
-                        return FlLine(
-                          color: Colors.grey.withOpacity(0.5),
-                          strokeWidth: 1.2,
-                        );
-                      },
-                    ),
-                    alignment: BarChartAlignment.spaceAround,
-                  ),
+                        ),
+                        titlesData: FlTitlesData(
+                          show: true,
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              interval: interval,
+                              reservedSize: 45,
+                              getTitlesWidget: (value, meta) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: Text(
+                                    value.toInt().toString(),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (value, meta) {
+                                const style = TextStyle(fontSize: 12);
+                                String text;
+                                switch (value.toInt()) {
+                                  case 0: text = 'Under Matric'; break;
+                                  case 1: text = 'Matric'; break;
+                                  case 2: text = 'FSc'; break;
+                                  case 3: text = 'Bachelors'; break;
+                                  case 4: text = 'Masters'; break;
+                                  case 5: text = 'PhD'; break;
+                                  default: text = '';
+                                }
+                                return SideTitleWidget(
+                                  axisSide: meta.axisSide,
+                                  child: Text(text, style: style),
+                                );
+                              },
+                            ),
+                          ),
+                          rightTitles: const AxisTitles(),
+                          topTitles: const AxisTitles(),
+                        ),
+                        borderData: FlBorderData(show: false),
+                        barGroups: List.generate(data.length, (index) {
+                          final isZero = data[index] == 0;
+                          final barColor = index % 2 == 0
+                              ? Colors.black
+                              : const Color(0xff87e64c);
+                          final actualHeight = isZero
+                              ? 0.1
+                              : data[index].toDouble();
+                          final animatedHeight = actualHeight * _animation.value;
+
+                          return BarChartGroupData(
+                            x: index,
+                            barRods: [
+                              BarChartRodData(
+                                toY: animatedHeight,
+                                color: barColor,
+                                width: 18,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ],
+                            showingTooltipIndicators: [0],
+                          );
+                        }),
+                        gridData: FlGridData(
+                          show: true,
+                          drawVerticalLine: false,
+                          getDrawingHorizontalLine: (value) {
+                            return FlLine(
+                              color: Colors.grey.withOpacity(0.5),
+                              strokeWidth: 1.2,
+                            );
+                          },
+                        ),
+                        alignment: BarChartAlignment.spaceAround,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

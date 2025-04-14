@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:newifchaly/admin/controllers/dashboard_controller.dart';
+import 'package:newifchaly/admin/models/dashboard_model.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/admin/views/dashboard_cards.dart';
 import 'package:newifchaly/admin/views/qualification_chart.dart';
@@ -14,7 +17,56 @@ class HomeAdmin extends StatefulWidget {
 }
 
 class _HomeAdminState extends State<HomeAdmin> {
-  String selectedTimeFrame = 'In 24 Hours';
+  String selectedTimeFrame = 'Past 24 Hours';
+  final DashboardController _controller = DashboardController();
+  List<Booking> _bookings = [];
+  Map<String, int> _bookingCounts = {
+    'Past 24 Hours': 0,
+    'Past 7 Days': 0,
+    'Past 15 Days': 0,
+    'Past 30 Days': 0,
+  };
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    setState(() => _isLoading = true);
+    try {
+      await Future.wait([
+        _loadBookingCounts(),
+        _loadRecentBookings(),
+      ]);
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loadBookingCounts() async {
+    final counts = {
+      'Past 24 Hours': await _controller.getBookingCount('Past 24 Hours'),
+      'Past 7 Days': await _controller.getBookingCount('Past 7 Days'),
+      'Past 15 Days': await _controller.getBookingCount('Past 15 Days'),
+      'Past 30 Days': await _controller.getBookingCount('Past 30 Days'),
+    };
+    setState(() => _bookingCounts = counts);
+  }
+
+  Future<void> _loadRecentBookings() async {
+    final bookings = await _controller.fetchRecentBookings(selectedTimeFrame);
+    setState(() => _bookings = bookings);
+  }
+
+  void _handleTimeFrameChange(String newTimeFrame) {
+    setState(() {
+      selectedTimeFrame = newTimeFrame;
+      _loadRecentBookings();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +76,7 @@ class _HomeAdminState extends State<HomeAdmin> {
         builder: (context, constraints) {
           return Row(
             children: [
-              // Sidebar
+              // Sidebar (unchanged)
               Container(
                 width: 200,
                 color: Colors.white,
@@ -91,163 +143,153 @@ class _HomeAdminState extends State<HomeAdmin> {
               ),
               // Main content
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 16.0, top: 5.0),
-                        child: Text(
-                          'Dashboard',
-                          style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16.0, top: 5.0, right: 16.0),
-                          child: Row(
-                            children: [
-                              DashboardCards.platformEngagementCard(),
-                              const SizedBox(width: 20),
-                              DashboardCards.profileRequestsCard(),
-                              const SizedBox(width: 20),
-                              DashboardCards.bookingRequestsCard(),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  const QualificationChart(),
-                                  const SizedBox(width: 20),
-                                  const ExperienceChart(),
-                                ],
+                            const Padding(
+                              padding: EdgeInsets.only(left: 16.0, top: 5.0),
+                              child: Text(
+                                'Dashboard',
+                                style: TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.bold),
                               ),
                             ),
-                            const SizedBox(height: 20),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.3),
-                                    spreadRadius: 2,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0, top: 5.0, right: 16.0),
+                                child: Row(
+                                  children: [
+                                    DashboardCards.platformEngagementCard(),
+                                    const SizedBox(width: 20),
+                                    DashboardCards.profileRequestsCard(),
+                                    const SizedBox(width: 20),
+                                    DashboardCards.bookingRequestsCard(),
+                                  ],
+                                ),
                               ),
+                            ),
+                            Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Upcoming Sessions',
-                                    style: TextStyle(
-                                        fontSize: 21,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 20),
                                   SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
                                       children: [
-                                        SessionCard(
-                                          timeFrame: 'In 24 Hours',
-                                          count: '3',
-                                          isSelected: selectedTimeFrame ==
-                                              'In 24 Hours',
-                                          onTap: () => setState(() =>
-                                              selectedTimeFrame =
-                                                  'In 24 Hours'),
-                                        ),
-                                        SessionCard(
-                                          timeFrame: 'In 7 Days',
-                                          count: '16',
-                                          isSelected:
-                                              selectedTimeFrame == 'In 7 Days',
-                                          onTap: () => setState(() =>
-                                              selectedTimeFrame = 'In 7 Days'),
-                                        ),
-                                        SessionCard(
-                                          timeFrame: 'In 15 Days',
-                                          count: '25',
-                                          isSelected:
-                                              selectedTimeFrame == 'In 15 Days',
-                                          onTap: () => setState(() =>
-                                              selectedTimeFrame = 'In 15 Days'),
-                                        ),
-                                        SessionCard(
-                                          timeFrame: 'In 30 Days',
-                                          count: '45',
-                                          isSelected:
-                                              selectedTimeFrame == 'In 30 Days',
-                                          onTap: () => setState(() =>
-                                              selectedTimeFrame = 'In 30 Days'),
-                                        ),
+                                        const QualificationChart(),
+                                        const SizedBox(width: 20),
+                                        const ExperienceChart(),
                                       ],
                                     ),
                                   ),
                                   const SizedBox(height: 20),
                                   Container(
-                                    padding: const EdgeInsets.all(10),
+                                    width: double.infinity,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xff87e64c),
+                                      color: Colors.white,
                                       borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text('Tutor Name', 
-                                              style: TextStyle(fontWeight: FontWeight.bold)),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text('Student Name', 
-                                              style: TextStyle(fontWeight: FontWeight.bold)),
-                                        ),
-                                        Expanded(
-                                          child: Text('Date', 
-                                              style: TextStyle(fontWeight: FontWeight.bold)),
-                                        ),
-                                        Expanded(
-                                          child: Text('Time', 
-                                              style: TextStyle(fontWeight: FontWeight.bold)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.3),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  const SessionRow(
-                                    tutorName: 'Muhammad Ali',
-                                    studentName: 'Bilal Jan',
-                                    date: '24-05-2025',
-                                    time: '1:00 PM',
-                                  ),
-                                  const SessionRow(
-                                    tutorName: 'Kashif Sarwar',
-                                    studentName: 'Hanzala Khan',
-                                    date: '24-5-2025',
-                                    time: '3:00 PM',
-                                  ),
-                                  const SessionRow(
-                                    tutorName: 'Sami Ullah',
-                                    studentName: 'Akif Imtiaz',
-                                    date: '25-5-2025',
-                                    time: '9:00 PM',
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Recent Bookings',
+                                          style: TextStyle(
+                                              fontSize: 21,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            children: [
+                                              SessionCard(
+                                                timeFrame: 'Past 24 Hours',
+                                                count: _bookingCounts['Past 24 Hours']?.toString() ?? '0',
+                                                isSelected: selectedTimeFrame == 'Past 24 Hours',
+                                                onTap: () => _handleTimeFrameChange('Past 24 Hours'),
+                                              ),
+                                              SessionCard(
+                                                timeFrame: 'Past 7 Days',
+                                                count: _bookingCounts['Past 7 Days']?.toString() ?? '0',
+                                                isSelected: selectedTimeFrame == 'Past 7 Days',
+                                                onTap: () => _handleTimeFrameChange('Past 7 Days'),
+                                              ),
+                                              SessionCard(
+                                                timeFrame: 'Past 15 Days',
+                                                count: _bookingCounts['Past 15 Days']?.toString() ?? '0',
+                                                isSelected: selectedTimeFrame == 'Past 15 Days',
+                                                onTap: () => _handleTimeFrameChange('Past 15 Days'),
+                                              ),
+                                              SessionCard(
+                                                timeFrame: 'Past 30 Days',
+                                                count: _bookingCounts['Past 30 Days']?.toString() ?? '0',
+                                                isSelected: selectedTimeFrame == 'Past 30 Days',
+                                                onTap: () => _handleTimeFrameChange('Past 30 Days'),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xff87e64c),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: const Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                flex: 2,
+                                                child: Text('Tutor Name', 
+                                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                                              ),
+                                              Expanded(
+                                                flex: 2,
+                                                child: Text('Student Name', 
+                                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                                              ),
+                                              Expanded(
+                                                child: Text('Date', 
+                                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                                              ),
+                                              Expanded(
+                                                child: Text('Time', 
+                                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        if (_bookings.isEmpty)
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(vertical: 20),
+                                            child: Center(child: Text('No bookings found')),
+                                          )
+                                        else
+                                          ..._bookings.map((booking) => SessionRow(
+                                            tutorName: booking.tutorName,
+                                            studentName: booking.studentName,
+                                            date: booking.formattedDate,
+                                            time: DateFormat.jm().format(booking.createdAt),
+                                          )).toList(),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -255,9 +297,6 @@ class _HomeAdminState extends State<HomeAdmin> {
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
               ),
             ],
           );

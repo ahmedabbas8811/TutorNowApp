@@ -9,14 +9,37 @@ class ExperienceChart extends StatefulWidget {
   State<ExperienceChart> createState() => _ExperienceChartState();
 }
 
-class _ExperienceChartState extends State<ExperienceChart> {
+class _ExperienceChartState extends State<ExperienceChart> with SingleTickerProviderStateMixin {
   final DashboardController _controller = DashboardController();
   late Future<List<int>> _experienceData;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
     _experienceData = _loadExperienceData();
+    
+    // Initialize animation controller
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500), // Animation duration
+    );
+    
+    _animation = CurvedAnimation(
+  parent: _animationController,
+  curve: Curves.fastOutSlowIn,
+  reverseCurve: Curves.easeOutQuad,
+);
+    
+    // Start the animation
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<List<int>> _loadExperienceData() async {
@@ -51,109 +74,115 @@ class _ExperienceChartState extends State<ExperienceChart> {
               ),
               const SizedBox(height: 10),
               Expanded(
-                child: BarChart(
-                  BarChartData(
-                    minY: 0,
-                    maxY: maxY + interval,
-                    barTouchData: BarTouchData(
-                      enabled: true,
-                      touchTooltipData: BarTouchTooltipData(
-                        tooltipBgColor: Colors.transparent,
-                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                          return BarTooltipItem(
-                            data[groupIndex].toString(),
-                            const TextStyle(
-                              color: Colors.black, // Always black for clear visibility
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    titlesData: FlTitlesData(
-                      show: true,
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          interval: interval,
-                          reservedSize: 45,
-                          getTitlesWidget: (value, meta) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Text(
-                                value.toInt().toString(),
-                                style: const TextStyle(
-                                  fontSize: 12,
+                child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return BarChart(
+                      BarChartData(
+                        minY: 0,
+                        maxY: maxY + interval,
+                        barTouchData: BarTouchData(
+                          enabled: true,
+                          touchTooltipData: BarTouchTooltipData(
+                            tooltipBgColor: Colors.transparent,
+                            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                              return BarTooltipItem(
+                                data[groupIndex].toString(),
+                                const TextStyle(
                                   color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            const style = TextStyle(fontSize: 12);
-                            String text;
-                            switch (value.toInt()) {
-                              case 0: text = '0-2 Y'; break;
-                              case 1: text = '3-4 Y'; break;
-                              case 2: text = '5-6 Y'; break;
-                              case 3: text = '7-8 Y'; break;
-                              case 4: text = '9-10 Y'; break;
-                              case 5: text = '<15 Y'; break;
-                              case 6: text = '<20 Y'; break;
-                              case 7: text = '>25 Y'; break;
-                              default: text = '';
-                            }
-                            return SideTitleWidget(
-                              axisSide: meta.axisSide,
-                              child: Text(text, style: style),
-                            );
-                          },
-                        ),
-                      ),
-                      rightTitles: const AxisTitles(),
-                      topTitles: const AxisTitles(),
-                    ),
-                    borderData: FlBorderData(show: false),
-                    barGroups: List.generate(data.length, (index) {
-                      final isZero = data[index] == 0;
-                      final barColor = index % 2 == 0 
-                          ? Colors.black 
-                          : const Color(0xff87e64c);
-                      final barHeight = isZero 
-                          ? 0.1 // Small but visible height
-                          : data[index].toDouble();
-
-                      return BarChartGroupData(
-                        x: index,
-                        barRods: [
-                          BarChartRodData(
-                            toY: barHeight,
-                            color: barColor,
-                            width: 18,
-                            borderRadius: BorderRadius.circular(4),
+                              );
+                            },
                           ),
-                        ],
-                        showingTooltipIndicators: [0],
-                      );
-                    }),
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      getDrawingHorizontalLine: (value) {
-                        return FlLine(
-                          color: Colors.grey.withOpacity(0.5),
-                          strokeWidth: 1.2,
-                        );
-                      },
-                    ),
-                    alignment: BarChartAlignment.spaceAround,
-                  ),
+                        ),
+                        titlesData: FlTitlesData(
+                          show: true,
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              interval: interval,
+                              reservedSize: 45,
+                              getTitlesWidget: (value, meta) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: Text(
+                                    value.toInt().toString(),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (value, meta) {
+                                const style = TextStyle(fontSize: 12);
+                                String text;
+                                switch (value.toInt()) {
+                                  case 0: text = '0-2 Y'; break;
+                                  case 1: text = '3-4 Y'; break;
+                                  case 2: text = '5-6 Y'; break;
+                                  case 3: text = '7-8 Y'; break;
+                                  case 4: text = '9-10 Y'; break;
+                                  case 5: text = '<15 Y'; break;
+                                  case 6: text = '<20 Y'; break;
+                                  case 7: text = '>25 Y'; break;
+                                  default: text = '';
+                                }
+                                return SideTitleWidget(
+                                  axisSide: meta.axisSide,
+                                  child: Text(text, style: style),
+                                );
+                              },
+                            ),
+                          ),
+                          rightTitles: const AxisTitles(),
+                          topTitles: const AxisTitles(),
+                        ),
+                        borderData: FlBorderData(show: false),
+                        barGroups: List.generate(data.length, (index) {
+                          final isZero = data[index] == 0;
+                          final barColor = index % 2 == 0
+                              ? Colors.black
+                              : const Color(0xff87e64c);
+                          final actualHeight = isZero
+                              ? 0.1
+                              : data[index].toDouble();
+                          final animatedHeight = actualHeight * _animation.value;
+
+                          return BarChartGroupData(
+                            x: index,
+                            barRods: [
+                              BarChartRodData(
+                                toY: animatedHeight,
+                                color: barColor,
+                                width: 18,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ],
+                            showingTooltipIndicators: [0],
+                          );
+                        }),
+                        gridData: FlGridData(
+                          show: true,
+                          drawVerticalLine: false,
+                          getDrawingHorizontalLine: (value) {
+                            return FlLine(
+                              color: Colors.grey.withOpacity(0.5),
+                              strokeWidth: 1.2,
+                            );
+                          },
+                        ),
+                        alignment: BarChartAlignment.spaceAround,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

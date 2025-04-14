@@ -176,4 +176,86 @@ Future<TutorExperience> fetchTutorExperience() async {
     return TutorExperience.empty();
   }
 }
+
+  Future<int> getBookingCount(String timeFrame) async {
+    try {
+      final now = DateTime.now().toUtc();
+      final filterDate = _getFilterDate(now, timeFrame);
+      
+      final response = await supabase
+          .from('bookings')
+          .select('id')
+          .gte('created_at', filterDate.toIso8601String());
+      
+      return response.length;
+    } catch (e) {
+      print('Error getting booking count: $e');
+      return 0;
+    }
+  }
+
+  Future<List<Booking>> fetchRecentBookings(String timeFrame) async {
+    try {
+      final now = DateTime.now().toUtc();
+      final filterDate = _getFilterDate(now, timeFrame);
+      
+      // 1. First fetch the bookings with tutor and student IDs
+      final bookingsResponse = await supabase
+          .from('bookings')
+          .select('created_at, tutor_id, user_id')
+          .gte('created_at', filterDate.toIso8601String())
+          .order('created_at', ascending: false);
+
+      if (bookingsResponse.isEmpty) return [];
+
+      // 2. Get all unique user IDs (both tutors and students)
+      final allUserIds = [
+        ...bookingsResponse.map((b) => b['tutor_id'] as String),
+        ...bookingsResponse.map((b) => b['user_id'] as String)
+      ].toSet().toList();
+
+      // 3. Fetch user names using proper IN clause
+      final usersResponse = await supabase
+          .from('users')
+          .select('id, metadata')
+          .inFilter('id', allUserIds);
+
+      // 4. Create name lookup map
+      final userNames = <String, String>{};
+      for (final user in usersResponse) {
+        final name = (user['metadata'] as Map<String, dynamic>?)?['name'];
+        if (name != null) {
+          userNames[user['id'] as String] = name;
+        }
+      }
+
+      // 5. Combine the data
+      return bookingsResponse.map<Booking>((booking) {
+        return Booking(
+          tutorName: userNames[booking['tutor_id'] as String] ?? 'Unknown Tutor',
+          studentName: userNames[booking['user_id'] as String] ?? 'Unknown Student',
+          createdAt: DateTime.parse(booking['created_at'] as String).toLocal(),
+        );
+      }).toList();
+    } catch (e) {
+      print('Error fetching bookings: $e');
+      return [];
+    }
+  }
+
+  DateTime _getFilterDate(DateTime now, String timeFrame) {
+    switch (timeFrame) {
+      case 'Past 24 Hours':
+        return now.subtract(const Duration(days: 1));
+      case 'Past 7 Days':
+        return now.subtract(const Duration(days: 7));
+      case 'Past 15 Days':
+        return now.subtract(const Duration(days: 15));
+      case 'Past 30 Days':
+        return now.subtract(const Duration(days: 30));
+      default:
+        return now.subtract(const Duration(days: 1));
+    }
+  }
 }
+

@@ -101,3 +101,22 @@ class TutorExperience {
     ];
   }
 }
+class Booking {
+  final String tutorName;
+  final String studentName;
+  final DateTime createdAt;
+
+  Booking({
+    required this.tutorName,
+    required this.studentName,
+    required this.createdAt,
+  });
+
+  String get formattedDate {
+    return "${createdAt.day.toString().padLeft(2, '0')}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.year}";
+  }
+
+  String get formattedTime {
+    return "${createdAt.hour.toString().padLeft(2, '0')}:${createdAt.minute.toString().padLeft(2, '0')}";
+  }
+}
