@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:newifchaly/admin/controllers/tutor_controller.dart';
-import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/admin/views/home_admin.dart';
 import 'package:newifchaly/login_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
