@@ -257,5 +257,40 @@ Future<TutorExperience> fetchTutorExperience() async {
         return now.subtract(const Duration(days: 1));
     }
   }
+
+  Future<BookingStats> fetchBookingStats() async {
+  try {
+    final response = await supabase
+        .from('bookings')
+        .select('status');
+
+    if (response == null || response.isEmpty) {
+      return BookingStats.empty();
+    }
+
+    // Total requests is simply the count of all booking records
+    int totalRequests = response.length;
+    
+    // Count each status type
+    int pending = response.where((b) => b['status'] == 'pending').length;
+    int inProgress = response.where((b) => b['status'] == 'active').length;
+    int completed = response.where((b) => b['status'] == 'completed').length;
+    int rejected = response.where((b) => b['status'] == 'rejected').length;
+
+    // Verify that sum of all statuses equals total (for debugging)
+    assert((pending + inProgress + completed + rejected) == totalRequests,
+      'Status counts don\'t match total bookings');
+
+    return BookingStats(
+      totalRequests: totalRequests,
+      inProgress: inProgress,
+      completed: completed,
+      rejected: rejected,
+    );
+  } catch (e) {
+    print('Error fetching booking stats: $e');
+    return BookingStats.empty();
+  }
+}
 }
 

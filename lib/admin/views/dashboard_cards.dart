@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:newifchaly/admin/controllers/tutor_controller.dart';
+import 'package:newifchaly/admin/widgets/animated_percentage_bar.dart';
 import '../widgets/engagement_card.dart';
 import '../widgets/status_card.dart';
 import '../controllers/dashboard_controller.dart';
@@ -185,13 +186,9 @@ class ProfileRequestsCard extends StatelessWidget {
                     Flexible(
                       child: Column(
                         children: [
-                          Container(
-                            height: 12,
-                            width: double.infinity,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(10)),
+                          AnimatedPercentageBar(
+                            percentage: controller.pendingPercentage / 100,
+                            color: Colors.orange,
                           ),
                           const SizedBox(height: 5),
                           Text(
@@ -203,13 +200,9 @@ class ProfileRequestsCard extends StatelessWidget {
                     Flexible(
                       child: Column(
                         children: [
-                          Container(
-                            height: 12,
-                            width: double.infinity,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xff87e64c),
-                              borderRadius: BorderRadius.circular(10)),
+                          AnimatedPercentageBar(
+                            percentage: controller.approvedPercentage / 100,
+                            color: const Color(0xff87e64c),
                           ),
                           const SizedBox(height: 5),
                           Text(
@@ -221,13 +214,9 @@ class ProfileRequestsCard extends StatelessWidget {
                     Flexible(
                       child: Column(
                         children: [
-                          Container(
-                            height: 12,
-                            width: double.infinity,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(10)),
+                          AnimatedPercentageBar(
+                            percentage: controller.rejectedPercentage / 100,
+                            color: Colors.red,
                           ),
                           const SizedBox(height: 5),
                           Text(
@@ -281,148 +270,163 @@ class ProfileRequestsCard extends StatelessWidget {
   }
 }
 
-class BookingRequestsCard extends StatelessWidget {
-  const BookingRequestsCard();
+class BookingRequestsCard extends StatefulWidget {
+  const BookingRequestsCard({super.key});
+
+  @override
+  State<BookingRequestsCard> createState() => _BookingRequestsCardState();
+}
+
+class _BookingRequestsCardState extends State<BookingRequestsCard> {
+  final DashboardController _controller = DashboardController();
+  late Future<BookingStats> _statsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _statsFuture = _controller.fetchBookingStats();
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 600;
 
-    return Container(
-      width: double.infinity,
-      constraints: BoxConstraints(maxWidth: isSmallScreen ? double.infinity : 400),
-      margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xffebebeb)),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text(
-            'Booking Requests',
-            style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+    return FutureBuilder<BookingStats>(
+      future: _statsFuture,
+      builder: (context, snapshot) {
+        final stats = snapshot.data ?? BookingStats.empty();
+        
+        return Container(
+          width: double.infinity,
+          constraints: BoxConstraints(maxWidth: isSmallScreen ? double.infinity : 400),
+          margin: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: const Color(0xffebebeb)),
+            borderRadius: BorderRadius.circular(10),
           ),
-          const SizedBox(height: 15),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: const Text(
-                  '192',
-                  style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
-                ),
+              const Text(
+                'Booking Requests',
+                style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(width: 4),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text('Total Booking', style: TextStyle(fontSize: 10)),
-                  Text('Requests', style: TextStyle(fontSize: 10))
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      stats.totalRequests.toString(),
+                      style: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Total Booking', style: TextStyle(fontSize: 10)),
+                      Text('Requests', style: TextStyle(fontSize: 10))
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
                   children: [
-                    Flexible(
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 12,
-                            width: double.infinity,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(10)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Column(
+                            children: [
+                              AnimatedPercentageBar(
+                                percentage: stats.inProgressPercentage,
+                                color: Colors.orange,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                '${(stats.inProgressPercentage * 100).toStringAsFixed(0)}%', 
+                                style: const TextStyle(fontSize: 12)),
+                            ],
                           ),
-                          const SizedBox(height: 5),
-                          const Text('32%', style: TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                    Flexible(
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 12,
-                            width: double.infinity,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xff87e64c),
-                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        Flexible(
+                          child: Column(
+                            children: [
+                              AnimatedPercentageBar(
+                                percentage: stats.completedPercentage,
+                                color: const Color(0xff87e64c),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                '${(stats.completedPercentage * 100).toStringAsFixed(0)}%', 
+                                style: const TextStyle(fontSize: 12)),
+                            ],
                           ),
-                          const SizedBox(height: 5),
-                          const Text('41%', style: TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                    Flexible(
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 12,
-                            width: double.infinity,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        Flexible(
+                          child: Column(
+                            children: [
+                              AnimatedPercentageBar(
+                                percentage: stats.rejectedPercentage,
+                                color: Colors.red,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                '${(stats.rejectedPercentage * 100).toStringAsFixed(0)}%', 
+                                style: const TextStyle(fontSize: 12)),
+                            ],
                           ),
-                          const SizedBox(height: 5),
-                          const Text('24%', style: TextStyle(fontSize: 12)),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 15),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Flexible(
+                        child: StatusCard(
+                          color: Colors.orange,
+                          icon: Icons.access_time,
+                          value: stats.inProgress.toString(),
+                          label: 'In Progress',
+                        ),
+                      ),
+                      Flexible(
+                        child: StatusCard(
+                          color: const Color(0xff87e64c),
+                          icon: Icons.check_circle,
+                          value: stats.completed.toString(),
+                          label: 'Completed',
+                        ),
+                      ),
+                      Flexible(
+                        child: StatusCard(
+                          color: Colors.red,
+                          icon: Icons.cancel,
+                          value: stats.rejected.toString(),
+                          label: 'Rejected',
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ),
-          const SizedBox(height: 15),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Flexible(
-                    child: StatusCard(
-                      color: Colors.orange,
-                      icon: Icons.access_time,
-                      value: '76',
-                      label: 'In Progress',
-                    ),
-                  ),
-                  Flexible(
-                    child: StatusCard(
-                      color: Color(0xff87e64c),
-                      icon: Icons.check_circle,
-                      value: '104',
-                      label: 'Completed',
-                    ),
-                  ),
-                  Flexible(
-                    child: StatusCard(
-                      color: Colors.red,
-                      icon: Icons.cancel,
-                      value: '2',
-                      label: 'Rejected',
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

@@ -120,3 +120,31 @@ class Booking {
     return "${createdAt.hour.toString().padLeft(2, '0')}:${createdAt.minute.toString().padLeft(2, '0')}";
   }
 }
+
+class BookingStats {
+  final int totalRequests;
+  final int inProgress;
+  final int completed;
+  final int rejected;
+
+  const BookingStats({
+    required this.totalRequests,
+    required this.inProgress,
+    required this.completed,
+    required this.rejected,
+  });
+
+  factory BookingStats.empty() {
+    return const BookingStats(
+      totalRequests: 0,
+      inProgress: 0,
+      completed: 0,
+      rejected: 0,
+    );
+  }
+
+  // Calculate percentages for each status
+  double get inProgressPercentage => totalRequests > 0 ? inProgress / totalRequests : 0;
+  double get completedPercentage => totalRequests > 0 ? completed / totalRequests : 0;
+  double get rejectedPercentage => totalRequests > 0 ? rejected / totalRequests : 0;
+}
