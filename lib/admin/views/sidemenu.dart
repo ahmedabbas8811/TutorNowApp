@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:newifchaly/admin/views/manageusers.dart';
 
 class SideMenu extends StatelessWidget {
   @override
@@ -60,6 +62,33 @@ class SideMenu extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 8),
+                      Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xfffafafa),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: ListTile(
+                        leading: Icon(FontAwesomeIcons.userTie, color: Colors.black),
+
+                        title: const Text(
+                          'Manage Users',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Manageusers()),
+                          );
+                        },
+                      ),
+                    ),
         ],
       ),
     );

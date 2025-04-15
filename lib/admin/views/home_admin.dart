@@ -4,10 +4,12 @@ import 'package:newifchaly/admin/controllers/dashboard_controller.dart';
 import 'package:newifchaly/admin/models/dashboard_model.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/admin/views/dashboard_cards.dart';
+import 'package:newifchaly/admin/views/manageusers.dart';
 import 'package:newifchaly/admin/views/qualification_chart.dart';
 import 'package:newifchaly/admin/views/experience_chart.dart';
 import 'package:newifchaly/admin/widgets/session_card.dart';
 import 'package:newifchaly/admin/widgets/session_row.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeAdmin extends StatefulWidget {
   const HomeAdmin({super.key});
@@ -134,6 +136,33 @@ class _HomeAdminState extends State<HomeAdmin> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => ApproveTutorsScreen()),
+                          );
+                        },
+                      ),
+                    ),
+                     const SizedBox(height: 8),
+                      Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xfffafafa),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: ListTile(
+                        leading: Icon(FontAwesomeIcons.userTie, color: Colors.black),
+
+                        title: const Text(
+                          'Manage Users',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Manageusers()),
                           );
                         },
                       ),
