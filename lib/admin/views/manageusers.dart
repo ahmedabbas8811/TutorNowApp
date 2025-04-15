@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:newifchaly/admin/views/approve_tutors.dart';
+import 'package:newifchaly/admin/views/home_admin.dart';
 
 class Manageusers extends StatefulWidget {
   const Manageusers({super.key});
@@ -31,35 +33,60 @@ class _ManageusersState extends State<Manageusers> {
                   height: 50,
                 ),
                 const SizedBox(height: 15),
-                Container(
+               Container(
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   padding: const EdgeInsets.symmetric(vertical: 1),
                   decoration: BoxDecoration(
                     color: const Color(0xfffafafa),
                     borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 0,
+                        spreadRadius: 1,
+                      ),
+                    ],
                   ),
-                  child: const ListTile(
-                    leading: Icon(Icons.home, color: Colors.black),
-                    title: Text('Home', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: ListTile(
+                    leading: const Icon(Icons.home, color: Colors.black),
+                    title: const Text(
+                      'Home',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeAdmin()),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  decoration: BoxDecoration(
-                    color: const Color(0xfffafafa),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Icons.check_circle, color: Colors.black),
-                    title: const Text(
-                      'Approve Tutors',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xfffafafa),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: ListTile(
+                        leading: const Icon(Icons.check_circle, color: Colors.black),
+                        title: const Text(
+                          'Approve Tutors',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ApproveTutorsScreen()),
+                          );
+                        },
+                      ),
                     ),
-                    onTap: () {},
-                  ),
-                ),
                 const SizedBox(height: 8),
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 3),
