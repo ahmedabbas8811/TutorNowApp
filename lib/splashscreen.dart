@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:newifchaly/admin/controllers/tutor_controller.dart';
 import 'package:newifchaly/admin/views/home_admin.dart';
+import 'package:newifchaly/blocked_account_screen.dart';
 import 'package:newifchaly/login_screen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/services/storage_service.dart';
@@ -45,24 +46,31 @@ class _SplashScreenState extends State<SplashScreen> {
         return;
       }
 
-      final userId = session.user!.id; // Retrieve userId from the session
+      final userId = session.user!.id;
       print("User ID: $userId");
 
-      // Fetch user type from the database
-      final user = await SupabaseService.supabase
+      // Fetch both status and user_type in single query
+      final userData = await SupabaseService.supabase
           .from('users')
-          .select('user_type')
+          .select('status, user_type')
           .eq('id', userId)
           .single();
-      print("User data: $user");
 
-      if (user != null && user['user_type'] != null) {
-        final userType = user['user_type'];
+      // First check if user is blocked
+      if (userData['status'] == 'blocked') {
+        print("User is blocked, redirecting to blocked account screen...");
+        Get.offAll(() => const BlockedAccountScreen());
+        return;
+      }
+
+
+      // Then check user type if not blocked
+      if (userData['user_type'] != null) {
+        final userType = userData['user_type'];
         print("User type: $userType");
 
-        // Redirect based on user type
         if (userType == 'Admin') {
-          Get.lazyPut(() => TutorController()); // Initialize the controller
+          Get.lazyPut(() => TutorController());
           Get.offAll(() => const HomeAdmin());
         } else if (userType == 'Student') {
           Get.offAll(() => StudentHomeScreen());
@@ -73,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen> {
           Get.offAll(() => LoginScreen());
         }
       } else {
-        print("User not found or user type is null, redirecting to login...");
+        print("User type is null, redirecting to login...");
         Get.offAll(() => LoginScreen());
       }
     } catch (e) {
