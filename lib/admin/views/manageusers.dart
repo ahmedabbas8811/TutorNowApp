@@ -4,6 +4,8 @@ import 'package:newifchaly/admin/controllers/manage_users_controller.dart';
 import 'package:newifchaly/admin/models/manage_users_model.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/admin/views/home_admin.dart';
+import 'package:newifchaly/messagescreen.dart';
+import 'package:newifchaly/student/views/chat_screen.dart';
 
 class Manageusers extends StatefulWidget {
   const Manageusers({super.key});
@@ -161,16 +163,28 @@ class _ManageusersState extends State<Manageusers> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(
+                Padding(
+                  padding: const EdgeInsets.only(
                       left: 24.0, right: 24.0, top: 16.0, bottom: 8.0),
                   child: Row(
                     children: [
-                      Text('Manage Users',
+                      const Text('Manage Users',
                           style: TextStyle(
                               fontSize: 28, fontWeight: FontWeight.bold)),
                       Spacer(),
-                      Icon(Icons.message, size: 28, color: Colors.black),
+                      InkWell(
+                        // Changed from Icon to InkWell
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TutorChatListScreen(),
+                            ),
+                          );
+                        },
+                        child:
+                            const Icon(Icons.message, size: 28, color: Colors.black),
+                      ),
                     ],
                   ),
                 ),
@@ -265,115 +279,129 @@ class _ManageusersState extends State<Manageusers> {
                               itemBuilder: (context, index) {
                                 final user = users[index];
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 6, horizontal: 12),
-                                  child: Row(
-                                    children: [
-                                      // Name Column (wider)
-                                      Flexible(
-                                        flex: 3, // Wider column
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            user.name,
-                                            style:
-                                                const TextStyle(fontSize: 14),
-                                            textAlign: TextAlign.center,
-                                            softWrap: true,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 6, horizontal: 12),
+                                    child: Row(
+                                      children: [
+                                        // Name Column (wider)
+                                        Flexible(
+                                          flex: 3,
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              user.name,
+                                              style:
+                                                  const TextStyle(fontSize: 14),
+                                              textAlign: TextAlign.center,
+                                              softWrap: true,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      // ID Column (wider)
-                                      Flexible(
-                                        flex: 3, // Wider column
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            user.id,
-                                            style:
-                                                const TextStyle(fontSize: 14),
-                                            textAlign: TextAlign.center,
-                                            softWrap: true,
+                                        // ID Column (wider)
+                                        Flexible(
+                                          flex: 3,
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              user.id,
+                                              style:
+                                                  const TextStyle(fontSize: 14),
+                                              textAlign: TextAlign.center,
+                                              softWrap: true,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      // Email Column (wider)
-                                      Flexible(
-                                        flex: 3, // Wider column
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            user.email,
-                                            style:
-                                                const TextStyle(fontSize: 14),
-                                            textAlign: TextAlign.center,
-                                            softWrap: true,
+                                        // Email Column (wider)
+                                        Flexible(
+                                          flex: 3,
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              user.email,
+                                              style:
+                                                  const TextStyle(fontSize: 14),
+                                              textAlign: TextAlign.center,
+                                              softWrap: true,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      // User Type Column (narrower)
-                                      Flexible(
-                                        flex: 1, // Narrower column
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            user.userType,
-                                            style:
-                                                const TextStyle(fontSize: 14),
-                                            textAlign: TextAlign.center,
+                                        // User Type Column (narrower)
+                                        Flexible(
+                                          flex: 1,
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              user.userType,
+                                              style:
+                                                  const TextStyle(fontSize: 14),
+                                              textAlign: TextAlign.center,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      // Block User Column (narrower)
-                                      Flexible(
-                                        flex: 1, // Narrower column
-                                        child: Center(
-                                          child: GestureDetector(
-                                            onTap: () =>
-                                                _toggleUserStatus(index),
-                                            child: AnimatedContainer(
-                                              duration: const Duration(
-                                                  milliseconds: 200),
-                                              width: 50,
-                                              height: 28,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                color: switchStates[index]
-                                                    ? const Color(0xffe64b4b)
-                                                    : const Color(0xffe9e9ea),
-                                              ),
-                                              child: AnimatedAlign(
+                                        // Block User Column (narrower)
+                                        Flexible(
+                                          flex: 1,
+                                          child: Center(
+                                            child: GestureDetector(
+                                              onTap: () =>
+                                                  _toggleUserStatus(index),
+                                              child: AnimatedContainer(
                                                 duration: const Duration(
                                                     milliseconds: 200),
-                                                alignment: switchStates[index]
-                                                    ? Alignment.centerRight
-                                                    : Alignment.centerLeft,
-                                                child: Container(
-                                                  margin:
-                                                      const EdgeInsets.all(4),
-                                                  width: 20,
-                                                  height: 20,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color: Colors.white,
-                                                    shape: BoxShape.circle,
+                                                width: 50,
+                                                height: 28,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  color: switchStates[index]
+                                                      ? const Color(0xffe64b4b)
+                                                      : const Color(0xffe9e9ea),
+                                                ),
+                                                child: AnimatedAlign(
+                                                  duration: const Duration(
+                                                      milliseconds: 200),
+                                                  alignment: switchStates[index]
+                                                      ? Alignment.centerRight
+                                                      : Alignment.centerLeft,
+                                                  child: Container(
+                                                    margin:
+                                                        const EdgeInsets.all(4),
+                                                    width: 20,
+                                                    height: 20,
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      color: Colors.white,
+                                                      shape: BoxShape.circle,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      // Message Icon Column (narrower)
-                                      const Flexible(
-                                        flex: 1, // Narrower column
-                                        child:
-                                            Center(child: Icon(Icons.message)),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                        // Message Icon Column (narrower) - Modified section
+                                        Flexible(
+                                          flex: 1,
+                                          child: Center(
+                                            child: InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ChatScreen(
+                                                      receiverId: user.id,
+                                                      receiverName: user.name,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: const Icon(Icons.message),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ));
                               },
                             ),
                           ],

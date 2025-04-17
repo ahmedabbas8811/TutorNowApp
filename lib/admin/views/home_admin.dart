@@ -36,32 +36,33 @@ class _HomeAdminState extends State<HomeAdmin> {
     _loadInitialData();
   }
 
-  Future<void> _loadInitialData() async {
-    setState(() => _isLoading = true);
-    try {
-      await Future.wait([
-        _loadBookingCounts(),
-        _loadRecentBookings(),
-      ]);
-    } finally {
-      setState(() => _isLoading = false);
-    }
+Future<void> _loadInitialData() async {
+  if (mounted) setState(() => _isLoading = true);
+  try {
+    await Future.wait([
+      _loadBookingCounts(),
+      _loadRecentBookings(),
+    ]);
+  } finally {
+    if (mounted) setState(() => _isLoading = false);
   }
+}
 
-  Future<void> _loadBookingCounts() async {
-    final counts = {
-      'Past 24 Hours': await _controller.getBookingCount('Past 24 Hours'),
-      'Past 7 Days': await _controller.getBookingCount('Past 7 Days'),
-      'Past 15 Days': await _controller.getBookingCount('Past 15 Days'),
-      'Past 30 Days': await _controller.getBookingCount('Past 30 Days'),
-    };
-    setState(() => _bookingCounts = counts);
-  }
+Future<void> _loadBookingCounts() async {
+  final counts = {
+    'Past 24 Hours': await _controller.getBookingCount('Past 24 Hours'),
+    'Past 7 Days': await _controller.getBookingCount('Past 7 Days'),
+    'Past 15 Days': await _controller.getBookingCount('Past 15 Days'),
+    'Past 30 Days': await _controller.getBookingCount('Past 30 Days'),
+  };
+  if (mounted) setState(() => _bookingCounts = counts);
+}
 
-  Future<void> _loadRecentBookings() async {
-    final bookings = await _controller.fetchRecentBookings(selectedTimeFrame);
-    setState(() => _bookings = bookings);
-  }
+Future<void> _loadRecentBookings() async {
+  final bookings = await _controller.fetchRecentBookings(selectedTimeFrame);
+  if (mounted) setState(() => _bookings = bookings);
+}
+
 
   void _handleTimeFrameChange(String newTimeFrame) {
     setState(() {
