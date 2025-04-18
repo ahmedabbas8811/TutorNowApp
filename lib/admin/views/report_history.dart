@@ -7,13 +7,73 @@ import 'package:newifchaly/admin/views/manageusers.dart';
 class ReportHistory extends StatelessWidget {
   const ReportHistory({super.key});
 
+  void _showConfirmationDialog({
+    required BuildContext context,
+    required String title,
+    required String description,
+    required IconData icon,
+    required Color iconColor,
+    required String confirmText,
+    required Color confirmColor,
+    required VoidCallback onConfirm,
+  }) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding: const EdgeInsets.all(20),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: iconColor, size: 50),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 15),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text("Cancel"),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // close dialog
+                      onConfirm();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: confirmColor,
+                    ),
+                    child: Text(confirmText, style: const TextStyle(color: Colors.white)),
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfffafafa),
       body: Row(
         children: [
-          // Sidebar 
+          // Sidebar
           Container(
             width: 200,
             color: Colors.white,
@@ -54,16 +114,12 @@ class ReportHistory extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: ListTile(
-                    leading:
-                        const Icon(Icons.check_circle, color: Colors.black),
+                    leading: const Icon(Icons.check_circle, color: Colors.black),
                     title: const Text('Approve Tutors',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ApproveTutorsScreen()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => ApproveTutorsScreen()));
                     },
                   ),
                 ),
@@ -76,16 +132,12 @@ class ReportHistory extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: ListTile(
-                    leading: const Icon(FontAwesomeIcons.userTie,
-                        color: Colors.black),
+                    leading: const Icon(FontAwesomeIcons.userTie, color: Colors.black),
                     title: const Text('Manage Users',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Manageusers()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => const Manageusers()));
                     },
                   ),
                 ),
@@ -100,217 +152,279 @@ class ReportHistory extends StatelessWidget {
                   child: ListTile(
                     leading: const Icon(Icons.insert_drive_file, color: Colors.black),
                     title: const Text('Reports',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     onTap: () {},
                   ),
                 ),
               ],
             ),
           ),
-  // Continue inside the Expanded widget
-Expanded(
-   child: Column(
+
+          // Main Content
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
-                  padding: EdgeInsets.only(
-                      left: 24.0, right: 24.0, top: 16.0, bottom: 8.0),
+                  padding: EdgeInsets.only(left: 24.0, right: 24.0, top: 16.0, bottom: 8.0),
                   child: Row(
                     children: [
                       Text('Report 1723891',
-                          style: TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.bold)),
+                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                       Spacer(),
-                      InkWell(
-                        child: Icon(Icons.message, size: 28, color: Colors.black),
-                      ),
+                      Icon(Icons.message, size: 28, color: Colors.black),
                     ],
                   ),
                 ),
-   SingleChildScrollView(
-    padding: const EdgeInsets.all(24.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-           const  Text('Status:'),
-           const SizedBox(width: 5
-           ),
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xff87e64c),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              child: 
-              
-              const Text('Open',
-                  style: TextStyle(color: Colors.black,)),
-            ),
-            const SizedBox(width: 16),
-           
-          ],
-        ),
-        const SizedBox(height: 7),
-         const Text('Submitted:  3 Days Ago'),
-          const SizedBox(height: 7),
-        const  Row(
-  children: [
-   Text('Reported By:  Ali (Student)'
-   ),
-     SizedBox(width: 8),
-     Icon(Icons.message, color: Colors.black, size: 15,), 
-   ],
-),
-         const SizedBox(height: 7),
-         
-       const  Row(
-  children: [
-   Text('Reported User:  Kashif (Tutor)'
-   ),
-     SizedBox(width: 8),
-     Icon(Icons.message, color: Colors.black, size: 15,), 
-   ],
-),
 
-         const SizedBox(height: 7),
-        const Text('Comments:  Foul Language'),
-        const SizedBox(height: 15),
-        const Text('User Report History',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-const SizedBox(height: 5),
-        // Tabs
-        Row(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 8, right: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xff87e64c),
-                borderRadius: BorderRadius.circular(7),
-                border: Border.all(color: Colors.black),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: const Text('Ali(5)', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(7),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: const Text('Kashif(0)'),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-
-        // Report Cards
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: List.generate(5, (index) {
-            final isClosed = index > 1;
-            return Container(
-              width: 280,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                      // ignore: deprecated_member_use
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 5,
-                      spreadRadius: 1)
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+                // Scrollable content
+                SingleChildScrollView(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Status:'),
-                     const SizedBox(width: 5,),
-                      Container(
-  decoration: BoxDecoration(
-    color: isClosed ? const Color(0xff87e64c) : const Color(0xffe64b4b),
-    borderRadius: BorderRadius.circular(12),
-  ),
-  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-  child: Text(
-    isClosed ? 'Closed' : 'Open',
-    style: TextStyle(
-      color: isClosed ? Colors.black : Colors.white,
-    ),
-  ),
-),
+                      const Row(
+                        children: [
+                          Text('Status:'),
+                          SizedBox(width: 5),
+                          StatusBadge(status: "Open", color: Color(0xff87e64c)),
+                        ],
+                      ),
+                      const SizedBox(height: 7),
+                      const Text('Submitted: 3 Days Ago'),
+                      const SizedBox(height: 7),
+                      const Row(
+                        children: [
+                          Text('Reported By: Ali (Student)'),
+                          SizedBox(width: 8),
+                          Icon(Icons.message, color: Colors.black, size: 15),
+                        ],
+                      ),
+                      const SizedBox(height: 7),
+                      const Row(
+                        children: [
+                          Text('Reported User: Kashif (Tutor)'),
+                          SizedBox(width: 8),
+                          Icon(Icons.message, color: Colors.black, size: 15),
+                        ],
+                      ),
+                      const SizedBox(height: 7),
+                      const Text('Comments: Foul Language'),
+                      const SizedBox(height: 15),
+                      const Text('User Report History',
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 5),
 
-                      const Spacer(),
-                     
+                      // Tabs
+                      Row(
+                        children: [
+                          TabBadge(label: "Ali(5)", isSelected: true),
+                          TabBadge(label: "Kashif(0)", isSelected: false),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Report Cards
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: List.generate(5, (index) {
+                          final isClosed = index > 1;
+                          return ReportCard(isClosed: isClosed);
+                        }),
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      const Text('Take Action',
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 12),
+
+                      // Action Buttons
+                      Wrap(
+                        spacing: 12,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              _showConfirmationDialog(
+                                context: context,
+                                title: "Block User Kashif?",
+                                description: "You're going to block Kashif, this will prevent him from logging in to app",
+                                icon: Icons.block,
+                                iconColor: Colors.red,
+                                confirmText: "Block",
+                                confirmColor: const Color(0xffe64b4b),
+                                onConfirm: () {
+                                  print("Blocked user");
+                                },
+                              );
+                            },
+                            icon: const Icon(Icons.block, color: Colors.white),
+                            label: const Text('Block User', style: TextStyle(color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xffe64b4b),
+                            ),
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              _showConfirmationDialog(
+                                context: context,
+                                title: "Warn User Kashif?",
+                                description: "This will send him a warning message.",
+                                icon: Icons.warning_amber_rounded,
+                                iconColor: Colors.orange,
+                                confirmText: "Warn",
+                                confirmColor: const Color(0xffffa21e),
+                                onConfirm: () {
+                                  print("Warned user");
+                                },
+                              );
+                            },
+                            icon: const Icon(Icons.warning_amber_rounded, color: Colors.black),
+                            label: const Text('Warn User', style: TextStyle(color: Colors.black)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xffffa21e),
+                            ),
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              _showConfirmationDialog(
+                                context: context,
+                                title: "Mark As Spam?",
+                                description: "You're going to mark this report as spam.",
+                                icon: Icons.report_gmailerrorred,
+                                iconColor: Colors.yellow[700]!,
+                                confirmText: "Spam",
+                                confirmColor: const Color(0xffe6e14b),
+                                onConfirm: () {
+                                  print("Marked as spam");
+                                },
+                              );
+                            },
+                            icon: const Icon(Icons.remove_circle_outline, color: Colors.black),
+                            label: const Text('Mark As Spam', style: TextStyle(color: Colors.black)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xffe6e14b),
+                            ),
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              _showConfirmationDialog(
+                                context: context,
+                                title: "Mark As Resolved?",
+                                description: "You're about to mark this report as resolved.",
+                                icon: Icons.check_circle_outline,
+                                iconColor: Colors.green,
+                                confirmText: "Resolve",
+                                confirmColor: const Color(0xff87e64c),
+                                onConfirm: () {
+                                  print("Marked as resolved");
+                                },
+                              );
+                            },
+                            icon: const Icon(Icons.check_circle_outline, color: Colors.black),
+                            label: const Text('Mark As Resolved', style: TextStyle(color: Colors.black)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xff87e64c),
+                            ),
+                          ),
+                        ],
+                      )
                     ],
                   ),
-                  const SizedBox(height: 8),
-                   const Text('Submitted: 3 Days Ago'),
-                  const Text('Reported By: Ali (Student)'),
-                  const Text('Comments: Foul Language'),
-                  Text('Action Taken: ${isClosed ? "Warned User" : ""}'),
-                ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Reusable Widgets for Status Badge, Report Card, and Tabs
+class StatusBadge extends StatelessWidget {
+  final String status;
+  final Color color;
+  const StatusBadge({required this.status, required this.color, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(20)),
+      child: Text(status, style: const TextStyle(color: Colors.black)),
+    );
+  }
+}
+
+class TabBadge extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  const TabBadge({required this.label, required this.isSelected, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 8, right: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: isSelected ? const Color(0xff87e64c) : Colors.grey[300],
+        borderRadius: BorderRadius.circular(7),
+        border: Border.all(color: Colors.black),
+      ),
+      child: Text(label,
+          style: TextStyle(
+              color: Colors.black, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+    );
+  }
+}
+
+class ReportCard extends StatelessWidget {
+  final bool isClosed;
+  const ReportCard({required this.isClosed, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 280,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('Status:'),
+              const SizedBox(width: 5),
+              Container(
+                decoration: BoxDecoration(
+                  color: isClosed ? const Color(0xff87e64c) : const Color(0xffe64b4b),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: Text(
+                  isClosed ? 'Closed' : 'Open',
+                  style: TextStyle(
+                    color: isClosed ? Colors.black : Colors.white,
+                  ),
+                ),
               ),
-            );
-          }),
-        ),
-
-        const SizedBox(height: 15),
-
-        // Take Action Section
-        const Text('Take Action', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 12),
-       Wrap(
-  spacing: 12,
-  children: [
-    ElevatedButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.block, color: Colors.white),
-      label: const Text('Block User', style: TextStyle(color: Colors.white)),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xffe64b4b),
-      ),
-    ),
-    ElevatedButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.warning_amber_rounded, color: Colors.black),
-      label: const Text('Warn User', style: TextStyle(color: Colors.black)),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xffffa21e),
-      ),
-    ),
-    ElevatedButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.remove_circle_outline, color: Colors.black),
-      label: const Text('Mark As Spam', style: TextStyle(color: Colors.black)),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xffe6e14b),
-      ),
-    ),
-    ElevatedButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.check_circle_outline, color: Colors.black,),
-      label: const Text('Mark As Resolved', style: TextStyle(color: Colors.black)),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xff87e64c),
-      ),
-    ),
-  ],
-)
-
-      ],
-    ),
-  ),
-        ],),),
-],
+              const Spacer(),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text('Submitted: 3 Days Ago'),
+          const Text('Reported By: Ali (Student)'),
+          const Text('Comments: Foul Language'),
+          Text('Action Taken: ${isClosed ? "Warned User" : ""}'),
+        ],
       ),
     );
   }
