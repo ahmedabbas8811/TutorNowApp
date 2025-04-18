@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:newifchaly/admin/controllers/manage_users_controller.dart';
 import 'package:newifchaly/admin/models/manage_users_model.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
+import 'package:newifchaly/admin/views/handle_reports.dart';
 import 'package:newifchaly/admin/views/home_admin.dart';
 import 'package:newifchaly/messagescreen.dart';
 import 'package:newifchaly/student/views/chat_screen.dart';
@@ -152,6 +153,28 @@ class _ManageusersState extends State<Manageusers> {
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16)),
                     onTap: () {},
+                  ),
+                ),
+                  const SizedBox(height: 8),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  padding: const EdgeInsets.symmetric(vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xfffafafa),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(Icons.insert_drive_file, color: Colors.black),
+                    title: const Text('Reports',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HandleReports()),
+                          );
+                        },
                   ),
                 ),
               ],

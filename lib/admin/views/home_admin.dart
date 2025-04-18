@@ -178,7 +178,7 @@ Future<void> _loadRecentBookings() async {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: ListTile(
-                        leading: Icon(FontAwesomeIcons.userTie, color: Colors.black),
+                        leading: Icon(Icons.insert_drive_file, color: Colors.black),
 
                         title: const Text(
                           'Reports',

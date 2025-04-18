@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:newifchaly/admin/views/handle_reports.dart';
 import 'package:newifchaly/admin/views/home_admin.dart';
 import 'package:newifchaly/admin/views/manageusers.dart';
 import '../controllers/tutor_controller.dart';
@@ -103,6 +104,28 @@ class ApproveTutorsScreen extends StatelessWidget {
                         },
                       ),
                     ),
+                     const SizedBox(height: 8),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  padding: const EdgeInsets.symmetric(vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xfffafafa),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(Icons.insert_drive_file, color: Colors.black),
+                    title: const Text('Reports',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HandleReports()),
+                          );
+                        },
+                  ),
+                ),
               ],
             ),
           ),
