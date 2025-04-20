@@ -1,13 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:newifchaly/admin/controllers/reports_controller.dart';
 import 'package:newifchaly/admin/models/reports_model.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/admin/views/home_admin.dart';
 import 'package:newifchaly/admin/views/manageusers.dart';
 
-class ReportHistory extends StatelessWidget {
+class ReportHistory extends StatefulWidget {
   final Report report;
   const ReportHistory({super.key, required this.report});
+
+  @override
+  State<ReportHistory> createState() => _ReportHistoryState();
+}
+
+class _ReportHistoryState extends State<ReportHistory> {
+  final ReportController _reportController = ReportController();
+  late Future<List<Report>> _reportedUserHistoryFuture;
+  late Future<List<Report>> _reporterHistoryFuture;
+  int _selectedTabIndex = 0;
+  late Future<int> _reportedUserCountFuture;
+  late Future<int> _reporterCountFuture;
+  int _reportedUserCount = 0;
+  int _reporterCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialCounts();
+    _loadReportData();
+  }
+
+  Future<void> _loadInitialCounts() async {
+    _reportedUserCount = await _reportController.countReportsForUser(
+      widget.report.reportedUserId ?? '',
+      excludeReportId: widget.report.id,
+    );
+    _reporterCount = await _reportController.countReportsForUser(
+      widget.report.reporterId ?? '',
+      excludeReportId: widget.report.id,
+    );
+    setState(() {});
+  }
+
+  Future<void> _loadReportData() async {
+    if (_selectedTabIndex == 0) {
+      _reportedUserHistoryFuture = _reportController.fetchUserReportHistory(
+        widget.report.reportedUserId ?? '',
+        excludeReportId: widget.report.id,
+      );
+    } else {
+      _reporterHistoryFuture = _reportController.fetchUserReportHistory(
+        widget.report.reporterId ?? '',
+        excludeReportId: widget.report.id,
+      );
+    }
+    setState(() {});
+  }
 
   void _showConfirmationDialog({
     required BuildContext context,
@@ -31,7 +80,7 @@ class ReportHistory extends StatelessWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: iconColor, size: 50), // Icon is back!
+              Icon(icon, color: iconColor, size: 50),
               const SizedBox(height: 12),
               Text(
                 title,
@@ -43,9 +92,7 @@ class ReportHistory extends StatelessWidget {
               Text(
                 description,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 15,
-                ),
+                style: const TextStyle(fontSize: 15),
               ),
               const SizedBox(height: 20),
               Row(
@@ -58,8 +105,7 @@ class ReportHistory extends StatelessWidget {
                         side: const BorderSide(color: Colors.black),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              10), // Circular border radius 10
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       child: const Text(
@@ -79,25 +125,39 @@ class ReportHistory extends StatelessWidget {
                         backgroundColor: confirmColor,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              10), // Circular border radius 10
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       child: Text(
                         confirmText,
                         style: TextStyle(
-                            color: isDanger ? Colors.white : Colors.black,
-                            fontWeight: FontWeight.bold),
+                          color: isDanger ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         );
       },
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays} ${difference.inDays == 1 ? 'Day' : 'Days'} Ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} ${difference.inHours == 1 ? 'Hour' : 'Hours'} Ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} ${difference.inMinutes == 1 ? 'Minute' : 'Minutes'} Ago';
+    }
+    return 'Just Now';
   }
 
   @override
@@ -123,20 +183,25 @@ class ReportHistory extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: const [
                       BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 0,
-                          spreadRadius: 1),
+                        color: Colors.black12,
+                        blurRadius: 0,
+                        spreadRadius: 1,
+                      ),
                     ],
                   ),
                   child: ListTile(
                     leading: const Icon(Icons.home, color: Colors.black),
-                    title: const Text('Home',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    title: const Text(
+                      'Home',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomeAdmin()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeAdmin(),
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -151,14 +216,20 @@ class ReportHistory extends StatelessWidget {
                   child: ListTile(
                     leading:
                         const Icon(Icons.check_circle, color: Colors.black),
-                    title: const Text('Approve Tutors',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    title: const Text(
+                      'Approve Tutors',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ApproveTutorsScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ApproveTutorsScreen(),
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -173,14 +244,20 @@ class ReportHistory extends StatelessWidget {
                   child: ListTile(
                     leading: const Icon(FontAwesomeIcons.userTie,
                         color: Colors.black),
-                    title: const Text('Manage Users',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    title: const Text(
+                      'Manage Users',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Manageusers()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Manageusers(),
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -195,9 +272,13 @@ class ReportHistory extends StatelessWidget {
                   child: ListTile(
                     leading: const Icon(Icons.insert_drive_file,
                         color: Colors.black),
-                    title: const Text('Reports',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    title: const Text(
+                      'Reports',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                     onTap: () {},
                   ),
                 ),
@@ -212,13 +293,19 @@ class ReportHistory extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(
-                      left: 24.0, right: 24.0, top: 16.0, bottom: 8.0),
+                    left: 24.0,
+                    right: 24.0,
+                    top: 16.0,
+                    bottom: 8.0,
+                  ),
                   child: Row(
                     children: [
                       Text(
-                        'Report #${report.id}',
+                        'Report #${widget.report.id}',
                         style: const TextStyle(
-                            fontSize: 32, fontWeight: FontWeight.bold),
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const Spacer(),
                       const Icon(Icons.message, size: 28, color: Colors.black),
@@ -252,10 +339,11 @@ class ReportHistory extends StatelessWidget {
                               ),
                             ),
                             StatusBadge(
-                              status: report.status,
-                              color: report.status.toLowerCase() == 'open'
-                                  ? const Color(0xff87e64c)
-                                  : const Color(0xffe64b4b),
+                              status: widget.report.status,
+                              color:
+                                  widget.report.status.toLowerCase() == 'open'
+                                      ? const Color(0xff87e64c)
+                                      : const Color(0xffe64b4b),
                             ),
                           ],
                         ),
@@ -274,7 +362,8 @@ class ReportHistory extends StatelessWidget {
                                 text: 'Submitted: ',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              TextSpan(text: _formatDate(report.createdAt)),
+                              TextSpan(
+                                  text: _formatDate(widget.report.createdAt)),
                             ],
                           ),
                         ),
@@ -296,7 +385,7 @@ class ReportHistory extends StatelessWidget {
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  TextSpan(text: report.reporterName),
+                                  TextSpan(text: widget.report.reporterName),
                                 ],
                               ),
                             ),
@@ -323,7 +412,8 @@ class ReportHistory extends StatelessWidget {
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  TextSpan(text: report.reportedUserName),
+                                  TextSpan(
+                                      text: widget.report.reportedUserName),
                                 ],
                               ),
                             ),
@@ -347,43 +437,105 @@ class ReportHistory extends StatelessWidget {
                                 text: 'Comments: ',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              TextSpan(text: report.comments),
+                              TextSpan(text: widget.report.comments),
                             ],
                           ),
                         ),
                         const SizedBox(height: 15),
-                        const Text('User Report History',
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold)),
+                        const Text(
+                          'User Report History',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 5),
 
-                        // Tabs
-                        const Row(
+                        // Tabs and Report Cards
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TabBadge(label: "Ali(5)", isSelected: true),
-                            TabBadge(
-                                label: "Kashif(0)",
-                                isSelected: false,
-                                removeBorder: true),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
+                            // Tabs (always visible, not part of loading)
+                            Row(
+                              children: [
+                                TabBadge(
+                                  label:
+                                      "${widget.report.reportedUserName}($_reportedUserCount)",
+                                  isSelected: _selectedTabIndex == 0,
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedTabIndex = 0;
+                                      _loadReportData(); // Refresh data without showing loading on buttons
+                                    });
+                                  },
+                                ),
+                                TabBadge(
+                                  label:
+                                      "${widget.report.reporterName}($_reporterCount)",
+                                  isSelected: _selectedTabIndex == 1,
+                                  removeBorder: true,
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedTabIndex = 1;
+                                      _loadReportData(); // Refresh data without showing loading on buttons
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
 
-                        // Report Cards
-                        Wrap(
-                          spacing: 16,
-                          runSpacing: 16,
-                          children: List.generate(5, (index) {
-                            final isClosed = index > 1;
-                            return ReportCard(isClosed: isClosed);
-                          }),
+                            // Report Cards (with loading state)
+                            FutureBuilder<List<Report>>(
+                              future: _selectedTabIndex == 0
+                                  ? _reportedUserHistoryFuture
+                                  : _reporterHistoryFuture,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
+
+                                if (snapshot.hasError) {
+                                  return Center(
+                                      child: Text('Error: ${snapshot.error}'));
+                                }
+
+                                final reports = snapshot.data ?? [];
+
+                                return reports.isEmpty
+                                    ? const Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 20),
+                                        child:
+                                            Text('No previous reports found'),
+                                      )
+                                    : Wrap(
+                                        spacing: 16,
+                                        runSpacing: 16,
+                                        children: reports.map((report) {
+                                          return ReportCard(
+                                            report: report,
+                                            isClosed:
+                                                report.status.toLowerCase() !=
+                                                    'open',
+                                          );
+                                        }).toList(),
+                                      );
+                              },
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 15),
-
-                        const Text('Take Action',
-                            style: TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.bold)),
+                        const Text(
+                          'Take Action',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 12),
 
                         // Action Buttons
@@ -394,9 +546,10 @@ class ReportHistory extends StatelessWidget {
                               onPressed: () {
                                 _showConfirmationDialog(
                                   context: context,
-                                  title: "Block User Kashif?",
+                                  title:
+                                      "Block User ${widget.report.reportedUserName}?",
                                   description:
-                                      "You’re going to block Kashif,this will \nprevent him from logging in to app",
+                                      "You're going to block ${widget.report.reportedUserName}, this will prevent them from logging in to app",
                                   icon: Icons.block,
                                   iconColor: Colors.red,
                                   confirmText: "Block",
@@ -409,8 +562,10 @@ class ReportHistory extends StatelessWidget {
                               },
                               icon:
                                   const Icon(Icons.block, color: Colors.white),
-                              label: const Text('Block User',
-                                  style: TextStyle(color: Colors.white)),
+                              label: const Text(
+                                'Block User',
+                                style: TextStyle(color: Colors.white),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xffe64b4b),
                               ),
@@ -419,9 +574,10 @@ class ReportHistory extends StatelessWidget {
                               onPressed: () {
                                 _showConfirmationDialog(
                                   context: context,
-                                  title: "Warn User Kashif?",
+                                  title:
+                                      "Warn User ${widget.report.reportedUserName}?",
                                   description:
-                                      "This will send him a warning message.",
+                                      "This will send them a warning message.",
                                   icon: Icons.warning_amber_rounded,
                                   iconColor: Colors.orange,
                                   confirmText: "Warn",
@@ -431,10 +587,14 @@ class ReportHistory extends StatelessWidget {
                                   },
                                 );
                               },
-                              icon: const Icon(Icons.warning_amber_rounded,
-                                  color: Colors.black),
-                              label: const Text('Warn User',
-                                  style: TextStyle(color: Colors.black)),
+                              icon: const Icon(
+                                Icons.warning_amber_rounded,
+                                color: Colors.black,
+                              ),
+                              label: const Text(
+                                'Warn User',
+                                style: TextStyle(color: Colors.black),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xffffa21e),
                               ),
@@ -455,10 +615,14 @@ class ReportHistory extends StatelessWidget {
                                   },
                                 );
                               },
-                              icon: const Icon(Icons.remove_circle_outline,
-                                  color: Colors.black),
-                              label: const Text('Mark As Spam',
-                                  style: TextStyle(color: Colors.black)),
+                              icon: const Icon(
+                                Icons.remove_circle_outline,
+                                color: Colors.black,
+                              ),
+                              label: const Text(
+                                'Mark As Spam',
+                                style: TextStyle(color: Colors.black),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xffe6e14b),
                               ),
@@ -479,16 +643,20 @@ class ReportHistory extends StatelessWidget {
                                   },
                                 );
                               },
-                              icon: const Icon(Icons.check_circle_outline,
-                                  color: Colors.black),
-                              label: const Text('Mark As Resolved',
-                                  style: TextStyle(color: Colors.black)),
+                              icon: const Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.black,
+                              ),
+                              label: const Text(
+                                'Mark As Resolved',
+                                style: TextStyle(color: Colors.black),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xff87e64c),
                               ),
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -496,6 +664,132 @@ class ReportHistory extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class StatusBadge extends StatelessWidget {
+  final String status;
+  final Color color;
+  const StatusBadge({
+    required this.status,
+    required this.color,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        status,
+        style: const TextStyle(color: Colors.black),
+      ),
+    );
+  }
+}
+
+class TabBadge extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final bool removeBorder;
+  final VoidCallback? onTap;
+  const TabBadge({
+    required this.label,
+    required this.isSelected,
+    this.removeBorder = false,
+    this.onTap,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(top: 8, right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xff87e64c) : Colors.grey[300],
+          borderRadius: BorderRadius.circular(7),
+          border: removeBorder ? null : Border.all(color: Colors.black),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ReportCard extends StatelessWidget {
+  final Report report;
+  final bool isClosed;
+  const ReportCard({
+    required this.report,
+    required this.isClosed,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 280,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text(
+                'Status:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 5),
+              Container(
+                decoration: BoxDecoration(
+                  color: isClosed
+                      ? const Color(0xff87e64c)
+                      : const Color(0xffe64b4b),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: Text(
+                  report.status,
+                  style: TextStyle(
+                    color: isClosed ? Colors.black : Colors.white,
+                  ),
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text('Submitted: ${_formatDate(report.createdAt)}'),
+          Text('Reported By: ${report.reporterName}'),
+          Text('Comments: ${report.comments}'),
+          Text('Action Taken: ${isClosed ? "Case Closed" : "Pending"}'),
         ],
       ),
     );
@@ -509,151 +803,7 @@ class ReportHistory extends StatelessWidget {
       return '${difference.inDays} ${difference.inDays == 1 ? 'Day' : 'Days'} Ago';
     } else if (difference.inHours > 0) {
       return '${difference.inHours} ${difference.inHours == 1 ? 'Hour' : 'Hours'} Ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} ${difference.inMinutes == 1 ? 'Minute' : 'Minutes'} Ago';
     }
-    return 'Just Now';
-  }
-}
-
-// ======= Sidebar Item Widget =======
-class _SidebarItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool isSelected;
-
-  const _SidebarItem({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.isSelected = false,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.grey[800] : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(label, style: const TextStyle(color: Colors.white)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ======= Extra Widgets =======
-
-class StatusBadge extends StatelessWidget {
-  final String status;
-  final Color color;
-  const StatusBadge({required this.status, required this.color, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration:
-          BoxDecoration(color: color, borderRadius: BorderRadius.circular(20)),
-      child: Text(status, style: const TextStyle(color: Colors.black)),
-    );
-  }
-}
-
-class TabBadge extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final bool removeBorder;
-  const TabBadge(
-      {required this.label,
-      required this.isSelected,
-      this.removeBorder = false,
-      super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 8, right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xff87e64c) : Colors.grey[300],
-        borderRadius: BorderRadius.circular(7),
-        border: removeBorder ? null : Border.all(color: Colors.black),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: Colors.black,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
-      ),
-    );
-  }
-}
-
-class ReportCard extends StatelessWidget {
-  final bool isClosed;
-  const ReportCard({required this.isClosed, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 280,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 5,
-              spreadRadius: 1)
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text('Status:'),
-              const SizedBox(width: 5),
-              Container(
-                decoration: BoxDecoration(
-                  color: isClosed
-                      ? const Color(0xff87e64c)
-                      : const Color(0xffe64b4b),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                child: Text(
-                  isClosed ? 'Closed' : 'Open',
-                  style: TextStyle(
-                    color: isClosed ? Colors.black : Colors.white,
-                  ),
-                ),
-              ),
-              const Spacer(),
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Text('Submitted: 3 Days Ago'),
-          const Text('Reported By: Ali (Student)'),
-          const Text('Comments: Foul Language'),
-          Text('Action Taken: ${isClosed ? "Warned User" : ""}'),
-        ],
-      ),
-    );
+    return 'Less than an hour ago';
   }
 }
