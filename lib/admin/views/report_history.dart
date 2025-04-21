@@ -342,8 +342,8 @@ class _ReportHistoryState extends State<ReportHistory> {
                               status: widget.report.status,
                               color:
                                   widget.report.status.toLowerCase() == 'open'
-                                      ? const Color(0xff87e64c)
-                                      : const Color(0xffe64b4b),
+                                      ? const Color(0xffe64b4b)
+                                      : const Color(0xff87e64c),
                             ),
                           ],
                         ),
@@ -424,7 +424,7 @@ class _ReportHistoryState extends State<ReportHistory> {
                         ),
                         const SizedBox(height: 7),
 
-                        // Comments
+                        // Comments section
                         RichText(
                           text: TextSpan(
                             style: const TextStyle(
@@ -442,6 +442,46 @@ class _ReportHistoryState extends State<ReportHistory> {
                           ),
                         ),
                         const SizedBox(height: 15),
+
+                        // Add the images display here
+                        if (widget.report.images != null &&
+                            widget.report.images!.isNotEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                height: 200,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: widget.report.images!.length,
+                                  itemBuilder: (context, index) {
+                                    final imageUrl = widget
+                                        .report.images!['$index']
+                                        ?.toString();
+                                    if (imageUrl == null)
+                                      return const SizedBox.shrink();
+
+                                    return Container(
+                                      width: 208.2,
+                                      height: 200,
+                                      margin: const EdgeInsets.only(right: 16),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        image: DecorationImage(
+                                          image: NetworkImage(imageUrl),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                            ],
+                          ),
+
+                        // User Report History section
                         const Text(
                           'User Report History',
                           style: TextStyle(
@@ -554,8 +594,31 @@ class _ReportHistoryState extends State<ReportHistory> {
                                   iconColor: Colors.red,
                                   confirmText: "Block",
                                   confirmColor: const Color(0xffe64b4b),
-                                  onConfirm: () {
-                                    print("Blocked user");
+                                  onConfirm: () async {
+                                    try {
+                                      // Update report status
+                                      await _reportController
+                                          .updateReportStatus(
+                                              widget.report.id, 'closed');
+
+                                      // Show success message
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'User blocked and report closed')),
+                                      );
+
+                                      // Navigate back to handler reports screen
+                                      Navigator.pop(context);
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                'Failed to block user: ${e.toString()}')),
+                                      );
+                                    }
                                   },
                                   isDanger: true,
                                 );
@@ -582,8 +645,26 @@ class _ReportHistoryState extends State<ReportHistory> {
                                   iconColor: Colors.orange,
                                   confirmText: "Warn",
                                   confirmColor: const Color(0xffffa21e),
-                                  onConfirm: () {
-                                    print("Warned user");
+                                  onConfirm: () async {
+                                    try {
+                                      await _reportController
+                                          .updateReportStatus(
+                                              widget.report.id, 'closed');
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'User warned and report closed')),
+                                      );
+                                      Navigator.pop(context);
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                'Failed to warn user: ${e.toString()}')),
+                                      );
+                                    }
                                   },
                                 );
                               },
@@ -610,8 +691,26 @@ class _ReportHistoryState extends State<ReportHistory> {
                                   iconColor: Colors.yellow,
                                   confirmText: "Spam",
                                   confirmColor: const Color(0xffe6e14b),
-                                  onConfirm: () {
-                                    print("Marked as spam");
+                                  onConfirm: () async {
+                                    try {
+                                      await _reportController
+                                          .updateReportStatus(
+                                              widget.report.id, 'closed');
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Report marked as spam and closed')),
+                                      );
+                                      Navigator.pop(context);
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                'Failed to mark as spam: ${e.toString()}')),
+                                      );
+                                    }
                                   },
                                 );
                               },
@@ -638,8 +737,26 @@ class _ReportHistoryState extends State<ReportHistory> {
                                   iconColor: Colors.green,
                                   confirmText: "Resolve",
                                   confirmColor: const Color(0xff87e64c),
-                                  onConfirm: () {
-                                    print("Marked as resolved");
+                                  onConfirm: () async {
+                                    try {
+                                      await _reportController
+                                          .updateReportStatus(
+                                              widget.report.id, 'closed');
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Report marked as resolved')),
+                                      );
+                                      Navigator.pop(context);
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                'Failed to resolve report: ${e.toString()}')),
+                                      );
+                                    }
                                   },
                                 );
                               },
@@ -764,7 +881,10 @@ class ReportCard extends StatelessWidget {
             children: [
               const Text(
                 'Status:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(width: 5),
               Container(
@@ -778,6 +898,7 @@ class ReportCard extends StatelessWidget {
                 child: Text(
                   report.status,
                   style: TextStyle(
+                    fontSize: 16,
                     color: isClosed ? Colors.black : Colors.white,
                   ),
                 ),
@@ -785,11 +906,70 @@ class ReportCard extends StatelessWidget {
               const Spacer(),
             ],
           ),
-          const SizedBox(height: 8),
-          Text('Submitted: ${_formatDate(report.createdAt)}'),
-          Text('Reported By: ${report.reporterName}'),
-          Text('Comments: ${report.comments}'),
-          Text('Action Taken: ${isClosed ? "Case Closed" : "Pending"}'),
+          const SizedBox(height: 7), // Added spacing
+          RichText(
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+              children: [
+                const TextSpan(
+                  text: 'Submitted: ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: _formatDate(report.createdAt)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 7), // Added spacing
+          RichText(
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+              children: [
+                const TextSpan(
+                  text: 'Reported By: ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: report.reporterName),
+              ],
+            ),
+          ),
+          const SizedBox(height: 7), // Added spacing
+          RichText(
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+              children: [
+                const TextSpan(
+                  text: 'Comments: ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: report.comments),
+              ],
+            ),
+          ),
+          const SizedBox(height: 7), // Added spacing
+          RichText(
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+              children: [
+                const TextSpan(
+                  text: 'Action Taken: ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: isClosed ? "Case Closed" : "Pending"),
+              ],
+            ),
+          ),
         ],
       ),
     );

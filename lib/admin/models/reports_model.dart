@@ -7,6 +7,7 @@ class Report {
   final String comments;
   final DateTime createdAt;
   final String status;
+  final Map<String, dynamic>? images;
 
   Report({
     required this.id,
@@ -17,6 +18,7 @@ class Report {
     required this.comments,
     required this.createdAt,
     required this.status,
+    this.images,
   });
 
   factory Report.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class Report {
       comments: json['comments']?.toString() ?? '', // Fallback for null comments
       createdAt: DateTime.parse(json['created_at']?.toString() ?? DateTime.now().toString()),
       status: json['status']?.toString() ?? 'open', // Fallback for null status
+      images: json['images'] != null ? Map<String, dynamic>.from(json['images']) : null,
     );
   }
 

@@ -15,6 +15,7 @@ class ReportController {
           comments, 
           created_at, 
           status,
+          images,
           reported_user:reported_user_id (metadata),
           reporter:reporter_id (metadata)
         ''')
@@ -46,6 +47,7 @@ Future<List<Report>> fetchUserReportHistory(String userId, {int? excludeReportId
             comments, 
             created_at, 
             status,
+            images,
             reported_user:reported_user_id (metadata),
             reporter:reporter_id (metadata)
           ''')
@@ -79,6 +81,16 @@ Future<List<Report>> fetchUserReportHistory(String userId, {int? excludeReportId
     }
   }
   
+  Future<void> updateReportStatus(int reportId, String status) async {
+  try {
+    await supabase
+        .from('reports')
+        .update({'status': status})
+        .eq('id', reportId);
+  } catch (e) {
+    throw Exception('Failed to update report status: ${e.toString()}');
+  }
+}
 }
 
 
