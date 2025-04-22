@@ -7,61 +7,93 @@ class TutorBookingsController {
   final SupabaseClient supabase = Supabase.instance.client;
 
   Future<Map<String, List<BookingModel>>> fetchTutorBookings() async {
-    final user = supabase.auth.currentUser;
-    if (user == null) {
-      print("No tutor is logged in.");
-      return {'pending': [], 'active': [], 'completed': []};
-    }
-
-    final response = await supabase
-        .from('bookings')
-        .select('id, package_id, user_id, tutor_id, time_slots, status')
-        .eq('tutor_id', user.id);
-
-    if (response.isEmpty) {
-      print("No bookings found for this tutor.");
-      return {'pending': [], 'active': [], 'completed': []};
-    }
-
-    List<BookingModel> pendingBookings = [];
-    List<BookingModel> activeBookings = [];
-    List<BookingModel> completedBookings = [];
-
-    response.forEach((data) {
-      BookingModel booking = BookingModel.fromJson(data);
-      print(
-          "Fetched Booking - Booking ID: ${booking.bookingId}, Package ID: ${booking.packageId}, Student ID: ${booking.userId}, Status: ${data['status']}");
-
-      //categorize bookings based on status
-      switch (data['status']) {
-        case 'pending':
-          pendingBookings.add(booking);
-          break;
-        case 'active':
-          activeBookings.add(booking);
-          break;
-        case 'completed':
-          completedBookings.add(booking);
-          break;
-      }
-    });
-
-    //fetch details for each booking
-    for (var booking in [
-      ...pendingBookings,
-      ...activeBookings,
-      ...completedBookings
-    ]) {
-      await fetchStudentInfo(booking);
-      await fetchPackageInfo(booking);
-    }
-
-    return {
-      'pending': pendingBookings,
-      'active': activeBookings,
-      'completed': completedBookings,
-    };
+  final user = supabase.auth.currentUser;
+  if (user == null) {
+    print("No tutor is logged in.");
+    return {'pending': [], 'active': [], 'completed': []};
   }
+
+  // Step 1: Fetch bookings with needed fields including accepted_at
+  final response = await supabase
+      .from('bookings')
+      .select('id, package_id, user_id, tutor_id, time_slots, status, accepted_at')
+      .eq('tutor_id', user.id);
+
+  if (response.isEmpty) {
+    print("No bookings found for this tutor.");
+    return {'pending': [], 'active': [], 'completed': []};
+  }
+
+  // Step 2: Check if status needs to be updated
+  for (var data in response) {
+    final status = data['status'];
+    final acceptedAt = DateTime.tryParse(data['accepted_at'] ?? '');
+    final packageId = data['package_id'];
+    final bookingId = data['id'];
+
+    if (status == 'active' && acceptedAt != null) {
+      // Step 3: Fetch number of weeks for this package
+      final packageResponse = await supabase
+          .from('packages')
+          .select('number_of_weeks')
+          .eq('id', packageId)
+          .single();
+
+      final numberOfWeeks = packageResponse['number_of_weeks'] ?? 0;
+
+      final currentDate = DateTime.now();
+      final weeksPassed = currentDate.difference(acceptedAt).inDays ~/ 7;
+
+      // Step 4: Update status if completed
+      if (weeksPassed >= numberOfWeeks) {
+        await supabase
+            .from('bookings')
+            .update({'status': 'completed'})
+            .eq('id', bookingId);
+        data['status'] = 'completed'; // Update locally too
+      }
+    }
+  }
+
+  // Categorize bookings after possible status updates
+  List<BookingModel> pendingBookings = [];
+  List<BookingModel> activeBookings = [];
+  List<BookingModel> completedBookings = [];
+
+  for (var data in response) {
+    BookingModel booking = BookingModel.fromJson(data);
+    print(
+        "Fetched Booking - Booking ID: ${booking.bookingId}, Package ID: ${booking.packageId}, Student ID: ${booking.userId}, Status: ${data['status']}");
+
+    switch (data['status']) {
+      case 'pending':
+        pendingBookings.add(booking);
+        break;
+      case 'active':
+        activeBookings.add(booking);
+        break;
+      case 'completed':
+        completedBookings.add(booking);
+        break;
+    }
+  }
+
+  // Fetch student/package info for each booking
+  for (var booking in [
+    ...pendingBookings,
+    ...activeBookings,
+    ...completedBookings
+  ]) {
+    await fetchStudentInfo(booking);
+    await fetchPackageInfo(booking);
+  }
+
+  return {
+    'pending': pendingBookings,
+    'active': activeBookings,
+    'completed': completedBookings,
+  };
+}
 
   Future<void> fetchStudentInfo(BookingModel booking) async {
     try {
@@ -134,7 +166,10 @@ class TutorBookingsController {
     try {
       final response = await Supabase.instance.client
           .from('bookings')
-          .update({'status': 'active'})
+          .update({
+            'status': 'active',
+            'accepted_at': DateTime.now().toUtc().toIso8601String(), // Add current timestamp
+          })
           .eq('id', bookingId)
           .select();
 

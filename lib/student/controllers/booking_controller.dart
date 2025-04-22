@@ -6,6 +6,7 @@ class BookingController extends GetxController {
   RxList<BookingModel> pendingBookings = <BookingModel>[].obs;
   RxList<BookingModel> activeBookings = <BookingModel>[].obs;
   RxList<BookingModel> rejectedBookings = <BookingModel>[].obs;
+  RxList<BookingModel> completedBookings = <BookingModel>[].obs;
 
   @override
   void onInit() {
@@ -34,6 +35,7 @@ class BookingController extends GetxController {
         activeBookings.clear();
         pendingBookings.clear();
         rejectedBookings.clear();
+        completedBookings.clear();
 
         for (var booking in response) {
           BookingModel bookingData = BookingModel.fromJson(booking);
@@ -51,11 +53,13 @@ class BookingController extends GetxController {
             pendingBookings.add(bookingData);
           } else if (booking['status'] == 'rejected') {
             rejectedBookings.add(bookingData);
+          } else if (booking['status'] == 'completed') {
+            completedBookings.add(bookingData);
           }
         }
 
         print(
-            "Active Bookings: ${activeBookings.length}, Pending Bookings: ${pendingBookings.length}, Rejected Bookings: ${rejectedBookings.length}");
+            "Active Bookings: ${activeBookings.length}, Pending Bookings: ${pendingBookings.length}, Rejected Bookings: ${rejectedBookings.length}, Completed Bookings: ${completedBookings.length}");
       } else {
         print("No bookings found for user_id: ${user.id}");
       }
@@ -124,4 +128,29 @@ class BookingController extends GetxController {
       print("Error fetching package info: $e");
     }
   }
+Future<void> submitFeedback({
+  required int rating,
+  required String review,
+  required String tutorId,
+  required String studentId,
+}) async {
+  final supabase = Supabase.instance.client;
+
+  if (rating <= 0 || review.trim().isEmpty) {
+    throw Exception("Rating and review cannot be empty.");
+  }
+
+  try {
+    await supabase.from('feedback').insert({
+      'rating': rating,
+      'review': review.trim(),
+      'tutor_id': tutorId,
+      'student_id': studentId,
+    });
+  } catch (e) {
+    throw Exception("Failed to submit feedback: $e");
+  }
+}
+
+  
 }

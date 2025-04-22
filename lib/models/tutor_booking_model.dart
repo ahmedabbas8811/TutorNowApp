@@ -11,6 +11,7 @@ class BookingModel {
   String numberOfWeeks;
   String price;
   Map<String, dynamic> timeSlots;
+  
 
   BookingModel({
     required this.bookingId,
