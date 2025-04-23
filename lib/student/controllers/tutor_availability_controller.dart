@@ -244,21 +244,63 @@ class TutorAvailabilityController extends GetxController {
         Duration(milliseconds: 100)); 
   }
 
-void nextSession() {
-  if (currentSession.value < totalSessions) {
-    // store selected time slot for current session in the selectedSlots map
-    selectedSlots["${currentSession.value}"] = {
-      "day": selectedDay.value,
-      "time": selectedTime.value.isNotEmpty ? selectedTime.value : ""
-    };
+Future<bool> isSlotAlreadyBooked(String day, String time) async {
+  try {
+    final response = await Supabase.instance.client
+        .from('booked_slots')
+        .select(day) // Select only the column for the specific day
+        .eq('tutor_id', userId.value);
 
-    // move to the next session
-    currentSession.value++;
-
-    // clear selections for next session
-    resetSelections();
+    if (response != null && response.isNotEmpty) {
+      for (final entry in response) {
+        final List<dynamic>? slots = entry[day];
+        if (slots != null && slots.contains(time)) {
+          return true; // slot already booked
+        }
+      }
+    }
+  } catch (e) {
+    print("Error while checking booked slots: $e");
   }
+
+  return false;
 }
+
+
+void nextSession() async {
+  final selectedDayStr = selectedDay.value.toLowerCase();
+  final selectedTimeStr = selectedTime.value;
+
+  if (selectedTimeStr.isEmpty) {
+    Get.snackbar("Error", "Please select a time slot.");
+    return;
+  }
+
+  // Cross-validate if the time slot is already booked
+  final alreadyBooked = await isSlotAlreadyBooked(selectedDayStr, selectedTimeStr);
+  if (alreadyBooked) {
+    Get.defaultDialog(
+      title: "Slot Unavailable",
+      middleText: "The selected time slot is already booked for $selectedDayStr.",
+      textConfirm: "OK",
+      onConfirm: () => Get.back(),
+    );
+    return;
+  }
+
+  // Store selected time slot for the current session
+  selectedSlots["${currentSession.value}"] = {
+    "day": selectedDay.value,
+    "time": selectedTimeStr
+  };
+
+  // Move to the next session
+  currentSession.value++;
+
+  // Reset selections for the next session
+  resetSelections();
+}
+
 
 Future<void> confirmAvailability() async {
   final user = Supabase.instance.client.auth.currentUser;
@@ -273,18 +315,37 @@ Future<void> confirmAvailability() async {
     return;
   }
 
-  // add last sessions selected slot to selectedSlots map
+  // Add the selected slot to the selectedSlots map
   selectedSlots["${currentSession.value}"] = {
     "day": selectedDay.value,
     "time": selectedTime.value.isNotEmpty ? selectedTime.value : ""
   };
+
+  // Cross-validate all selected slots
+  for (var session in selectedSlots.entries) {
+    final day = session.value["day"]?.toLowerCase();
+    final time = session.value["time"];
+
+    if (day != null && time != null && time.isNotEmpty) {
+      final alreadyBooked = await isSlotAlreadyBooked(day, time);
+      if (alreadyBooked) {
+        Get.defaultDialog(
+          title: "Slot Unavailable",
+          middleText: "Time slot $time on ${day[0].toUpperCase()}${day.substring(1)} is already booked.",
+          textConfirm: "OK",
+          onConfirm: () => Get.back(),
+        );
+        return;
+      }
+    }
+  }
 
   print("Final Availability List:");
   selectedSlots.forEach((session, details) {
     print("Session: $session, Day: ${details["day"]}, Time: ${details["time"]}");
   });
 
-  // prepare data to insert into database
+  // Prepare data to insert into the bookings table
   final bookingData = {
     'user_id': user.id, 
     'tutor_id': userId.value,
@@ -293,7 +354,7 @@ Future<void> confirmAvailability() async {
   };
 
   try {
-    // insert data into the bookings table
+    // Insert data into the bookings table
     final response = await Supabase.instance.client
         .from('bookings')
         .insert(bookingData)
@@ -324,7 +385,7 @@ Future<void> confirmAvailability() async {
     );
   }
 
-  // clear selectedSlots map after confirmation
+  // Clear selectedSlots map after confirmation
   selectedSlots.clear();
 }
 

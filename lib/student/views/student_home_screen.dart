@@ -6,9 +6,8 @@ import 'package:newifchaly/student/views/student_profile.dart';
 import 'package:newifchaly/student/views/tutor_detail.dart';
 import 'package:newifchaly/student/views/widgets/nav_bar.dart';
 import '../controllers/student_home_controller.dart';
-import '../models/student_home_model.dart'; 
+import '../models/student_home_model.dart';
 import 'package:get/get.dart';
-
 
 class StudentHomeScreen extends StatefulWidget {
   @override
@@ -113,8 +112,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                 : SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _educationLevels.map((level) {
-                        return buildSection(level);
+                      children: _educationLevels.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        String level = entry.value;
+                        return buildSection(
+                            level, index == 0); // Only show icon for the first
                       }).toList(),
                     ),
                   ),
@@ -124,7 +126,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             selectedIndex: 0, onItemTapped: _onItemTapped));
   }
 
-  Widget buildSection(String educationLevel) {
+  Widget buildSection(String educationLevel, bool showChatIcon) {
     final tutors = _tutorsByEducationLevel[educationLevel] ?? [];
 
     return Column(
@@ -137,7 +139,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               'Tutors For $educationLevel',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            if (educationLevel == "Bachelors") // Add chat icon for Bachelors
+            if (showChatIcon)
               IconButton(
                 icon: const Icon(Icons.message_outlined, color: Colors.black),
                 onPressed: () => Get.to(() => TutorChatListScreen()),
