@@ -7,6 +7,7 @@ class BookingController extends GetxController {
   RxList<BookingModel> activeBookings = <BookingModel>[].obs;
   RxList<BookingModel> rejectedBookings = <BookingModel>[].obs;
   RxList<BookingModel> completedBookings = <BookingModel>[].obs;
+  var isLoading = true.obs;
 
   @override
   void onInit() {
@@ -14,11 +15,13 @@ class BookingController extends GetxController {
     fetchBookings();
   }
 
-  Future<void> fetchBookings() async {
+ Future<void> fetchBookings() async {
+    isLoading(true); // Set loading to true when fetch starts
     final user = Supabase.instance.client.auth.currentUser;
 
     if (user == null) {
       print("No user is currently logged in.");
+      isLoading(false); // Make sure to set loading to false even if no user
       return;
     }
 
@@ -31,32 +34,45 @@ class BookingController extends GetxController {
       if (response.isNotEmpty) {
         print("Bookings fetched successfully: $response");
 
-        //clear existing bookings
+        // Clear existing bookings
         activeBookings.clear();
         pendingBookings.clear();
         rejectedBookings.clear();
         completedBookings.clear();
 
-        for (var booking in response) {
+        // Temporary lists to hold data before assigning
+        List<BookingModel> active = [];
+        List<BookingModel> pending = [];
+        List<BookingModel> rejected = [];
+        List<BookingModel> completed = [];
+
+        // Process bookings in parallel for better performance
+        await Future.wait(response.map((booking) async {
           BookingModel bookingData = BookingModel.fromJson(booking);
 
-          //fetch tutor info and update
+          // Fetch tutor info and update
           await fetchTutorInfo(bookingData);
 
-          //fetch package info and update
+          // Fetch package info and update
           await fetchPackageInfo(bookingData);
 
-          //categorize bookings based on status
+          // Categorize bookings based on status
           if (booking['status'] == 'active') {
-            activeBookings.add(bookingData);
+            active.add(bookingData);
           } else if (booking['status'] == 'pending') {
-            pendingBookings.add(bookingData);
+            pending.add(bookingData);
           } else if (booking['status'] == 'rejected') {
-            rejectedBookings.add(bookingData);
+            rejected.add(bookingData);
           } else if (booking['status'] == 'completed') {
-            completedBookings.add(bookingData);
+            completed.add(bookingData);
           }
-        }
+        }));
+
+        // Assign all at once to minimize UI updates
+        activeBookings.assignAll(active);
+        pendingBookings.assignAll(pending);
+        rejectedBookings.assignAll(rejected);
+        completedBookings.assignAll(completed);
 
         print(
             "Active Bookings: ${activeBookings.length}, Pending Bookings: ${pendingBookings.length}, Rejected Bookings: ${rejectedBookings.length}, Completed Bookings: ${completedBookings.length}");
@@ -65,6 +81,9 @@ class BookingController extends GetxController {
       }
     } catch (e) {
       print("Error fetching bookings: $e");
+      
+    } finally {
+      isLoading(false); 
     }
   }
 
