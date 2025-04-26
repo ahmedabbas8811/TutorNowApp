@@ -1,15 +1,8 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:newifchaly/student/views/bookings.dart';
 import 'package:newifchaly/student/views/search_results.dart';
 import 'package:newifchaly/student/views/student_home_screen.dart';
 import 'package:newifchaly/student/views/widgets/nav_bar.dart';
-// Import your bottom navigation bar file and screens
-// import 'your_custom_bottom_navigation_bar.dart';
-// import 'student_home_screen.dart';
-// import 'search_results.dart';
-// import 'bookings_screen.dart';
 
 class EditStudentProfileScreen extends StatefulWidget {
   @override
@@ -62,61 +55,59 @@ class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
         elevation: 0,
         foregroundColor: Colors.black,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+        
         padding: const EdgeInsets.all(20),
-        child: ListView(
+        child: Column(
           children: [
-            Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const CircleAvatar(
-                    radius: 60,
-                    backgroundImage: AssetImage('assets/profile.jpg'),
-                  ),
-                  Positioned(
-                    top: 120,
-                    bottom: -10,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
+            Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                const CircleAvatar(
+                  radius: 70,
+                  backgroundImage: AssetImage('assets/profile.jpg'),
+                ),
+                Positioned(
+                  top: 142,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          // Change profile image logic
+                        },
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF87E64B),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ],
+                          child: const Icon(Icons.edit, color: Colors.black, size: 18),
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: const Icon(Icons.edit, color: Colors.green, size: 20),
-                            onPressed: () {
-                              // Change profile image
-                            },
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          // Delete profile image logic
+                        },
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                            onPressed: () {
-                              // Delete profile image
-                            },
-                          ),
-                        ],
+                          child: const Icon(Icons.delete, color: Colors.white, size: 18),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 50),
             Row(
               children: [
                 Expanded(child: buildTextField("Full Name", "Enter your full name", nameController)),
@@ -129,36 +120,42 @@ class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
             const SizedBox(height: 20),
             buildTextField("Education Level", "Enter your education level", educationController),
             const SizedBox(height: 20),
-            buildTextField("Subjects I am weak at", "Enter subjects", subjectsController),
+            buildTextField("Subjects I am weak at", "Biology , Chemistry", subjectsController),
             const SizedBox(height: 20),
             buildTextField("Learning Goals", "Enter your goals", goalsController),
-            const SizedBox(height: 30),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Save logic
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightGreenAccent.shade400,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Save',
-                  style: TextStyle(color: Colors.black, fontSize: 18),
-                ),
-              ),
-            ),
+            const SizedBox(height: 100), // Extra space for bottom sheet visibility
           ],
         ),
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
+      ),
+      bottomSheet: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: SafeArea(
+          child: SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () {
+                // Save logic
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF87E64B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Save',
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

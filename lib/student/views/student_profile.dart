@@ -235,7 +235,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
   );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.lightGreenAccent.shade400,
+                        backgroundColor: const Color(0xFF87E64B),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         
