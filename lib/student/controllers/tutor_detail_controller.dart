@@ -16,6 +16,11 @@ class TutorDetailController extends GetxController {
           isVerified: false)
       .obs;
 
+var reviews = <Map<String, dynamic>>[].obs;
+var averageRating = 0.0.obs;
+var isLoadingReviews = true.obs;
+
+
   void resetProfile() {
     profile.value = PersonModel(
       name: "",
@@ -36,6 +41,7 @@ class TutorDetailController extends GetxController {
     fetchUserImg(UserId!);
     fetchQualifications(UserId!);
     fetchExperiences(UserId!);
+    fetchReviews(UserId!);
   }
 
   Future<void> updateVerificationStatus() async {
@@ -234,4 +240,41 @@ class TutorDetailController extends GetxController {
       }
     }
   }
+  Future<void> fetchReviews(String tutorId) async {
+  isLoadingReviews.value = true;
+  reviews.clear();
+
+  try {
+    final supabase = Supabase.instance.client;
+
+    final reviewsResponse = await supabase
+        .from('feedback')
+        .select('*')
+        .eq('tutor_id', tutorId)
+        .order('created_at', ascending: false);
+
+    if (reviewsResponse.isNotEmpty) {
+      final totalRating = reviewsResponse.fold(0, (sum, review) => sum + (review['rating'] as int));
+      averageRating.value = totalRating / reviewsResponse.length;
+    }
+
+    for (var review in reviewsResponse) {
+      final studentResponse = await supabase
+          .from('users')
+          .select('image_url, metadata')
+          .eq('id', review['student_id'])
+          .single();
+
+      reviews.add({
+        ...review,
+        'student_name': studentResponse['metadata']['name'] ?? 'Anonymous',
+        'student_image': studentResponse['image_url'],
+      });
+    }
+  } catch (e) {
+    print('Error fetching reviews: $e');
+  } finally {
+    isLoadingReviews.value = false;
+  }
+}
 }

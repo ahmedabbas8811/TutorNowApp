@@ -8,6 +8,7 @@ class Report {
   final DateTime createdAt;
   final String status;
   final Map<String, dynamic>? images;
+  final String? actionTaken;
 
   Report({
     required this.id,
@@ -19,6 +20,7 @@ class Report {
     required this.createdAt,
     required this.status,
     this.images,
+    this.actionTaken,
   });
 
   factory Report.fromJson(Map<String, dynamic> json) {
@@ -28,10 +30,15 @@ class Report {
       reportedUserName: _extractUserName(json['reported_user_metadata']),
       reporterId: json['reporter_id']?.toString(),
       reporterName: _extractUserName(json['reporter_metadata']),
-      comments: json['comments']?.toString() ?? '', // Fallback for null comments
-      createdAt: DateTime.parse(json['created_at']?.toString() ?? DateTime.now().toString()),
+      comments:
+          json['comments']?.toString() ?? '', // Fallback for null comments
+      createdAt: DateTime.parse(
+          json['created_at']?.toString() ?? DateTime.now().toString()),
       status: json['status']?.toString() ?? 'open', // Fallback for null status
-      images: json['images'] != null ? Map<String, dynamic>.from(json['images']) : null,
+      images: json['images'] != null
+          ? Map<String, dynamic>.from(json['images'])
+          : null,
+      actionTaken: json['action_taken']?.toString(),
     );
   }
 

@@ -63,14 +63,21 @@ class TutorDetailScreen extends StatelessWidget {
                               profile.name.isNotEmpty
                                   ? profile.name
                                   : 'Loading...',
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Row(
                               children: [
-                                Icon(Icons.star, color: Colors.amber, size: 16),
-                                SizedBox(width: 4),
-                                Text('4.8', style: TextStyle(fontSize: 16)),
+                                const Icon(Icons.star,
+                                    color: Colors.amber, size: 16),
+                                const SizedBox(width: 4),
+                                Obx(() => Text(
+                                      _controller.reviews.isNotEmpty
+                                          ? _controller.averageRating
+                                              .toStringAsFixed(1)
+                                          : '0.0', 
+                                      style: const TextStyle(fontSize: 16),
+                                    )),
                               ],
                             ),
                           ],
@@ -102,7 +109,7 @@ class TutorDetailScreen extends StatelessWidget {
                             userId: userId,
                           );
                         case 2:
-                          return ReviewsSection();
+                          return ReviewsSection(tutorId: userId);
                         default:
                           return SizedBox();
                       }
@@ -132,11 +139,10 @@ class TutorDetailScreen extends StatelessWidget {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    final profileName =
-                        _controller.profile.value.name; 
+                    final profileName = _controller.profile.value.name;
                     Get.to(() => ChatScreen(
                           receiverId: userId,
-                          receiverName: profileName, 
+                          receiverName: profileName,
                         ));
                   },
                   style: ElevatedButton.styleFrom(

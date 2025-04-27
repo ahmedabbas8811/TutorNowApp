@@ -6,6 +6,7 @@ import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/admin/views/home_admin.dart';
 import 'package:newifchaly/admin/views/manageusers.dart';
 import 'package:newifchaly/admin/views/report_history.dart';
+import 'package:newifchaly/messagescreen.dart';
 
 class HandleReports extends StatefulWidget {
   const HandleReports({super.key});
@@ -138,22 +139,30 @@ class _HandleReportsState extends State<HandleReports> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(
-                      left: 24.0, right: 24.0, top: 16.0, bottom: 8.0),
-                  child: Row(
-                    children: [
-                      Text('Handle Reports',
+                Padding(
+                    padding: const EdgeInsets.only(
+                        left: 24.0, right: 24.0, top: 16.0, bottom: 8.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Handle Reports',
                           style: TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.bold)),
-                      Spacer(),
-                      InkWell(
-                        child:
-                            Icon(Icons.message, size: 28, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
+                              fontSize: 28, fontWeight: FontWeight.bold),
+                        ),
+                        const Spacer(),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => TutorChatListScreen()),
+                            );
+                          },
+                          child: const Icon(Icons.message,
+                              size: 28, color: Colors.black),
+                        ),
+                      ],
+                    )),
 
                 // Reports Table Card
                 Expanded(
@@ -348,8 +357,7 @@ class _HandleReportsState extends State<HandleReports> {
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         ReportHistory(
-                                                      report:
-                                                          report, 
+                                                      report: report,
                                                     ),
                                                   ),
                                                 );

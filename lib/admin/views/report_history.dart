@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:newifchaly/admin/controllers/manage_users_controller.dart';
 import 'package:newifchaly/admin/controllers/reports_controller.dart';
 import 'package:newifchaly/admin/models/reports_model.dart';
 import 'package:newifchaly/admin/views/approve_tutors.dart';
 import 'package:newifchaly/admin/views/home_admin.dart';
 import 'package:newifchaly/admin/views/manageusers.dart';
+import 'package:newifchaly/messagescreen.dart';
+import 'package:newifchaly/student/views/chat_screen.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+final supabase = Supabase.instance.client;
 
 class ReportHistory extends StatefulWidget {
   final Report report;
@@ -16,6 +24,7 @@ class ReportHistory extends StatefulWidget {
 
 class _ReportHistoryState extends State<ReportHistory> {
   final ReportController _reportController = ReportController();
+  final UserController _userController = UserController();
   late Future<List<Report>> _reportedUserHistoryFuture;
   late Future<List<Report>> _reporterHistoryFuture;
   int _selectedTabIndex = 0;
@@ -308,7 +317,18 @@ class _ReportHistoryState extends State<ReportHistory> {
                         ),
                       ),
                       const Spacer(),
-                      const Icon(Icons.message, size: 28, color: Colors.black),
+                      IconButton(
+                        icon: const Icon(Icons.message,
+                            size: 28, color: Colors.black),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TutorChatListScreen(),
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -369,7 +389,7 @@ class _ReportHistoryState extends State<ReportHistory> {
                         ),
                         const SizedBox(height: 7),
 
-                        // Reported By
+                        // Reported By section
                         Row(
                           children: [
                             RichText(
@@ -390,13 +410,27 @@ class _ReportHistoryState extends State<ReportHistory> {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.message,
-                                color: Colors.black, size: 15),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatScreen(
+                                      receiverId:
+                                          widget.report.reporterId ?? '',
+                                      receiverName: widget.report.reporterName,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: const Icon(Icons.message,
+                                  color: Colors.black, size: 15),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 7),
 
-                        // Reported User
+                        // Reported User section
                         Row(
                           children: [
                             RichText(
@@ -418,8 +452,23 @@ class _ReportHistoryState extends State<ReportHistory> {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.message,
-                                color: Colors.black, size: 15),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatScreen(
+                                      receiverId:
+                                          widget.report.reportedUserId ?? '',
+                                      receiverName:
+                                          widget.report.reportedUserName,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: const Icon(Icons.message,
+                                  color: Colors.black, size: 15),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 7),
@@ -462,15 +511,180 @@ class _ReportHistoryState extends State<ReportHistory> {
                                     if (imageUrl == null)
                                       return const SizedBox.shrink();
 
-                                    return Container(
-                                      width: 208.2,
-                                      height: 200,
-                                      margin: const EdgeInsets.only(right: 16),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        image: DecorationImage(
-                                          image: NetworkImage(imageUrl),
-                                          fit: BoxFit.cover,
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              final pageController =
+                                                  PageController(
+                                                      initialPage: index);
+                                              ValueNotifier<int>
+                                                  currentIndexNotifier =
+                                                  ValueNotifier<int>(index);
+
+                                              return Scaffold(
+                                                appBar: AppBar(
+                                                  title: ValueListenableBuilder<
+                                                      int>(
+                                                    valueListenable:
+                                                        currentIndexNotifier,
+                                                    builder: (context,
+                                                        currentIndex, child) {
+                                                      return Text(
+                                                          'Image ${currentIndex + 1}/${widget.report.images!.length}');
+                                                    },
+                                                  ),
+                                                ),
+                                                body: Stack(
+                                                  children: [
+                                                    PhotoViewGallery.builder(
+                                                      itemCount: widget.report
+                                                          .images!.length,
+                                                      builder:
+                                                          (context, index) {
+                                                        final galleryImageUrl =
+                                                            widget
+                                                                .report
+                                                                .images![
+                                                                    '$index']
+                                                                ?.toString();
+                                                        return PhotoViewGalleryPageOptions(
+                                                          imageProvider:
+                                                              NetworkImage(
+                                                                  galleryImageUrl!),
+                                                          minScale:
+                                                              PhotoViewComputedScale
+                                                                  .contained,
+                                                          maxScale:
+                                                              PhotoViewComputedScale
+                                                                      .covered *
+                                                                  2,
+                                                          heroAttributes:
+                                                              PhotoViewHeroAttributes(
+                                                                  tag:
+                                                                      galleryImageUrl),
+                                                        );
+                                                      },
+                                                      scrollPhysics:
+                                                          const BouncingScrollPhysics(),
+                                                      backgroundDecoration:
+                                                          const BoxDecoration(
+                                                        color: Colors.black,
+                                                      ),
+                                                      pageController:
+                                                          pageController,
+                                                      onPageChanged: (index) {
+                                                        currentIndexNotifier
+                                                            .value = index;
+                                                      },
+                                                    ),
+
+                                                    // Left arrow - only show when not on first image
+                                                    ValueListenableBuilder<int>(
+                                                      valueListenable:
+                                                          currentIndexNotifier,
+                                                      builder: (context,
+                                                          currentIndex, child) {
+                                                        return currentIndex > 0
+                                                            ? Positioned(
+                                                                left: 10,
+                                                                top: 0,
+                                                                bottom: 0,
+                                                                child: Center(
+                                                                  child:
+                                                                      IconButton(
+                                                                    icon:
+                                                                        const Icon(
+                                                                      Icons
+                                                                          .arrow_back_ios,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
+                                                                    onPressed:
+                                                                        () {
+                                                                      pageController
+                                                                          .previousPage(
+                                                                        duration:
+                                                                            const Duration(milliseconds: 300),
+                                                                        curve: Curves
+                                                                            .easeInOut,
+                                                                      );
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : const SizedBox
+                                                                .shrink();
+                                                      },
+                                                    ),
+
+                                                    // Right arrow - only show when not on last image
+                                                    ValueListenableBuilder<int>(
+                                                      valueListenable:
+                                                          currentIndexNotifier,
+                                                      builder: (context,
+                                                          currentIndex, child) {
+                                                        return currentIndex <
+                                                                widget
+                                                                        .report
+                                                                        .images!
+                                                                        .length -
+                                                                    1
+                                                            ? Positioned(
+                                                                right: 10,
+                                                                top: 0,
+                                                                bottom: 0,
+                                                                child: Center(
+                                                                  child:
+                                                                      IconButton(
+                                                                    icon:
+                                                                        const Icon(
+                                                                      Icons
+                                                                          .arrow_forward_ios,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
+                                                                    onPressed:
+                                                                        () {
+                                                                      pageController
+                                                                          .nextPage(
+                                                                        duration:
+                                                                            const Duration(milliseconds: 300),
+                                                                        curve: Curves
+                                                                            .easeInOut,
+                                                                      );
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : const SizedBox
+                                                                .shrink();
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      child: Hero(
+                                        tag: imageUrl,
+                                        child: Container(
+                                          width: 208.2,
+                                          height: 200,
+                                          margin:
+                                              const EdgeInsets.only(right: 16),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                            image: DecorationImage(
+                                              image: NetworkImage(imageUrl),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     );
@@ -480,7 +694,6 @@ class _ReportHistoryState extends State<ReportHistory> {
                               const SizedBox(height: 15),
                             ],
                           ),
-
                         // User Report History section
                         const Text(
                           'User Report History',
@@ -599,7 +812,17 @@ class _ReportHistoryState extends State<ReportHistory> {
                                       // Update report status
                                       await _reportController
                                           .updateReportStatus(
-                                              widget.report.id, 'closed');
+                                              widget.report.id, 'closed',
+                                              actionType: 'block');
+
+                                      // Update user status to blocked
+                                      if (widget.report.reportedUserId !=
+                                          null) {
+                                        await _userController.updateUserStatus(
+                                            widget.report.reportedUserId!,
+                                            true // true means block the user
+                                            );
+                                      }
 
                                       // Show success message
                                       ScaffoldMessenger.of(context)
@@ -647,15 +870,34 @@ class _ReportHistoryState extends State<ReportHistory> {
                                   confirmColor: const Color(0xffffa21e),
                                   onConfirm: () async {
                                     try {
+                                      // First, send the warning message
+                                      final myUserId =
+                                          supabase.auth.currentUser?.id;
+                                      if (myUserId != null) {
+                                        await supabase.from('messages').insert({
+                                          'sender_id': myUserId,
+                                          'receiver_id':
+                                              widget.report.reportedUserId ??
+                                                  '',
+                                          'content':
+                                              'You have received a warning from the admin regarding your recent behavior. Please review our community guidelines.',
+                                          'created_at':
+                                              DateTime.now().toIso8601String(),
+                                        });
+                                      }
+
+                                      // Then update report status
                                       await _reportController
                                           .updateReportStatus(
-                                              widget.report.id, 'closed');
+                                              widget.report.id, 'closed',
+                                              actionType: 'warn');
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
                                             content: Text(
                                                 'User warned and report closed')),
                                       );
+
                                       Navigator.pop(context);
                                     } catch (e) {
                                       ScaffoldMessenger.of(context)
@@ -695,7 +937,8 @@ class _ReportHistoryState extends State<ReportHistory> {
                                     try {
                                       await _reportController
                                           .updateReportStatus(
-                                              widget.report.id, 'closed');
+                                              widget.report.id, 'closed',
+                                              actionType: 'spam');
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
@@ -741,7 +984,8 @@ class _ReportHistoryState extends State<ReportHistory> {
                                     try {
                                       await _reportController
                                           .updateReportStatus(
-                                              widget.report.id, 'closed');
+                                              widget.report.id, 'closed',
+                                              actionType: 'resolve');
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
@@ -906,7 +1150,7 @@ class ReportCard extends StatelessWidget {
               const Spacer(),
             ],
           ),
-          const SizedBox(height: 7), // Added spacing
+          const SizedBox(height: 7),
           RichText(
             text: TextSpan(
               style: const TextStyle(
@@ -922,7 +1166,7 @@ class ReportCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 7), // Added spacing
+          const SizedBox(height: 7),
           RichText(
             text: TextSpan(
               style: const TextStyle(
@@ -938,7 +1182,7 @@ class ReportCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 7), // Added spacing
+          const SizedBox(height: 7),
           RichText(
             text: TextSpan(
               style: const TextStyle(
@@ -954,7 +1198,7 @@ class ReportCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 7), // Added spacing
+          const SizedBox(height: 7),
           RichText(
             text: TextSpan(
               style: const TextStyle(
@@ -966,7 +1210,7 @@ class ReportCard extends StatelessWidget {
                   text: 'Action Taken: ',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                TextSpan(text: isClosed ? "Case Closed" : "Pending"),
+                TextSpan(text: report.actionTaken ?? "No action taken"),
               ],
             ),
           ),

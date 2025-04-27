@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/student/controllers/booking_controller.dart';
 import 'package:newifchaly/student/models/booking_model.dart';
-
 import 'package:newifchaly/student/views/progress_stu.dart';
 import 'package:newifchaly/student/views/search_results.dart';
 import 'package:newifchaly/student/views/student_home_screen.dart';
 import 'package:newifchaly/student/views/student_profile.dart';
 import 'package:newifchaly/student/views/widgets/nav_bar.dart';
+import 'package:newifchaly/views/widgets/booking_card_shimmer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class BookingsScreen extends StatefulWidget {
@@ -51,144 +51,158 @@ class _BookingsScreenState extends State<BookingsScreen> {
     }
   }
 
-void _showReviewDialog(BookingModel booking) {
-  int selectedRating = 0;
-  TextEditingController reviewController = TextEditingController();
+  void _showReviewDialog(BookingModel booking) {
+    int selectedRating = 0;
+    TextEditingController reviewController = TextEditingController();
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder(builder: (context, setState) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'Leave a review',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F5F5),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Leave a review',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: List.generate(5, (index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedRating = index + 1;
-                          });
-                        },
-                        child: Icon(
-                          index < selectedRating
-                              ? Icons.star
-                              : Icons.star_border,
-                          size: 32,
-                          color: index < selectedRating
-                              ? Colors.amber
-                              : Colors.grey,
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: List.generate(5, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedRating = index + 1;
+                            });
+                          },
+                          child: Icon(
+                            index < selectedRating
+                                ? Icons.star
+                                : Icons.star_border,
+                            size: 32,
+                            color: index < selectedRating
+                                ? Colors.amber
+                                : Colors.grey,
+                          ),
                         ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: reviewController,
+                    maxLines: 4,
+                    decoration: const InputDecoration(
+                      hintText: 'Write your comments here',
+                      filled: true,
+                      fillColor: Color(0xFFF5F5F5),
+                      contentPadding: EdgeInsets.all(12),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black, width: 1.2),
                       ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: reviewController,
-                  maxLines: 4,
-                  decoration: const InputDecoration(
-                    hintText: 'Write your comments here',
-                    filled: true,
-                    fillColor: Color(0xFFF5F5F5),
-                    contentPadding: EdgeInsets.all(12),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 1.2),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 1.2),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 1.2),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black, width: 1.2),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black, width: 1.2),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final user = Supabase.instance.client.auth.currentUser;
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final user = Supabase.instance.client.auth.currentUser;
 
-                      if (user != null &&
-                          selectedRating > 0 &&
-                          reviewController.text.isNotEmpty) {
-                        try {
-                          final bookingController = Get.find<BookingController>();
-                          await bookingController.submitFeedback(
-                            rating: selectedRating,
-                            review: reviewController.text,
-                            tutorId: booking.tutorId,
-                            studentId: booking.userId,
-                          );
+                        if (user != null &&
+                            selectedRating > 0 &&
+                            reviewController.text.isNotEmpty) {
+                          try {
+                            final bookingController = Get.find<BookingController>();
+                            await bookingController.submitFeedback(
+                              rating: selectedRating,
+                              review: reviewController.text,
+                              tutorId: booking.tutorId,
+                              studentId: booking.userId,
+                            );
 
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Review submitted!')),
+                            );
+                            Navigator.of(context).pop();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: $e')),
+                            );
+                          }
+                        } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Review submitted!')),
-                          );
-                          Navigator.of(context).pop();
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error: $e')),
+                            const SnackBar(
+                              content: Text('Please select a rating and write a review.'),
+                            ),
                           );
                         }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please select a rating and write a review.'),
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF87E64B),
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(color: Colors.black),
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF87E64B),
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(color: Colors.black),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: const Text(
-                      'Send Feedback',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                      child: const Text(
+                        'Send Feedback',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      });
-    },
-  );
-}
+          );
+        });
+      },
+    );
+  }
 
-
+  Widget _buildShimmerCards(int count) {
+    return SizedBox(
+      height: 180,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: count,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: BookingCardShimmer(),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -216,6 +230,9 @@ void _showReviewDialog(BookingModel booking) {
               ),
               const SizedBox(height: 8),
               Obx(() {
+                if (bookingController.isLoading.value) {
+                  return _buildShimmerCards(3);
+                }
                 if (bookingController.pendingBookings.isEmpty) {
                   return const Center(child: Text("No pending bookings."));
                 }
@@ -253,6 +270,9 @@ void _showReviewDialog(BookingModel booking) {
               ),
               const SizedBox(height: 10),
               Obx(() {
+                if (bookingController.isLoading.value) {
+                  return _buildShimmerCards(3);
+                }
                 if (bookingController.activeBookings.isEmpty) {
                   return const Center(child: Text("No Active bookings."));
                 }
@@ -268,7 +288,7 @@ void _showReviewDialog(BookingModel booking) {
                       duration: "${booking.numberOfWeeks} Weeks",
                       price: "${booking.price}/- PKR",
                       rating: "4.8",
-                      statusColor: Colors.orange,
+                      statusColor: Colors.green,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -299,6 +319,9 @@ void _showReviewDialog(BookingModel booking) {
               ),
               const SizedBox(height: 10),
               Obx(() {
+                if (bookingController.isLoading.value) {
+                  return _buildShimmerCards(3);
+                }
                 if (bookingController.completedBookings.isEmpty) {
                   return const Center(child: Text("No Completed bookings."));
                 }
