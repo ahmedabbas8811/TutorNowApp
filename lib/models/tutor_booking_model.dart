@@ -1,6 +1,6 @@
 class BookingModel {
   final String bookingId;
-  final String userId; 
+  final String userId;
   final String packageId;
   final String tutorId;
   String studentName;
@@ -10,8 +10,8 @@ class BookingModel {
   String sessionsPerWeek;
   String numberOfWeeks;
   String price;
+  DateTime accepted_at;
   Map<String, dynamic> timeSlots;
-  
 
   BookingModel({
     required this.bookingId,
@@ -25,7 +25,8 @@ class BookingModel {
     this.sessionsPerWeek = '0',
     this.numberOfWeeks = '0',
     this.price = '0',
-    this.timeSlots = const {}, 
+    required this.accepted_at,
+    this.timeSlots = const {},
   });
 
   // factory method to create BookingModel from JSON
@@ -33,16 +34,20 @@ class BookingModel {
     return BookingModel(
       bookingId: json['id'].toString(),
       userId: json['user_id'] ?? '',
-      packageId: json['package_id'] != null ? json['package_id'].toString() : '',
+      packageId:
+          json['package_id'] != null ? json['package_id'].toString() : '',
       tutorId: json['tutor_id'] ?? '',
-      timeSlots: json['time_slots'] != null 
-          ? Map<String, dynamic>.from(json['time_slots'])  // Convert JSONB to Map
+      timeSlots: json['time_slots'] != null
+          ? Map<String, dynamic>.from(
+              json['time_slots']) // Convert JSONB to Map
           : {},
+      accepted_at: json['accepted_at'] != null
+          ? DateTime.parse(json['accepted_at'])
+          : DateTime.now(), // fallback if accepted_at is null
     );
   }
 
-
-  // method to update student info 
+  // method to update student info
   void updateStudentInfo(String name, String imageUrl) {
     studentName = name.isNotEmpty ? name : 'Unknown Student';
     studentImage = imageUrl.isNotEmpty ? imageUrl : '';
@@ -57,5 +62,12 @@ class BookingModel {
     numberOfWeeks = weeks.isNotEmpty ? weeks : '0';
     this.price = price.isNotEmpty ? price : '0';
   }
-}
 
+  int get weeksCompletedTillNow {
+    if (accepted_at == null) return 0;
+    final now = DateTime.now();
+    final difference = now.difference(accepted_at).inDays;
+
+    return (difference / 7).ceil();
+  }
+}
