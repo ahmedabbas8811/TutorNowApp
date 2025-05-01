@@ -137,17 +137,20 @@ class _AboutProgressState extends State<AboutProgress> {
     return Column(
       children: [
         // Progress header
-        Container(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(
-            'Week $currentWeek of $totalWeeks',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-        ),
+        currentWeek < totalWeeks
+            ? Container(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(
+                  'Week $currentWeek of $totalWeeks',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              )
+            : const SizedBox
+                .shrink(), // returns an empty widget when condition is false
 
         // Weeks grid
         GridView.builder(
@@ -192,15 +195,6 @@ class _AboutProgressState extends State<AboutProgress> {
             );
           },
         ),
-
-        if (currentWeek > totalWeeks) // All weeks completed
-          const Padding(
-            padding: EdgeInsets.only(top: 20),
-            child: Text(
-              'All weeks completed!',
-              style: TextStyle(color: Colors.green),
-            ),
-          ),
       ],
     );
   }
@@ -291,37 +285,22 @@ class _AboutProgressState extends State<AboutProgress> {
       children: [
         SizedBox(
           width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () {
-              // Complete Booking Action
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xff87e64c),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: const BorderSide(color: Colors.black),
+          child: SizedBox(
+            height: 60,
+            child: ElevatedButton(
+              onPressed: () {
+                // Cancel Booking Action
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xffe64b4b),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: const BorderSide(color: Colors.black),
+                ),
               ),
+              child: const Text('Cancel Booking',
+                  style: TextStyle(color: Colors.white, fontSize: 16)),
             ),
-            child: const Text('Complete Booking',
-                style: TextStyle(color: Colors.black, fontSize: 16)),
-          ),
-        ),
-        const SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () {
-              // Cancel Booking Action
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xffe64b4b),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: const BorderSide(color: Colors.black),
-              ),
-            ),
-            child: const Text('Cancel Booking',
-                style: TextStyle(color: Colors.white, fontSize: 16)),
           ),
         ),
       ],

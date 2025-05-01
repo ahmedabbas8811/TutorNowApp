@@ -5,7 +5,7 @@ import 'package:newifchaly/models/progress_model.dart';
 
 class WeekProgress extends StatefulWidget {
   final int weekNumber;
-  final String bookingId; 
+  final String bookingId;
   const WeekProgress(
       {Key? key, required this.weekNumber, required this.bookingId})
       : super(key: key);
@@ -15,6 +15,9 @@ class WeekProgress extends StatefulWidget {
 }
 
 class _WeekProgressState extends State<WeekProgress> {
+  ProgressModel? existingReport;
+  bool isLoading = true;
+  bool reportExists = false;
   String? selectedPerformance;
   TextEditingController commentController = TextEditingController();
   final ProgressController progressController = ProgressController();
@@ -24,6 +27,38 @@ class _WeekProgressState extends State<WeekProgress> {
     super.initState();
     debugPrint(
         'Opened WeekProgress Screen for Booking ID: ${widget.bookingId}, Week Number: ${widget.weekNumber}');
+    _checkExistingReport();
+  }
+
+  Future<void> _checkExistingReport() async {
+    try {
+      // First check if report exists
+      final exists = await progressController.checkProgressReportExists(
+          widget.bookingId, widget.weekNumber);
+
+      if (exists) {
+        final report = await progressController.fetchProgressReport(
+          widget.bookingId,
+          widget.weekNumber,
+        );
+        setState(() {
+          existingReport = report;
+        });
+      } else {
+        setState(() {
+          existingReport = null;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error checking report: $e');
+      setState(() {
+        existingReport = null;
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   final List<String> performanceOptions = [
@@ -70,10 +105,118 @@ class _WeekProgressState extends State<WeekProgress> {
         imageUrl: '',
         imageId: '');
 
-    String result = await progressController.saveProgressReport(report);
+    String result =
+        await progressController.saveProgressReport(report, context);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(result)),
+    );
+  }
+
+  Widget _buildReportDisplay() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Performance Report",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        SizedBox(height: 20),
+        const Text("Overall performance", style: TextStyle(fontSize: 16)),
+        Text("${existingReport!.overallPerformance}",
+            style: TextStyle(fontSize: 16, color: Colors.grey)),
+        SizedBox(height: 30),
+        const Text("Additional Comments", style: TextStyle(fontSize: 16)),
+        Text("${existingReport!.comments}",
+            style: TextStyle(fontSize: 16, color: Colors.grey)),
+        SizedBox(height: 30),
+      ],
+    );
+  }
+
+  Widget _buildInputForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Overall performance", style: TextStyle(fontSize: 16)),
+        const SizedBox(height: 5),
+        Wrap(
+          spacing: 8.0,
+          children: performanceOptions.map((option) {
+            return ChoiceChip(
+              label: Text(option,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.normal)),
+              selected: selectedPerformance == option,
+              backgroundColor: const Color(0xfff3f3f3),
+              shape: RoundedRectangleBorder(
+                side: const BorderSide(color: Colors.transparent),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              onSelected: (selected) {
+                setState(() {
+                  selectedPerformance = selected ? option : null;
+                });
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 10),
+        const Text("Additional comments (if any)",
+            style: TextStyle(fontSize: 16)),
+        const SizedBox(height: 8),
+        Container(
+          constraints: const BoxConstraints(minHeight: 50, maxHeight: 150),
+          child: TextField(
+            controller: commentController,
+            maxLines: null,
+            keyboardType: TextInputType.multiline,
+            decoration: InputDecoration(
+              hintText: "Write your comment here",
+              filled: true,
+              fillColor: const Color(0xfff3f3f3),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: groupedTags
+              .map((group) => Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: group
+                        .map((tag) => Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: _buildTag(tag),
+                              ),
+                            ))
+                        .toList(),
+                  ))
+              .toList(),
+        ),
+        const SizedBox(height: 14),
+        Center(
+          child: ElevatedButton(
+            onPressed: saveProgress,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xff87e64c),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 14, horizontal: 140),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: const BorderSide(color: Colors.black, width: 1),
+              ),
+            ),
+            child: const Text("Save",
+                style: TextStyle(fontSize: 17, color: Colors.black)),
+          ),
+        ),
+      ],
     );
   }
 
@@ -101,71 +244,10 @@ class _WeekProgressState extends State<WeekProgress> {
               const Text("Weekly Progress Report",
                   style: TextStyle(fontSize: 16)),
               const SizedBox(height: 10),
-              const Text("Overall performance", style: TextStyle(fontSize: 16)),
-              const SizedBox(height: 5),
-              Wrap(
-                spacing: 8.0,
-                children: performanceOptions.map((option) {
-                  return ChoiceChip(
-                    label: Text(option,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.normal)),
-                    selected: selectedPerformance == option,
-                    backgroundColor: const Color(0xfff3f3f3),
-                    shape: RoundedRectangleBorder(
-                      side: const BorderSide(color: Colors.transparent),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    onSelected: (selected) {
-                      setState(() {
-                        selectedPerformance = selected ? option : null;
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 10),
-              const Text("Additional comments (if any)",
-                  style: TextStyle(fontSize: 16)),
-              const SizedBox(height: 8),
-              Container(
-                constraints:
-                    const BoxConstraints(minHeight: 50, maxHeight: 150),
-                child: TextField(
-                  controller: commentController,
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  decoration: InputDecoration(
-                    hintText: "Write your comment here",
-                    filled: true,
-                    fillColor: const Color(0xfff3f3f3),
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 14, horizontal: 14),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: groupedTags
-                    .map((group) => Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: group
-                              .map((tag) => Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: _buildTag(tag),
-                                    ),
-                                  ))
-                              .toList(),
-                        ))
-                    .toList(),
-              ),
-              const SizedBox(height: 14),
+              existingReport != null
+                  ? _buildReportDisplay()
+                  : _buildInputForm(),
+              const SizedBox(height: 12),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
@@ -192,22 +274,6 @@ class _WeekProgressState extends State<WeekProgress> {
                 ),
               ),
               const SizedBox(height: 5),
-              Center(
-                child: ElevatedButton(
-                  onPressed: saveProgress,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff87e64c),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 14, horizontal: 140),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: const BorderSide(color: Colors.black, width: 1),
-                    ),
-                  ),
-                  child: const Text("Save",
-                      style: TextStyle(fontSize: 17, color: Colors.black)),
-                ),
-              ),
             ],
           ),
         ),

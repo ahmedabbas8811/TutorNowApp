@@ -62,12 +62,4 @@ class BookingModel {
     numberOfWeeks = weeks.isNotEmpty ? weeks : '0';
     this.price = price.isNotEmpty ? price : '0';
   }
-
-  int get weeksCompletedTillNow {
-    if (accepted_at == null) return 0;
-    final now = DateTime.now();
-    final difference = now.difference(accepted_at).inDays;
-
-    return (difference / 7).ceil();
-  }
 }
