@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/teach_to.dart';
 import 'package:newifchaly/utils/profile_helper.dart';
+import 'package:newifchaly/views/widgets/snackbar.dart';
 import '../controllers/qualification_controller.dart';
 import 'teaching_detail.dart';
 
@@ -245,78 +246,125 @@ class _QualificationScreenState extends State<QualificationScreen> {
                   ),
                   const SizedBox(height: 70),
 
-                  SizedBox(
-                    width: double.infinity,
-                    // Add Another Qualification Button
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final qualificationId =
-                            await controller.storeQualification(context);
-                        if (qualificationId != null &&
-                            controller.qualification.qualificationFile.value !=
-                                null) {
-                          await controller.uploadFileToSupabase(
-                              controller.qualification.qualificationFile.value!,
-                              qualificationId);
-                        }
+                 SizedBox(
+  width: double.infinity,
+  // Add Another Qualification Button
+  child: ElevatedButton(
+    onPressed: () async {
+      // Check if fields are filled but no file is attached
+      if (controller.qualification.educationLevel.value.isNotEmpty &&
+          controller.qualification.instituteName.value.isNotEmpty &&
+          controller.qualification.qualificationFile.value == null) {
+        showCustomSnackBar(context, 'Please attach your qualification document (PDF only)');
+        return;
+      }
 
-                        // Clear fields
-                        controller.qualification.educationLevel.value = '';
-                        controller.qualification.instituteName.value = '';
-                        controller.qualification.qualificationFileName.value =
-                            '';
-                        controller.qualification.qualificationFile.value = null;
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text(
-                        'Add Another +',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                    ), //Add another button end
-                  ),
+      // Check if file is attached but not PDF
+      if (controller.qualification.qualificationFile.value != null &&
+          !controller.qualification.qualificationFileName.value.toLowerCase().endsWith('.pdf')) {
+        showCustomSnackBar(context, 'Only PDF files are allowed');
+        return;
+      }
 
-                  const SizedBox(height: 10),
+      // Only proceed if either:
+      // 1. Both fields are empty (skip case)
+      // 2. All fields including PDF file are filled
+      if (controller.qualification.educationLevel.value.isNotEmpty ||
+          controller.qualification.instituteName.value.isNotEmpty) {
+        final qualificationId = await controller.storeQualification(context);
+        if (qualificationId != null &&
+            controller.qualification.qualificationFile.value != null) {
+          await controller.uploadFileToSupabase(
+            controller.qualification.qualificationFile.value!,
+            qualificationId,
+          );
+        }
+      }
 
-                  SizedBox(
-                    width: double.infinity,
-                    //Next button
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final qualificationId =
-                            await controller.storeQualification(context);
-                        if (qualificationId != null &&
-                            controller.qualification.qualificationFile.value !=
-                                null) {
-                          await controller.uploadFileToSupabase(
-                              controller.qualification.qualificationFile.value!,
-                              qualificationId);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeachingDetail(),
-                            ),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff87e64c),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text(
-                        'Next',
-                        style: TextStyle(fontSize: 18, color: Colors.black),
-                      ),
-                    ), //Next button end
-                  ),
+      // Clear fields
+      controller.qualification.educationLevel.value = '';
+      controller.qualification.instituteName.value = '';
+      controller.qualification.qualificationFileName.value = '';
+      controller.qualification.qualificationFile.value = null;
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.black,
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    ),
+    child: const Text(
+      'Add Another +',
+      style: TextStyle(fontSize: 18, color: Colors.white),
+    ),
+  ),
+),
+
+const SizedBox(height: 10),
+
+SizedBox(
+  width: double.infinity,
+  // Next button
+  child: ElevatedButton(
+    onPressed: () async {
+      // Check if fields are filled but no file is attached
+      if (controller.qualification.educationLevel.value.isNotEmpty &&
+          controller.qualification.instituteName.value.isNotEmpty &&
+          controller.qualification.qualificationFile.value == null) {
+        showCustomSnackBar(context, 'Please attach your qualification document (PDF only)');
+        return;
+      }
+
+      // Check if file is attached but not PDF
+      if (controller.qualification.qualificationFile.value != null &&
+          !controller.qualification.qualificationFileName.value.toLowerCase().endsWith('.pdf')) {
+        showCustomSnackBar(context, 'Only PDF files are allowed');
+        return;
+      }
+
+      // Only proceed if either:
+      // 1. Both fields are empty (skip case)
+      // 2. All fields including PDF file are filled
+      if (controller.qualification.educationLevel.value.isEmpty &&
+          controller.qualification.instituteName.value.isEmpty) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeachingDetail(),
+          ),
+        );
+        return;
+      }
+
+      final qualificationId = await controller.storeQualification(context);
+      if (qualificationId != null &&
+          controller.qualification.qualificationFile.value != null) {
+        await controller.uploadFileToSupabase(
+          controller.qualification.qualificationFile.value!,
+          qualificationId,
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeachingDetail(),
+          ),
+        );
+      }
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xff87e64c),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    ),
+    child: const Text(
+      'Next',
+      style: TextStyle(fontSize: 18, color: Colors.black),
+    ),
+  ),
+),
                 ],
               ),
             ),

@@ -7,19 +7,15 @@ import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 import 'package:newifchaly/utils/features/auth/auth_controller.dart';
 
-// Import your controller
 class ChangePasswordScreen extends StatefulWidget {
   @override
   _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  // Controllers and Focus Nodes
-  final TextEditingController _currentPasswordController =
-      TextEditingController();
+  final TextEditingController _currentPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _retypePasswordController =
-      TextEditingController();
+  final TextEditingController _retypePasswordController = TextEditingController();
 
   final FocusNode _currentPasswordFocusNode = FocusNode();
   final FocusNode _newPasswordFocusNode = FocusNode();
@@ -28,11 +24,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool _isCurrentPasswordVisible = false;
   bool _isNewPasswordVisible = false;
   bool _isRetypePasswordVisible = false;
+  bool _isPasswordValid = false;
+  String _passwordError = '';
 
-  int _selectedIndex = 4; // Set default to 'Profile' tab (index 4)
+  int _selectedIndex = 4;
 
-  final AuthController _authController =
-      Get.find<AuthController>(); // Using GetX to fetch the controller
+  final AuthController _authController = Get.find<AuthController>();
 
   @override
   void dispose() {
@@ -43,6 +40,40 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     _newPasswordFocusNode.dispose();
     _retypePasswordFocusNode.dispose();
     super.dispose();
+  }
+
+  void _validatePassword(String password) {
+    // Check for at least 8 characters
+    if (password.length < 8) {
+      _isPasswordValid = false;
+      _passwordError = 'Password must be at least 8 characters';
+      return;
+    }
+
+    // Check for at least one uppercase letter
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      _isPasswordValid = false;
+      _passwordError = 'Password must contain at least one uppercase letter';
+      return;
+    }
+
+    // Check for at least one number
+    if (!password.contains(RegExp(r'[0-9]'))) {
+      _isPasswordValid = false;
+      _passwordError = 'Password must contain at least one number';
+      return;
+    }
+
+    // Check for at least one special character
+    if (!password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+      _isPasswordValid = false;
+      _passwordError = 'Password must contain at least one special character';
+      return;
+    }
+
+    // If all checks pass
+    _isPasswordValid = true;
+    _passwordError = '';
   }
 
   void _onBottomNavTap(int index) {
@@ -74,23 +105,24 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Text('Change Password',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-            ),
-            const Text('Confirm Current Password',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-            const SizedBox(height: 10),
+  
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    body: SingleChildScrollView(  // Add this
+      padding: const EdgeInsets.all(16.0),  // Move padding here
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Text('Change Password',
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+          ),
+          const Text('Confirm Current Password',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+          const SizedBox(height: 10),
             // Current Password Field
             TextField(
               controller: _currentPasswordController,
@@ -158,6 +190,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               focusNode: _newPasswordFocusNode,
               obscureText: !_isNewPasswordVisible,
               cursorColor: Colors.grey,
+              onChanged: (value) {
+                _validatePassword(value);
+                setState(() {});
+              },
               decoration: InputDecoration(
                 labelText: 'New Password',
                 hintText: 'AliyanRizvi123.',
@@ -189,6 +225,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     });
                   },
                 ),
+                errorText: _newPasswordController.text.isNotEmpty && !_isPasswordValid 
+                    ? _passwordError 
+                    : null,
               ),
             ),
             const SizedBox(height: 20),
@@ -232,9 +271,90 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               ),
             ),
             const SizedBox(height: 20),
+            // Password requirements
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Password must contain:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      _newPasswordController.text.length >= 8
+                          ? Icons.check_circle
+                          : Icons.circle,
+                      size: 16,
+                      color: _newPasswordController.text.length >= 8
+                          ? Colors.green
+                          : Colors.grey,
+                    ),
+                    SizedBox(width: 8),
+                    Text('At least 8 characters'),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      _newPasswordController.text.contains(RegExp(r'[A-Z]'))
+                          ? Icons.check_circle
+                          : Icons.circle,
+                      size: 16,
+                      color: _newPasswordController.text.contains(RegExp(r'[A-Z]'))
+                          ? Colors.green
+                          : Colors.grey,
+                    ),
+                    SizedBox(width: 8),
+                    Text('At least one uppercase letter'),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      _newPasswordController.text.contains(RegExp(r'[0-9]'))
+                          ? Icons.check_circle
+                          : Icons.circle,
+                      size: 16,
+                      color: _newPasswordController.text.contains(RegExp(r'[0-9]'))
+                          ? Colors.green
+                          : Colors.grey,
+                    ),
+                    SizedBox(width: 8),
+                    Text('At least one number'),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      _newPasswordController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))
+                          ? Icons.check_circle
+                          : Icons.circle,
+                      size: 16,
+                      color: _newPasswordController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))
+                          ? Colors.green
+                          : Colors.grey,
+                    ),
+                    SizedBox(width: 8),
+                    Text('At least one special character'),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             // Submit Button
             ElevatedButton(
               onPressed: () async {
+                if (!_isPasswordValid) {
+                  Get.snackbar(
+                      "Invalid Password", "Please meet all password requirements.");
+                  return;
+                }
+
                 if (_newPasswordController.text !=
                     _retypePasswordController.text) {
                   Get.snackbar(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/views/widgets/snackbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart'; // Import the intl package for time formatting.
 
@@ -107,61 +108,80 @@ class _EditAvailabilityScreenState extends State<EditAvailabilityScreen> {
   }
 
   // Update availability in the database
-  Future<void> updateAvailability() async {
-    final supabase = Supabase.instance.client;
-    final user = supabase.auth.currentUser;
+Future<void> updateAvailability() async {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
 
-    if (user != null) {
-      try {
-        // Prepare data for upsert
-        final Map<String, List<Map<String, String>>> availabilityData =
-            _timeSlots.map((day, slots) {
-          return MapEntry(
-            day,
-            slots.map((slot) {
-              return {
-                'start': "${slot[0].hour}:${slot[0].minute}",
-                'end': "${slot[1].hour}:${slot[1].minute}",
-              };
-            }).toList(),
-          );
-        });
+  if (user == null) {
+    showCustomSnackBar(context, "No user logged in");
+    return;
+  }
 
-        // Prepare data for upsert
-        final List<Map<String, dynamic>> dataToUpsert =
-            availabilityData.entries.map((entry) {
+  try {
+    // Prepare data for upsert
+    final Map<String, List<Map<String, String>>> availabilityData =
+        _timeSlots.map((day, slots) {
+      return MapEntry(
+        day,
+        slots.map((slot) {
           return {
-            'user_id': user.id, // User ID from authentication
-            'day': entry.key, // Day (e.g., Monday, Tuesday)
-            'slots': entry.value, // List of slots (start and end times)
-            'is_available':
-                _availability[entry.key]!, // True if switch is on for the day
+            'start': "${slot[0].hour}:${slot[0].minute.toString().padLeft(2, '0')}",
+            'end': "${slot[1].hour}:${slot[1].minute.toString().padLeft(2, '0')}",
           };
-        }).toList();
+        }).toList(),
+      );
+    });
 
-        // Perform the upsert operation
-        for (var data in dataToUpsert) {
-          final day = data['day'];
-          final response = await supabase
-              .from('availability')
-              .upsert(data, onConflict: 'user_id, day')
-              .eq('day', day) // Filter records by 'day'
-              .eq('user_id', user.id); // Filter records by 'user_id'
+    // Prepare data for upsert
+    final List<Map<String, dynamic>> dataToUpsert =
+        availabilityData.entries.map((entry) {
+      return {
+        'user_id': user.id,
+        'day': entry.key,
+        'slots': entry.value,
+        'is_available': _availability[entry.key]!,
+      };
+    }).toList();
 
-          // Check if response is not null and handle the error properly
-          if (response != null && response.error != null) {
-            print("Error: ${response.error!.message}");
-          } else if (response != null) {
-            print("Availability updated successfully for $day!");
-          }
+    bool allUpdatesSuccessful = true;
+    String? lastError;
+    
+    // Perform the upsert operation
+    for (var data in dataToUpsert) {
+      final day = data['day'];
+      try {
+        final response = await supabase
+            .from('availability')
+            .upsert(data, onConflict: 'user_id,day') // Make sure onConflict matches your constraint
+            .eq('day', day)
+            .eq('user_id', user.id);
+
+        // Check if there was an error (response is null when successful in some cases)
+        if (response != null && response.error != null) {
+          allUpdatesSuccessful = false;
+          lastError = response.error!.message;
+          print("Error updating $day: $lastError");
         }
       } catch (e) {
-        print("Failed to update availability: $e");
+        allUpdatesSuccessful = false;
+        lastError = e.toString();
+        print("Exception updating $day: $lastError");
       }
-    } else {
-      print("No user is logged in.");
     }
+
+    if (allUpdatesSuccessful) {
+      showCustomSnackBar(context, "Availability updated successfully!");
+    } else {
+      showCustomSnackBar(
+        context, 
+        lastError ?? "Some updates failed. Please try again."
+      );
+    }
+  } catch (e) {
+    print("Failed to update availability: $e");
+    showCustomSnackBar(context, "Failed to update availability: ${e.toString()}");
   }
+}
  // Select a time for the time slot
 Future<void> _selectTime(
     BuildContext context, String day, int slotIndex, int timeIndex) async {

@@ -196,4 +196,10 @@ class QualificationController extends GetxController {
       print("Error in updating qualification record: $e");
     }
   }
+
+  bool areFieldsFilledWithoutFile() {
+  return qualification.educationLevel.value.isNotEmpty &&
+      qualification.instituteName.value.isNotEmpty &&
+      qualification.qualificationFile.value == null;
+}
 }

@@ -86,7 +86,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
         return null;
       }
       print("Please upload proof of qualification");
-      showCustomSnackBar(context, "Please upload proof of qualification");
+      showCustomSnackBar(context, "Please upload proof of experience");
     }
     return null;
   }
@@ -497,7 +497,7 @@ class _TeachingDetailState extends State<TeachingDetail> {
                         const Padding(
                           padding: EdgeInsets.all(3.0),
                           child: Text(
-                            'Upload Proof Of Qualification',
+                            'Upload Proof Of Experience',
                             style: TextStyle(
                                 fontSize: 22, fontWeight: FontWeight.bold),
                           ),
@@ -560,6 +560,14 @@ class _TeachingDetailState extends State<TeachingDetail> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
+                        if (_teachingDetailFile != null &&
+                            !_qualificationFileName!
+                                .toLowerCase()
+                                .endsWith('.pdf')) {
+                          showCustomSnackBar(
+                              context, 'Only PDF files are allowed');
+                          return;
+                        }
                         // Store the experience data and get the ID of the inserted experience record
                         final experienceId = await _storeTeachingExperience();
 
@@ -621,6 +629,14 @@ class _TeachingDetailState extends State<TeachingDetail> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
+                        if (_teachingDetailFile != null &&
+                            !_qualificationFileName!
+                                .toLowerCase()
+                                .endsWith('.pdf')) {
+                          showCustomSnackBar(
+                              context, 'Only PDF files are allowed');
+                          return;
+                        }
                         // Store the experience data and get the ID of the inserted experience record
                         final experienceId = await _storeTeachingExperience();
 
