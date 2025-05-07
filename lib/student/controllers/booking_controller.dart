@@ -15,7 +15,7 @@ class BookingController extends GetxController {
     fetchBookings();
   }
 
- Future<void> fetchBookings() async {
+  Future<void> fetchBookings() async {
     isLoading(true); // Set loading to true when fetch starts
     final user = Supabase.instance.client.auth.currentUser;
 
@@ -29,7 +29,7 @@ class BookingController extends GetxController {
       final response = await Supabase.instance.client
           .from('bookings')
           .select('id, user_id, package_id, tutor_id, time_slots, status')
-          .eq('user_id', user.id);
+          .or('user_id.eq.${user.id},parent_id.eq.${user.id}');
 
       if (response.isNotEmpty) {
         print("Bookings fetched successfully: $response");
@@ -81,9 +81,8 @@ class BookingController extends GetxController {
       }
     } catch (e) {
       print("Error fetching bookings: $e");
-      
     } finally {
-      isLoading(false); 
+      isLoading(false);
     }
   }
 
@@ -147,29 +146,28 @@ class BookingController extends GetxController {
       print("Error fetching package info: $e");
     }
   }
-Future<void> submitFeedback({
-  required int rating,
-  required String review,
-  required String tutorId,
-  required String studentId,
-}) async {
-  final supabase = Supabase.instance.client;
 
-  if (rating <= 0 || review.trim().isEmpty) {
-    throw Exception("Rating and review cannot be empty.");
+  Future<void> submitFeedback({
+    required int rating,
+    required String review,
+    required String tutorId,
+    required String studentId,
+  }) async {
+    final supabase = Supabase.instance.client;
+
+    if (rating <= 0 || review.trim().isEmpty) {
+      throw Exception("Rating and review cannot be empty.");
+    }
+
+    try {
+      await supabase.from('feedback').insert({
+        'rating': rating,
+        'review': review.trim(),
+        'tutor_id': tutorId,
+        'student_id': studentId,
+      });
+    } catch (e) {
+      throw Exception("Failed to submit feedback: $e");
+    }
   }
-
-  try {
-    await supabase.from('feedback').insert({
-      'rating': rating,
-      'review': review.trim(),
-      'tutor_id': tutorId,
-      'student_id': studentId,
-    });
-  } catch (e) {
-    throw Exception("Failed to submit feedback: $e");
-  }
-}
-
-  
 }

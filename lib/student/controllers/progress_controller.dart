@@ -4,8 +4,19 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class ProgressReportController {
   final SupabaseClient _supabase = Supabase.instance.client;
 
+  Future<void> linkParent(String bookingId, String parentId) async {
+    try {
+      await _supabase
+          .from('bookings')
+          .update({'parent_id': parentId}).eq('id', bookingId);
+    } catch (e) {
+      throw Exception('Failed to link parent: $e');
+    }
+  }
+
   // Fetch progress reports for a specific booking ID
-  Future<List<ProgressReportModel>> fetchProgressReports(String bookingId) async {
+  Future<List<ProgressReportModel>> fetchProgressReports(
+      String bookingId) async {
     try {
       final response = await _supabase
           .from('progress_reports')
@@ -17,9 +28,7 @@ class ProgressReportController {
         return [];
       }
 
-      return response
-          .map((data) => ProgressReportModel.fromMap(data))
-          .toList();
+      return response.map((data) => ProgressReportModel.fromMap(data)).toList();
     } catch (e) {
       throw Exception('Failed to fetch progress reports: $e');
     }
@@ -30,7 +39,9 @@ class ProgressReportController {
     if (reports.isEmpty) return 'No Data';
 
     // Calculate the average performance value
-    final total = reports.map((report) => report.performanceValue).reduce((a, b) => a + b);
+    final total = reports
+        .map((report) => report.performanceValue)
+        .reduce((a, b) => a + b);
     final average = total / reports.length;
 
     // Map the average to a performance category

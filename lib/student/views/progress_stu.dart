@@ -3,6 +3,7 @@ import 'package:newifchaly/student/controllers/progress_controller.dart';
 import 'package:newifchaly/student/models/booking_model.dart';
 import 'package:newifchaly/student/models/progress_model.dart';
 import 'package:newifchaly/student/views/progressreport_stu.dart';
+import 'package:newifchaly/student/views/widgets/parentlink_popup.dart';
 
 class ProgressScreen extends StatefulWidget {
   final BookingModel booking;
@@ -126,6 +127,35 @@ class _ProgressScreenState extends State<ProgressScreen> {
         ]),
         const SizedBox(height: 20),
         _buildTimeSlotsCard(),
+        ElevatedButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => ParentLink(
+                bookingId: widget.booking.bookingId,
+                controller: _progressReportController,
+              ),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xff87e64c), // Selected color
+            foregroundColor: Colors.black, // Text color
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: const BorderSide(color: Colors.black), // Border
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            minimumSize: const Size(double.infinity, 48),
+            elevation: 0,
+          ),
+          child: const Text(
+            'Link Parent',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        )
       ],
     );
   }
@@ -218,13 +248,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
               const SizedBox(height: 16),
               ...progressReports
                   .map((report) => _buildWeekProgress(
-                        'Week ${report.week}',
-                        report.overallPerformance,
-                        _getPerformanceColor(report.overallPerformance),
-                        _getPerformanceEmoji(report.overallPerformance),
-                        _getPerformanceTextColor(report.overallPerformance),
-                        report.comments,
-                      ))
+                      'Week ${report.week}',
+                      report.overallPerformance,
+                      _getPerformanceColor(report.overallPerformance),
+                      _getPerformanceEmoji(report.overallPerformance),
+                      _getPerformanceTextColor(report.overallPerformance),
+                      report.comments,
+                      report.isConfidential))
                   .toList(),
             ],
           );
@@ -302,8 +332,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildWeekProgress(String week, String performanceWithEmoji,
-      Color color, String emoji, Color textColor, String comments) {
+  Widget _buildWeekProgress(
+      String week,
+      String performanceWithEmoji,
+      Color color,
+      String emoji,
+      Color textColor,
+      String comments,
+      bool isConfidential) {
     final performance = _extractPerformanceCategory(performanceWithEmoji);
     return GestureDetector(
       onTap: () {
@@ -312,12 +348,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
           MaterialPageRoute(
             builder: (context) => ProgressReportStu(
               report: ProgressReportModel(
-                bookingId: widget.booking.bookingId,
-                week: int.parse(
-                    week.split(' ')[1]), // Extract week number from "Week X"
-                overallPerformance: performanceWithEmoji,
-                comments: comments,
-              ),
+                  bookingId: widget.booking.bookingId,
+                  week: int.parse(
+                      week.split(' ')[1]), // Extract week number from "Week X"
+                  overallPerformance: performanceWithEmoji,
+                  comments: comments,
+                  isConfidential: isConfidential),
             ),
           ),
         );

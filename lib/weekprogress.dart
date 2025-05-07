@@ -19,6 +19,7 @@ class _WeekProgressState extends State<WeekProgress> {
   bool isLoading = true;
   bool reportExists = false;
   String? selectedPerformance;
+  bool isConfidential = false;
   TextEditingController commentController = TextEditingController();
   final ProgressController progressController = ProgressController();
 
@@ -103,7 +104,8 @@ class _WeekProgressState extends State<WeekProgress> {
         comments: commentController.text.trim(),
         bookingId: widget.bookingId,
         imageUrl: '',
-        imageId: '');
+        imageId: '',
+        isConfidential: isConfidential);
 
     String result =
         await progressController.saveProgressReport(report, context);
@@ -163,6 +165,20 @@ class _WeekProgressState extends State<WeekProgress> {
         const Text("Additional comments (if any)",
             style: TextStyle(fontSize: 16)),
         const SizedBox(height: 8),
+        Row(
+          children: [
+            Checkbox(
+              value: isConfidential,
+              onChanged: (value) {
+                setState(() {
+                  isConfidential = value ?? false;
+                });
+              },
+            ),
+            const Text("Only show to parent"),
+          ],
+        ),
+        const SizedBox(height: 10),
         Container(
           constraints: const BoxConstraints(minHeight: 50, maxHeight: 150),
           child: TextField(

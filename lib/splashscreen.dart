@@ -63,7 +63,6 @@ class _SplashScreenState extends State<SplashScreen> {
         return;
       }
 
-
       // Then check user type if not blocked
       if (userData['user_type'] != null) {
         final userType = userData['user_type'];
@@ -72,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
         if (userType == 'Admin') {
           Get.lazyPut(() => TutorController());
           Get.offAll(() => const HomeAdmin());
-        } else if (userType == 'Student') {
+        } else if (userType == 'Student' || userType == 'Parent') {
           Get.offAll(() => StudentHomeScreen());
         } else if (userType == 'Tutor') {
           Get.offAll(() => ProfileScreen());

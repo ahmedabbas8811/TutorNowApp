@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:newifchaly/student/models/progress_model.dart';
 import 'package:newifchaly/student/models/progress_images_model.dart';
 import 'package:newifchaly/student/controllers/progress_images_controller.dart';
+import 'package:newifchaly/utils/report_confidentiality_check.dart';
 
 class ProgressReportStu extends StatelessWidget {
   final ProgressReportModel report;
@@ -16,6 +17,7 @@ class ProgressReportStu extends StatelessWidget {
   Widget build(BuildContext context) {
     final performance = _extractPerformanceCategory(report.overallPerformance);
     final emoji = _getPerformanceEmoji(performance);
+    final ProgressReportUtils _utils = ProgressReportUtils();
 
     return Scaffold(
       appBar: AppBar(
@@ -66,9 +68,32 @@ class ProgressReportStu extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               const Text("Additional comments"),
-              Text(
-                report.comments,
-                style: const TextStyle(color: Colors.grey),
+              FutureBuilder<bool>(
+                future: _utils.shouldHideComments(report),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+
+                  if (snapshot.hasError) {
+                    return const Text('Error loading comments');
+                  }
+
+                  final shouldHide = snapshot.data ?? false;
+
+                  if (shouldHide) {
+                    return Text(
+                      "This comment is confidential and only visible to parents",
+                      style: TextStyle(
+                          color: Colors.grey, fontStyle: FontStyle.italic),
+                    );
+                  }
+
+                  return Text(
+                    report.comments,
+                    style: const TextStyle(color: Colors.grey),
+                  );
+                },
               ),
               const SizedBox(height: 10),
               FutureBuilder<List<ProgressImagesModel>>(

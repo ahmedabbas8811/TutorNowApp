@@ -5,15 +5,16 @@ class ProgressModel {
   final String bookingId;
   final String imageId;
   final String imageUrl;
+  final bool isConfidential;
 
-  ProgressModel({
-    required this.week,
-    required this.overallPerformance,
-    required this.comments,
-    required this.bookingId,
-    required this.imageUrl,
-    required this.imageId,
-  });
+  ProgressModel(
+      {required this.week,
+      required this.overallPerformance,
+      required this.comments,
+      required this.bookingId,
+      required this.imageUrl,
+      required this.imageId,
+      required this.isConfidential});
 
   // Convert Map to ProgressModel (fromMap constructor)
   factory ProgressModel.fromMap(Map<String, dynamic> map) {
@@ -24,6 +25,7 @@ class ProgressModel {
       bookingId: map['booking_id'] ?? '',
       imageId: map['image_id'] ?? '',
       imageUrl: map['image_url'] ?? '',
+      isConfidential: map['isConfidential'] ?? 'false',
     );
   }
 

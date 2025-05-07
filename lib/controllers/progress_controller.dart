@@ -36,6 +36,7 @@ class ProgressController {
           'overall_performance': report.overallPerformance,
           'comments': report.comments,
           'booking_id': report.bookingId,
+          'isConfidential': report.isConfidential
         }
       ]).select();
 
