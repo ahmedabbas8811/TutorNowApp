@@ -1,21 +1,51 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:newifchaly/student/controllers/student_profile_controller.dart';
+import 'package:newifchaly/views/widgets/snackbar.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:newifchaly/student/models/student_profile_model.dart';
 import 'package:newifchaly/student/views/bookings.dart';
 import 'package:newifchaly/student/views/search_results.dart';
 import 'package:newifchaly/student/views/student_home_screen.dart';
 import 'package:newifchaly/student/views/widgets/nav_bar.dart';
 
 class EditStudentProfileScreen extends StatefulWidget {
+  final StudentProfile profile;
+
+  const EditStudentProfileScreen({super.key, required this.profile});
+
   @override
-  _EditStudentProfileScreenState createState() => _EditStudentProfileScreenState();
+  _EditStudentProfileScreenState createState() =>
+      _EditStudentProfileScreenState();
 }
 
 class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
-  final TextEditingController nameController = TextEditingController(text: "Aliyan Rizvi");
-  final TextEditingController cityController = TextEditingController(text: "Rawalpindi");
-  final TextEditingController emailController = TextEditingController(text: "aliyanrizvi@gmail.com");
-  final TextEditingController educationController = TextEditingController();
-  final TextEditingController subjectsController = TextEditingController();
-  final TextEditingController goalsController = TextEditingController();
+  late TextEditingController nameController;
+  late TextEditingController emailController;
+  late TextEditingController cityController;
+  late TextEditingController educationController;
+  late TextEditingController subjectsController;
+  late TextEditingController goalsController;
+
+  final ImagePicker _picker = ImagePicker();
+  XFile? _selectedImage;
+  String? _newImageUrl;
+  bool _isImageDeleted = false;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController = TextEditingController(text: widget.profile.name);
+    emailController = TextEditingController(text: widget.profile.email);
+    cityController = TextEditingController(text: widget.profile.city);
+    educationController = TextEditingController(text: widget.profile.educationalLevel);
+    subjectsController = TextEditingController(text: widget.profile.subjects);
+    goalsController = TextEditingController(text: widget.profile.learningGoals);
+    _newImageUrl = widget.profile.imageUrl;
+  }
 
   int _selectedIndex = 3;
 
@@ -26,19 +56,132 @@ class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
       });
       switch (index) {
         case 0:
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StudentHomeScreen()));
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => StudentHomeScreen()));
           break;
         case 1:
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SearchResults()));
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => SearchResults()));
           break;
         case 2:
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BookingsScreen()));
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => BookingsScreen()));
           break;
         case 3:
-          // Already on profile screen
           break;
       }
     }
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = pickedFile;
+          _isImageDeleted = false;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to pick image: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _deleteImage() async {
+    setState(() {
+      _selectedImage = null;
+      _newImageUrl = null;
+      _isImageDeleted = true;
+    });
+  }
+
+  Future<void> _saveProfile() async {
+    if (_isSaving) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      final supabase = Supabase.instance.client;
+      final userId = supabase.auth.currentUser?.id;
+
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not authenticated')),
+        );
+        return;
+      }
+
+      // Handle image deletion
+      if (_isImageDeleted) {
+        await supabase
+            .from('users')
+            .update({'image_url': null}).eq('id', userId);
+        setState(() {
+          _newImageUrl = null;
+        });
+      }
+      // Handle new image upload
+      else if (_selectedImage != null) {
+        final fileExt = _selectedImage!.path.split('.').last;
+        final fileName =
+            'profile_$userId.${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+
+        final file = File(_selectedImage!.path);
+        await supabase.storage
+            .from('user_img')
+            .upload(fileName, file, fileOptions: FileOptions(upsert: true));
+
+        // Get public URL
+        final publicUrl =
+            supabase.storage.from('user_img').getPublicUrl(fileName);
+
+        // Update user profile
+        await supabase
+            .from('users')
+            .update({'image_url': publicUrl}).eq('id', userId);
+
+        setState(() {
+          _newImageUrl = publicUrl;
+        });
+      }
+      // Update city in the location table
+      final controller = Get.find<StudentProfileController>();
+      await controller.updateUserCity(cityController.text.trim());
+
+      // for updating student details
+      await controller.updateStudentDetails(
+        educationalLevel: educationController.text.trim(),
+        subjects: subjectsController.text.trim(),
+        learningGoals: goalsController.text.trim(),
+      );
+      showCustomSnackBar(context, 'Profile saved successfully');
+
+    } catch (e) {
+      showCustomSnackBar(context, 'Error saving profile: ${e.toString()}');
+    } finally {
+      setState(() => _isSaving = false);
+    }
+    final controller = Get.find<StudentProfileController>();
+    await controller.fetchStudentProfile();
+    Navigator.pop(context);
+  }
+
+  ImageProvider _getProfileImage() {
+    if (_isImageDeleted) {
+      return const AssetImage('assets/profile.jpg');
+    }
+    if (_selectedImage != null) {
+      return FileImage(File(_selectedImage!.path));
+    }
+    if (_newImageUrl != null && _newImageUrl!.isNotEmpty) {
+      return NetworkImage(_newImageUrl!);
+    }
+    if (widget.profile.imageUrl.isNotEmpty) {
+      return NetworkImage(widget.profile.imageUrl);
+    }
+    return const AssetImage('assets/profile.jpg');
   }
 
   @override
@@ -56,74 +199,100 @@ class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
         foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
-        
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
+            // Avatar with edit/delete buttons
+            Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const CircleAvatar(
-                  radius: 70,
-                  backgroundImage: AssetImage('assets/profile.jpg'),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 70,
+                      backgroundImage: _getProfileImage(),
+                    ),
+                  ],
                 ),
-                Positioned(
-                  top: 142,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          // Change profile image logic
-                        },
-                        child: Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF87E64B),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.edit, color: Colors.black, size: 18),
+                const SizedBox(height: 0), // Space between avatar and buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Edit Button
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF87E64B),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
+                        child: const Icon(Icons.edit,
+                            color: Colors.black, size: 20),
                       ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: () {
-                          // Delete profile image logic
-                        },
-                        child: Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.delete, color: Colors.white, size: 18),
+                    ),
+                    const SizedBox(width: 0), // Space between buttons
+                    // Delete Button
+                    GestureDetector(
+                      onTap: _deleteImage,
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
+                        child: const Icon(Icons.delete,
+                            color: Colors.white, size: 20),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 15),
             Row(
               children: [
-                Expanded(child: buildTextField("Full Name", "Enter your full name", nameController)),
+                Expanded(
+                    child: buildTextField(
+                        "Full Name", "Enter your full name", nameController, readOnly: true)),
                 const SizedBox(width: 10),
-                Expanded(child: buildTextField("City", "Enter your city", cityController)),
+                Expanded(
+                    child: buildTextField(
+                        "City", "Enter your city", cityController)),
               ],
             ),
             const SizedBox(height: 20),
-            buildTextField("Email", "Enter your email", emailController, readOnly: true),
+            buildTextField("Email", "Enter your email", emailController,
+                readOnly: true),
             const SizedBox(height: 20),
-            buildTextField("Education Level", "Enter your education level", educationController),
+            buildTextField("Education Level", "Enter your education level",
+                educationController),
             const SizedBox(height: 20),
-            buildTextField("Subjects I am weak at", "Biology , Chemistry", subjectsController),
+            buildTextField("Subjects I am weak at", "Biology , Chemistry",
+                subjectsController),
             const SizedBox(height: 20),
-            buildTextField("Learning Goals", "Enter your goals", goalsController),
-            const SizedBox(height: 100), // Extra space for bottom sheet visibility
+            buildTextField(
+                "Learning Goals", "Enter your goals", goalsController),
+            const SizedBox(height: 100),
           ],
         ),
       ),
@@ -139,20 +308,19 @@ class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
-              onPressed: () {
-                // Save logic
-                Navigator.pop(context);
-              },
+              onPressed: _isSaving ? null : _saveProfile,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF87E64B),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text(
-                'Save',
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              ),
+              child: _isSaving
+                  ? const CircularProgressIndicator(color: Colors.black)
+                  : const Text(
+                      'Save',
+                      style: TextStyle(color: Colors.black, fontSize: 18),
+                    ),
             ),
           ),
         ),
@@ -160,7 +328,9 @@ class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
     );
   }
 
-  Widget buildTextField(String label, String hint, TextEditingController controller, {bool readOnly = false}) {
+  Widget buildTextField(
+      String label, String hint, TextEditingController controller,
+      {bool readOnly = false}) {
     return TextField(
       controller: controller,
       readOnly: readOnly,
