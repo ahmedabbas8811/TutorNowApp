@@ -11,25 +11,19 @@ import 'package:newifchaly/student/views/search_results.dart';
 import 'package:newifchaly/student/views/student_home_screen.dart';
 import 'package:newifchaly/student/views/widgets/nav_bar.dart';
 
-class EditStudentProfileScreen extends StatefulWidget {
+class EditTutorProfileScreen extends StatefulWidget {
   final StudentProfile profile;
-  
 
-  const EditStudentProfileScreen({super.key, required this.profile});
+  const EditTutorProfileScreen({super.key, required this.profile});
 
   @override
-  _EditStudentProfileScreenState createState() =>
-      _EditStudentProfileScreenState();
+  _EditStudentProfileScreenState createState() => _EditStudentProfileScreenState();
 }
 
-class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
+class _EditStudentProfileScreenState extends State<EditTutorProfileScreen> {
   late TextEditingController nameController;
   late TextEditingController emailController;
   late TextEditingController cityController;
-  late TextEditingController educationController;
-  late TextEditingController subjectsController;
-  late TextEditingController goalsController;
-  
 
   final ImagePicker _picker = ImagePicker();
   XFile? _selectedImage;
@@ -43,9 +37,6 @@ class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
     nameController = TextEditingController(text: widget.profile.name);
     emailController = TextEditingController(text: widget.profile.email);
     cityController = TextEditingController(text: widget.profile.city);
-    educationController = TextEditingController(text: widget.profile.educationalLevel);
-    subjectsController = TextEditingController(text: widget.profile.subjects);
-    goalsController = TextEditingController(text: widget.profile.learningGoals);
     _newImageUrl = widget.profile.imageUrl;
   }
 
@@ -58,16 +49,13 @@ class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
       });
       switch (index) {
         case 0:
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => StudentHomeScreen()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StudentHomeScreen()));
           break;
         case 1:
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => SearchResults()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SearchResults()));
           break;
         case 2:
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => BookingsScreen()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BookingsScreen()));
           break;
         case 3:
           break;
@@ -99,80 +87,45 @@ class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
     });
   }
 
-Future<void> _saveProfile() async {
-  if (_isSaving) return;
+  Future<void> _saveProfile() async {
+    if (_isSaving) return;
 
-  setState(() => _isSaving = true);
+    setState(() => _isSaving = true);
 
-  try {
-    final supabase = Supabase.instance.client;
-    final userId = supabase.auth.currentUser?.id;
+    try {
+      final supabase = Supabase.instance.client;
+      final userId = supabase.auth.currentUser?.id;
 
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not authenticated')),
-      );
-      return;
-    }
-
-    // Handle image deletion
-    if (_isImageDeleted) {
-      // First delete from storage if URL exists
-      if (_newImageUrl?.startsWith('http') ?? false) {
-        try {
-          final oldFileName = _newImageUrl!.split('/').last;
-          await supabase.storage.from('user_img').remove([oldFileName]);
-        } catch (e) {
-          debugPrint('Error deleting old image: $e');
-        }
-      }
-      
-      await supabase
-          .from('users')
-          .update({'image_url': null}).eq('id', userId);
-          
-      setState(() => _newImageUrl = null);
-    }
-    // Handle new image upload
-    else if (_selectedImage != null) {
-      // Delete old image first if exists
-      if (_newImageUrl?.startsWith('http') ?? false) {
-        try {
-          final oldFileName = _newImageUrl!.split('/').last;
-          await supabase.storage.from('user_img').remove([oldFileName]);
-        } catch (e) {
-          debugPrint('Error deleting old image: $e');
-        }
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not authenticated')),
+        );
+        return;
       }
 
-      // Upload new image
-      final fileExt = _selectedImage!.path.split('.').last;
-      final fileName = 'profile_$userId.${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+      if (_isImageDeleted) {
+        await supabase.from('users').update({'image_url': null}).eq('id', userId);
+        setState(() {
+          _newImageUrl = null;
+        });
+      } else if (_selectedImage != null) {
+        final fileExt = _selectedImage!.path.split('.').last;
+        final fileName = 'profile_$userId.${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+        final file = File(_selectedImage!.path);
 
-      await supabase.storage
-          .from('user_img')
-          .upload(fileName, File(_selectedImage!.path), 
-          fileOptions: FileOptions(upsert: true));
+        await supabase.storage.from('user_img').upload(fileName, file, fileOptions: FileOptions(upsert: true));
 
-      final publicUrl = supabase.storage.from('user_img').getPublicUrl(fileName);
+        final publicUrl = supabase.storage.from('user_img').getPublicUrl(fileName);
+        await supabase.from('users').update({'image_url': publicUrl}).eq('id', userId);
 
-      // Update database
-      await supabase
-          .from('users')
-          .update({'image_url': publicUrl}).eq('id', userId);
+        setState(() {
+          _newImageUrl = publicUrl;
+        });
+      }
 
-      setState(() => _newImageUrl = publicUrl);
-    }
-      // Update city in the location table
       final controller = Get.find<StudentProfileController>();
       await controller.updateUserCity(cityController.text.trim());
 
-      // for updating student details
-      await controller.updateStudentDetails(
-        educationalLevel: educationController.text.trim(),
-        subjects: subjectsController.text.trim(),
-        learningGoals: goalsController.text.trim(),
-      );
       showCustomSnackBar(context, 'Profile saved successfully');
 
     } catch (e) {
@@ -180,6 +133,7 @@ Future<void> _saveProfile() async {
     } finally {
       setState(() => _isSaving = false);
     }
+
     final controller = Get.find<StudentProfileController>();
     await controller.fetchStudentProfile();
     Navigator.pop(context);
@@ -219,7 +173,6 @@ Future<void> _saveProfile() async {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Avatar with edit/delete buttons
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -232,11 +185,10 @@ Future<void> _saveProfile() async {
                     ),
                   ],
                 ),
-                const SizedBox(height: 0), // Space between avatar and buttons
+                const SizedBox(height: 0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Edit Button
                     GestureDetector(
                       onTap: _pickImage,
                       child: Container(
@@ -254,12 +206,10 @@ Future<void> _saveProfile() async {
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.edit,
-                            color: Colors.black, size: 20),
+                        child: const Icon(Icons.edit, color: Colors.black, size: 20),
                       ),
                     ),
-                    const SizedBox(width: 0), // Space between buttons
-                    // Delete Button
+                    const SizedBox(width: 0),
                     GestureDetector(
                       onTap: _deleteImage,
                       child: Container(
@@ -277,8 +227,7 @@ Future<void> _saveProfile() async {
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.delete,
-                            color: Colors.white, size: 20),
+                        child: const Icon(Icons.delete, color: Colors.white, size: 20),
                       ),
                     ),
                   ],
@@ -288,27 +237,13 @@ Future<void> _saveProfile() async {
             const SizedBox(height: 15),
             Row(
               children: [
-                Expanded(
-                    child: buildTextField(
-                        "Full Name", "Enter your full name", nameController, readOnly: true)),
+                Expanded(child: buildTextField("Full Name", "Enter your full name", nameController, readOnly: true)),
                 const SizedBox(width: 10),
-                Expanded(
-                    child: buildTextField(
-                        "City", "Enter your city", cityController)),
+                Expanded(child: buildTextField("City", "Enter your city", cityController)),
               ],
             ),
             const SizedBox(height: 20),
-            buildTextField("Email", "Enter your email", emailController,
-                readOnly: true),
-            const SizedBox(height: 20),
-            buildTextField("Education Level", "Enter your education level",
-                educationController),
-            const SizedBox(height: 20),
-            buildTextField("Subjects I am weak at", "Biology , Chemistry",
-                subjectsController),
-            const SizedBox(height: 20),
-            buildTextField(
-                "Learning Goals", "Enter your goals", goalsController),
+            buildTextField("Email", "Enter your email", emailController, readOnly: true),
             const SizedBox(height: 100),
           ],
         ),
@@ -345,9 +280,7 @@ Future<void> _saveProfile() async {
     );
   }
 
-  Widget buildTextField(
-      String label, String hint, TextEditingController controller,
-      {bool readOnly = false}) {
+  Widget buildTextField(String label, String hint, TextEditingController controller, {bool readOnly = false}) {
     return TextField(
       controller: controller,
       readOnly: readOnly,
