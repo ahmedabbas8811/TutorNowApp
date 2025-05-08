@@ -4,11 +4,29 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class ProgressReportController {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  Future<void> linkParent(String bookingId, String parentId) async {
+  // Add this to ProgressReportController
+  Future<bool> isCurrentUserStudent() async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return false;
+
+      final response = await _supabase
+          .from('users')
+          .select('user_type')
+          .eq('id', user.id)
+          .single();
+      print("user type is $response");
+      return response['user_type'] == 'Student';
+    } catch (e) {
+      throw Exception('Failed to check user role: $e');
+    }
+  }
+
+  Future<void> linkParent(String bookingId, String parent_email) async {
     try {
       await _supabase
           .from('bookings')
-          .update({'parent_id': parentId}).eq('id', bookingId);
+          .update({'parent_email': parent_email}).eq('id', bookingId);
     } catch (e) {
       throw Exception('Failed to link parent: $e');
     }

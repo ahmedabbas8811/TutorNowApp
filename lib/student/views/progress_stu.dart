@@ -127,35 +127,46 @@ class _ProgressScreenState extends State<ProgressScreen> {
         ]),
         const SizedBox(height: 20),
         _buildTimeSlotsCard(),
-        ElevatedButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => ParentLink(
-                bookingId: widget.booking.bookingId,
-                controller: _progressReportController,
-              ),
-            );
+        FutureBuilder<bool>(
+          future: _progressReportController.isCurrentUserStudent(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox.shrink(); // Or a loading indicator
+            }
+            if (snapshot.hasData && snapshot.data == true) {
+              return ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => ParentLink(
+                      bookingId: widget.booking.bookingId,
+                      controller: _progressReportController,
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff87e64c),
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: const BorderSide(color: Colors.black),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  minimumSize: const Size(double.infinity, 48),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Link Parent',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
           },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xff87e64c), // Selected color
-            foregroundColor: Colors.black, // Text color
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: const BorderSide(color: Colors.black), // Border
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            minimumSize: const Size(double.infinity, 48),
-            elevation: 0,
-          ),
-          child: const Text(
-            'Link Parent',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        )
+        ),
       ],
     );
   }

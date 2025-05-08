@@ -26,10 +26,17 @@ class BookingController extends GetxController {
     }
 
     try {
+      final userResponse = await Supabase.instance.client
+          .from('users')
+          .select('email')
+          .eq('id', user.id)
+          .single();
+
+      final userEmail = userResponse['email'];
       final response = await Supabase.instance.client
           .from('bookings')
           .select('id, user_id, package_id, tutor_id, time_slots, status')
-          .or('user_id.eq.${user.id},parent_id.eq.${user.id}');
+          .or('user_id.eq.${user.id},parent_email.eq.$userEmail');
 
       if (response.isNotEmpty) {
         print("Bookings fetched successfully: $response");
