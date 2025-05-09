@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/student/controllers/booking_controller.dart';
+import 'package:newifchaly/student/controllers/tutor_detail_controller.dart';
 import 'package:newifchaly/student/models/booking_model.dart';
 import 'package:newifchaly/student/views/progress_stu.dart';
 import 'package:newifchaly/student/views/search_results.dart';
@@ -19,6 +20,14 @@ class _BookingsScreenState extends State<BookingsScreen> {
   int _selectedIndex = 2;
   final BookingController bookingController = Get.put(BookingController());
   final TextEditingController reviewController = TextEditingController();
+
+  @override
+  void dispose() {
+    for (var booking in bookingController.pendingBookings) {
+      Get.delete<TutorDetailController>(tag: booking.tutorId);
+    }
+    super.dispose(); 
+  }
 
   void _onItemTapped(int index) {
     if (_selectedIndex != index) {
@@ -77,7 +86,8 @@ class _BookingsScreenState extends State<BookingsScreen> {
                     padding: EdgeInsets.all(8.0),
                     child: Text(
                       'Leave a review',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -136,7 +146,8 @@ class _BookingsScreenState extends State<BookingsScreen> {
                             selectedRating > 0 &&
                             reviewController.text.isNotEmpty) {
                           try {
-                            final bookingController = Get.find<BookingController>();
+                            final bookingController =
+                                Get.find<BookingController>();
                             await bookingController.submitFeedback(
                               rating: selectedRating,
                               review: reviewController.text,
@@ -145,7 +156,8 @@ class _BookingsScreenState extends State<BookingsScreen> {
                             );
 
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Review submitted!')),
+                              const SnackBar(
+                                  content: Text('Review submitted!')),
                             );
                             Navigator.of(context).pop();
                           } catch (e) {
@@ -156,7 +168,8 @@ class _BookingsScreenState extends State<BookingsScreen> {
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Please select a rating and write a review.'),
+                              content: Text(
+                                  'Please select a rating and write a review.'),
                             ),
                           );
                         }
@@ -239,6 +252,10 @@ class _BookingsScreenState extends State<BookingsScreen> {
                 return BookingSwipeView(
                   height: 180,
                   cards: bookingController.pendingBookings.map((booking) {
+                    final tutorController = Get.put(
+                      TutorDetailController(UserId: booking.tutorId),
+                      tag: booking.tutorId,
+                    );
                     return BookingCard(
                       name: booking.tutorName,
                       tutorImage: booking.tutorImage,
@@ -247,7 +264,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                       frequency: "${booking.sessionsPerWeek}X / Week",
                       duration: "${booking.numberOfWeeks} Weeks",
                       price: "${booking.price}/- PKR",
-                      rating: "4.8",
+                      rating: tutorController.averageRating.value,
                       statusColor: Colors.orange,
                     );
                   }).toList(),
@@ -279,6 +296,10 @@ class _BookingsScreenState extends State<BookingsScreen> {
                 return BookingSwipeView(
                   height: 180,
                   cards: bookingController.activeBookings.map((booking) {
+                    final tutorController = Get.put(
+                      TutorDetailController(UserId: booking.tutorId),
+                      tag: booking.tutorId,
+                    );
                     return BookingCard(
                       name: booking.tutorName,
                       tutorImage: booking.tutorImage,
@@ -287,7 +308,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                       frequency: "${booking.sessionsPerWeek}X / Week",
                       duration: "${booking.numberOfWeeks} Weeks",
                       price: "${booking.price}/- PKR",
-                      rating: "4.8",
+                      rating: tutorController.averageRating.value,
                       statusColor: Colors.green,
                       onTap: () {
                         Navigator.push(
@@ -328,6 +349,10 @@ class _BookingsScreenState extends State<BookingsScreen> {
                 return BookingSwipeView(
                   height: 220,
                   cards: bookingController.completedBookings.map((booking) {
+                    final tutorController = Get.put(
+                      TutorDetailController(UserId: booking.tutorId),
+                      tag: booking.tutorId,
+                    );
                     return BookingCard(
                       name: booking.tutorName,
                       package: booking.packageName,
@@ -336,7 +361,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                       frequency: "${booking.sessionsPerWeek}X / Week",
                       duration: "${booking.numberOfWeeks} Weeks",
                       price: "${booking.price}/- PKR",
-                      rating: '4.8',
+                      rating: tutorController.averageRating.value,
                       statusColor: Colors.white,
                       backgroundColor: Colors.white,
                       buttonText: "Leave a Review",
@@ -381,7 +406,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                     frequency: '3X / Week',
                     duration: '8 Weeks',
                     price: '5000/- PKR',
-                    rating: '4.8',
+                    rating: 4.8,
                     statusColor: Colors.red,
                   ),
                 ],
@@ -430,7 +455,7 @@ class BookingCard extends StatelessWidget {
   final String frequency;
   final String duration;
   final String price;
-  final String rating;
+  final double rating;
   final Color statusColor;
   final Color? backgroundColor;
   final VoidCallback? onTap;
@@ -491,9 +516,35 @@ class BookingCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(name,
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  name,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.star,
+                                color: Colors.orange,
+                                size: 12,
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                rating.toStringAsFixed(1),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
                           Text(package,
                               style: const TextStyle(
                                   color: Colors.grey, fontSize: 14)),

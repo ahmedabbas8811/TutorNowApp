@@ -46,6 +46,8 @@ class ProgressController {
         await supabase
             .from('bookings')
             .update({'status': 'completed'}).eq('id', report.bookingId);
+        //  Delete booked_slots here
+        await deleteBookedSlots(report.bookingId);
       }
 
       await checkProgressReportExists(report.bookingId, report.week);
@@ -99,6 +101,19 @@ class ProgressController {
     } catch (e) {
       print('Error fetching progress report: $e');
       return null;
+    }
+  }
+
+  Future<void> deleteBookedSlots(String bookingId) async {
+    try {
+      final response = await supabase
+          .from('booked_slots')
+          .delete()
+          .eq('booking_id', bookingId);
+
+      print('[DEBUG] Deleted booked_slots for booking_id: $bookingId');
+    } catch (e) {
+      print('[ERROR] Failed to delete booked_slots for booking $bookingId: $e');
     }
   }
 }
