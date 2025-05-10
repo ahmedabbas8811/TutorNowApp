@@ -117,7 +117,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
                         value: controller
                                 .qualification.educationLevel.value.isNotEmpty
                             ? controller.qualification.educationLevel.value
-                            : null, // Current value or null
+                            : null, 
                         items: [
                           'Matric',
                           'Intermediate',

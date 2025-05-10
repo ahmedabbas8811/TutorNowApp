@@ -45,7 +45,8 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
 
     final response = await supabase
         .from('messages')
-        .select('sender_id, receiver_id, content, created_at, is_read, is_archived, pinned_by')
+        .select(
+            'sender_id, receiver_id, content, created_at, is_read, is_archived, pinned_by')
         .or('sender_id.eq.$myUserId,receiver_id.eq.$myUserId')
         .eq('is_archived', false)
         .order('created_at', ascending: false);
@@ -78,8 +79,9 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
           'is_pinned': message['pinned_by'] == myUserId,
         };
       } else {
-        uniqueChats[chatPartnerId]?['is_pinned'] = 
-            uniqueChats[chatPartnerId]?['is_pinned'] || (message['pinned_by'] == myUserId);
+        uniqueChats[chatPartnerId]?['is_pinned'] = uniqueChats[chatPartnerId]
+                ?['is_pinned'] ||
+            (message['pinned_by'] == myUserId);
       }
       userIdsToFetch.add(chatPartnerId);
     }
@@ -115,13 +117,14 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
         .stream(primaryKey: ['id'])
         .order('created_at', ascending: false)
         .listen((_) {
-      if (mounted) {
-        _fetchChatList();
-      }
-    });
+          if (mounted) {
+            _fetchChatList();
+          }
+        });
   }
 
-  Future<Map<String, Map<String, String>>> _fetchMultipleUserDetails(Set<String> userIds) async {
+  Future<Map<String, Map<String, String>>> _fetchMultipleUserDetails(
+      Set<String> userIds) async {
     if (userIds.isEmpty) return {};
 
     final response = await supabase
@@ -134,7 +137,9 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
     for (var user in response) {
       final metadata = user['metadata'];
       userDetails[user['id']] = {
-        'name': metadata is Map<String, dynamic> ? metadata['name'] ?? 'Unknown' : 'Unknown',
+        'name': metadata is Map<String, dynamic>
+            ? metadata['name'] ?? 'Unknown'
+            : 'Unknown',
         'image_url': user['image_url'] ?? '',
       };
     }
@@ -195,7 +200,9 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
       body: isLoading
           ? ShimmerChatList()
           : chatList.isEmpty
-              ? Center(child: Text('No chats yet.', style: TextStyle(color: Colors.grey)))
+              ? Center(
+                  child: Text('No chats yet.',
+                      style: TextStyle(color: Colors.grey)))
               : ListView.builder(
                   itemCount: chatList.length,
                   itemBuilder: (context, index) {
@@ -266,7 +273,8 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
     );
   }
 
-  void _showChatOptionsBottomSheet(String chatPartnerId, bool isPinned, String userName) {
+  void _showChatOptionsBottomSheet(
+      String chatPartnerId, bool isPinned, String userName) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -274,7 +282,8 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
           child: Wrap(
             children: <Widget>[
               ListTile(
-                leading: Icon(isPinned ? Icons.push_pin : Icons.push_pin_outlined),
+                leading:
+                    Icon(isPinned ? Icons.push_pin : Icons.push_pin_outlined),
                 title: Text(isPinned ? 'Unpin Chat' : 'Pin Chat'),
                 onTap: () {
                   _togglePinChat(chatPartnerId, isPinned);
@@ -305,20 +314,20 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
   }
 
   void _navigateToReportScreen(String userId, String userName) {
-  try {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ReportUserScreen(
-          userId: userId,
-          userName: userName,
+    try {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReportUserScreen(
+            userId: userId,
+            userName: userName,
+          ),
         ),
-      ),
-    );
-  } catch (e) {
-    Get.snackbar('Error', 'Could not open report screen: $e');
+      );
+    } catch (e) {
+      Get.snackbar('Error', 'Could not open report screen: $e');
+    }
   }
-}
 
   void _openChatScreen(String chatPartnerId) {
     _markMessagesAsRead(chatPartnerId);
@@ -358,10 +367,6 @@ class _TutorChatListScreenState extends State<TutorChatListScreen> {
   }
 }
 
-
-
-
-
 class ReportUserScreen extends StatefulWidget {
   final String userId;
   final String userName;
@@ -394,7 +399,20 @@ class _ReportUserScreenState extends State<ReportUserScreen> {
         maxHeight: 1000,
         imageQuality: 80,
       );
+
       if (images != null && images.isNotEmpty) {
+        // Check each image's type
+        for (final image in images) {
+          final extension = image.path.split('.').last.toLowerCase();
+          if (extension != 'jpg' && extension != 'jpeg' && extension != 'png') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('Only JPG and PNG images are allowed')),
+            );
+            return;
+          }
+        }
+
         setState(() {
           _selectedImages.addAll(images);
         });
@@ -407,43 +425,49 @@ class _ReportUserScreenState extends State<ReportUserScreen> {
   }
 
   Future<Map<String, String>> _uploadImages() async {
-  if (_selectedImages.isEmpty) return {};
+    if (_selectedImages.isEmpty) return {};
 
-  Map<String, String> imageUrls = {};
-  final myUserId = supabase.auth.currentUser?.id;
-  if (myUserId == null) return {};
+    Map<String, String> imageUrls = {};
+    final myUserId = supabase.auth.currentUser?.id;
+    if (myUserId == null) return {};
 
-  try {
-    for (int i = 0; i < _selectedImages.length; i++) {
-      final file = File(_selectedImages[i].path);
-      final fileName = 'report_${widget.userId}_${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
-      final filePath = '$myUserId/$fileName';
+    try {
+      for (int i = 0; i < _selectedImages.length; i++) {
+        final file = File(_selectedImages[i].path);
+        final fileName =
+            'report_${widget.userId}_${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
+        final filePath = '$myUserId/$fileName';
 
-      // Upload to public 'reportimages' bucket
-      await supabase.storage
-          .from('reportimages')
-          .upload(filePath, file, fileOptions: FileOptions(contentType: 'image/jpeg'));
+        // Upload to public 'reportimages' bucket
+        await supabase.storage.from('reportimages').upload(filePath, file,
+            fileOptions: FileOptions(contentType: 'image/jpeg'));
 
-      // Get public URL (no signing needed for public bucket)
-      final imageUrl = supabase.storage
-          .from('reportimages')
-          .getPublicUrl(filePath);
+        // Get public URL (no signing needed for public bucket)
+        final imageUrl =
+            supabase.storage.from('reportimages').getPublicUrl(filePath);
 
-      imageUrls[i.toString()] = imageUrl;
+        imageUrls[i.toString()] = imageUrl;
+      }
+      return imageUrls;
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to upload images: $e')),
+      );
+      return {};
     }
-    return imageUrls;
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to upload images: $e')),
-    );
-    return {};
   }
-}
 
   Future<void> _submitReport() async {
     if (_commentsController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please provide details for your report')),
+      );
+      return;
+    }
+    // Check if at least one image is attached
+    if (_selectedImages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please attach at least one image')),
       );
       return;
     }
@@ -554,8 +578,10 @@ class _ReportUserScreenState extends State<ReportUserScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.add_a_photo, size: 40, color: Colors.grey),
-                            Text('Tap to upload image', style: TextStyle(color: Colors.grey)),
+                            Icon(Icons.add_a_photo,
+                                size: 40, color: Colors.grey),
+                            Text('Tap to upload image',
+                                style: TextStyle(color: Colors.grey)),
                           ],
                         ),
                       ),
@@ -584,7 +610,8 @@ class _ReportUserScreenState extends State<ReportUserScreen> {
                                 top: 0,
                                 right: 0,
                                 child: IconButton(
-                                  icon: const Icon(Icons.close, color: Colors.red),
+                                  icon: const Icon(Icons.close,
+                                      color: Colors.red),
                                   onPressed: () {
                                     setState(() {
                                       _selectedImages.removeAt(index);
@@ -605,7 +632,8 @@ class _ReportUserScreenState extends State<ReportUserScreen> {
                     onPressed: _isSubmitting ? null : _submitReport,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff87e64c),
-                      padding: const EdgeInsets.symmetric(horizontal: 93, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 93, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(color: Colors.black),
@@ -644,7 +672,7 @@ class DashedBorderPainter extends CustomPainter {
     // Top border
     while (startX < size.width) {
       double endX = startX + dashWidth;
-      if (endX > size.width) endX = size.width; 
+      if (endX > size.width) endX = size.width;
       canvas.drawLine(
         Offset(startX, 0),
         Offset(endX, 0),
@@ -657,7 +685,7 @@ class DashedBorderPainter extends CustomPainter {
     double startY = 0;
     while (startY < size.height - 1) {
       double endY = startY + dashWidth;
-      if (endY > size.height - 1) endY = size.height - 1; 
+      if (endY > size.height - 1) endY = size.height - 1;
       canvas.drawLine(
         Offset(size.width - 1, startY),
         Offset(size.width - 1, endY),
@@ -670,7 +698,7 @@ class DashedBorderPainter extends CustomPainter {
     startX = 0;
     while (startX < size.width) {
       double endX = startX + dashWidth;
-      if (endX > size.width) endX = size.width; 
+      if (endX > size.width) endX = size.width;
       canvas.drawLine(
         Offset(startX, size.height - 1),
         Offset(endX, size.height - 1),
@@ -683,7 +711,7 @@ class DashedBorderPainter extends CustomPainter {
     startY = 0;
     while (startY < size.height - 1) {
       double endY = startY + dashWidth;
-      if (endY > size.height - 1) endY = size.height - 1; 
+      if (endY > size.height - 1) endY = size.height - 1;
       canvas.drawLine(
         Offset(0, startY),
         Offset(0, endY),
