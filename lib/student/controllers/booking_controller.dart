@@ -5,7 +5,7 @@ import 'package:newifchaly/student/models/booking_model.dart';
 class BookingController extends GetxController {
   RxList<BookingModel> pendingBookings = <BookingModel>[].obs;
   RxList<BookingModel> activeBookings = <BookingModel>[].obs;
-  RxList<BookingModel> rejectedBookings = <BookingModel>[].obs;
+  RxList<BookingModel> declinedBookings = <BookingModel>[].obs;
   RxList<BookingModel> completedBookings = <BookingModel>[].obs;
   var isLoading = true.obs;
 
@@ -44,13 +44,13 @@ class BookingController extends GetxController {
         // Clear existing bookings
         activeBookings.clear();
         pendingBookings.clear();
-        rejectedBookings.clear();
+        declinedBookings.clear();
         completedBookings.clear();
 
         // Temporary lists to hold data before assigning
         List<BookingModel> active = [];
         List<BookingModel> pending = [];
-        List<BookingModel> rejected = [];
+        List<BookingModel> declined = [];
         List<BookingModel> completed = [];
 
         // Process bookings in parallel for better performance
@@ -68,8 +68,8 @@ class BookingController extends GetxController {
             active.add(bookingData);
           } else if (booking['status'] == 'pending') {
             pending.add(bookingData);
-          } else if (booking['status'] == 'rejected') {
-            rejected.add(bookingData);
+          } else if (booking['status'] == 'declined') {
+            declined.add(bookingData);
           } else if (booking['status'] == 'completed') {
             completed.add(bookingData);
           }
@@ -78,11 +78,11 @@ class BookingController extends GetxController {
         // Assign all at once to minimize UI updates
         activeBookings.assignAll(active);
         pendingBookings.assignAll(pending);
-        rejectedBookings.assignAll(rejected);
+        declinedBookings.assignAll(declined);
         completedBookings.assignAll(completed);
 
         print(
-            "Active Bookings: ${activeBookings.length}, Pending Bookings: ${pendingBookings.length}, Rejected Bookings: ${rejectedBookings.length}, Completed Bookings: ${completedBookings.length}");
+            "Active Bookings: ${activeBookings.length}, Pending Bookings: ${pendingBookings.length}, Rejected Bookings: ${declinedBookings.length}, Completed Bookings: ${completedBookings.length}");
       } else {
         print("No bookings found for user_id: ${user.id}");
       }

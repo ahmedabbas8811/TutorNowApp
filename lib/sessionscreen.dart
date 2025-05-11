@@ -22,6 +22,8 @@ class _SessionScreenState extends State<SessionScreen> {
   int _selectedIndex = 2;
   List<BookingModel> pendingBookings = [];
   List<BookingModel> activeBookings = [];
+  List<BookingModel> cancelledBookings = [];
+  List<BookingModel> completedBookings = [];
   bool _isLoading = true;
 
   @override
@@ -35,6 +37,8 @@ class _SessionScreenState extends State<SessionScreen> {
     setState(() {
       pendingBookings = bookingsData['pending']!;
       activeBookings = bookingsData['active']!;
+      cancelledBookings = bookingsData['cancelled']!;
+      completedBookings = bookingsData['completed']!;
       _isLoading = false;
     });
   }
@@ -81,6 +85,10 @@ class _SessionScreenState extends State<SessionScreen> {
               buildBookingRequestsSection(),
               const SizedBox(height: 24),
               buildBookingActiveSection(context),
+              const SizedBox(height: 24),
+              buildBookingCompletedSection(),
+              const SizedBox(height: 24),
+              buildBookingCancelledSection(),
             ],
           ),
         ),
@@ -105,6 +113,38 @@ class _SessionScreenState extends State<SessionScreen> {
         );
       },
       statusColor: Colors.orange,
+    );
+  }
+
+  Widget buildBookingCompletedSection() {
+    return buildBookingSection(
+      title: 'Completed Bookings',
+      bookings: completedBookings,
+      onTap: (booking) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BookingRequestScreen(booking: booking),
+          ),
+        );
+      },
+      statusColor: const Color.fromARGB(0, 227, 227, 227),
+    );
+  }
+
+  Widget buildBookingCancelledSection() {
+    return buildBookingSection(
+      title: 'Cancelled Bookings',
+      bookings: cancelledBookings,
+      onTap: (booking) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BookingRequestScreen(booking: booking),
+          ),
+        );
+      },
+      statusColor: const Color.fromARGB(0, 84, 84, 84),
     );
   }
 

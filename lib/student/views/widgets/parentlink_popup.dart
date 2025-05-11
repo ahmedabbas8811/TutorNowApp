@@ -22,14 +22,14 @@ class ParentLink extends StatelessWidget {
           TextField(
             controller: parentIdController,
             decoration: const InputDecoration(
-              labelText: 'Parent ID',
-              hintText: 'Enter parent user ID',
+              labelText: 'Parent Email',
+              hintText: 'Enter parent user Email',
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 20),
           const Text(
-            'Ask the parent for their user ID to link their account',
+            'Ask the parent for their user email to link their account',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ],
@@ -43,7 +43,7 @@ class ParentLink extends StatelessWidget {
           onPressed: () async {
             if (parentIdController.text.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Please enter parent ID')),
+                const SnackBar(content: Text('Please enter parent Email')),
               );
               return;
             }

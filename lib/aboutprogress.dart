@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:newifchaly/controllers/booking_controller.dart';
+import 'package:newifchaly/controllers/progress_controller.dart';
 import 'package:newifchaly/models/tutor_booking_model.dart';
 import 'weekprogress.dart';
 
@@ -13,6 +15,7 @@ class AboutProgress extends StatefulWidget {
 
 class _AboutProgressState extends State<AboutProgress> {
   bool isAboutSelected = true;
+  TutorBookingsController controller = TutorBookingsController();
 
   @override
   void initState() {
@@ -289,7 +292,7 @@ class _AboutProgressState extends State<AboutProgress> {
             height: 60,
             child: ElevatedButton(
               onPressed: () {
-                // Cancel Booking Action
+                controller.cancelBooking(widget.booking.bookingId, context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xffe64b4b),

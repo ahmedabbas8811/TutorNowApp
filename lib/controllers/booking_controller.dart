@@ -10,7 +10,7 @@ class TutorBookingsController {
     final user = supabase.auth.currentUser;
     if (user == null) {
       print("[DEBUG] No tutor is logged in.");
-      return {'pending': [], 'active': [], 'completed': []};
+      return {'pending': [], 'active': [], 'completed': [], 'cancelled': []};
     }
 
     print('[DEBUG] Fetching bookings for tutor ${user.id}');
@@ -27,7 +27,7 @@ class TutorBookingsController {
 
       if (response.isEmpty) {
         print("[DEBUG] No bookings found for this tutor.");
-        return {'pending': [], 'active': [], 'completed': []};
+        return {'pending': [], 'active': [], 'completed': [], 'cancelled': []};
       }
 
       // Step 2: Process each booking
@@ -75,6 +75,7 @@ class TutorBookingsController {
       List<BookingModel> pendingBookings = [];
       List<BookingModel> activeBookings = [];
       List<BookingModel> completedBookings = [];
+      List<BookingModel> cancelledBookings = [];
 
       for (var data in response) {
         try {
@@ -89,6 +90,9 @@ class TutorBookingsController {
             case 'completed':
               completedBookings.add(booking);
               break;
+            case 'cancelled':
+              cancelledBookings.add(booking);
+              break;
           }
         } catch (e) {
           print('[ERROR] Failed to categorize booking: $e');
@@ -96,6 +100,9 @@ class TutorBookingsController {
       }
 
       print('[DEBUG] Completed bookings: ${completedBookings.length}');
+      print('[DEBUG] Cancelled bookings: ${cancelledBookings.length}');
+      print('[DEBUG] Active bookings: ${activeBookings.length}');
+      print('[DEBUG] Request bookings: ${pendingBookings.length}');
 
       // Enhanced booked_slots deletion with comprehensive debugging
       if (completedBookings.isNotEmpty) {
@@ -178,7 +185,8 @@ class TutorBookingsController {
       final allBookings = [
         ...pendingBookings,
         ...activeBookings,
-        ...completedBookings
+        ...completedBookings,
+        ...cancelledBookings
       ];
       for (var booking in allBookings) {
         try {
@@ -194,10 +202,11 @@ class TutorBookingsController {
         'pending': pendingBookings,
         'active': activeBookings,
         'completed': completedBookings,
+        'cancelled': cancelledBookings,
       };
     } catch (e) {
       print('[ERROR] Critical error in fetchTutorBookings: $e');
-      return {'pending': [], 'active': [], 'completed': []};
+      return {'pending': [], 'active': [], 'completed': [], 'cancelled': []};
     }
   }
 
@@ -258,6 +267,74 @@ class TutorBookingsController {
       }
     } catch (e) {
       print("Error fetching package info: $e");
+    }
+  }
+
+  Future<void> declineBooking(String bookingId) async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user == null) {
+      print("No user is currently logged in.");
+      return;
+    }
+    try {
+      //Update booking status to active
+      final response = await Supabase.instance.client
+          .from('bookings')
+          .update({
+            'status': 'declined',
+          })
+          .eq('id', bookingId)
+          .select();
+
+      if (response.isNotEmpty) {
+        print("Booking status updated to declined for booking ID: $bookingId");
+      }
+    } catch (e) {
+      print("Error updating booking status: $e");
+    }
+  }
+
+  Future<void> deleteBookedSlots(String bookingId) async {
+    try {
+      final response = await supabase
+          .from('booked_slots')
+          .delete()
+          .eq('booking_id', bookingId);
+
+      print('[DEBUG] Deleted booked_slots for booking_id: $bookingId');
+    } catch (e) {
+      print('[ERROR] Failed to delete booked_slots for booking $bookingId: $e');
+    }
+  }
+
+  Future<void> cancelBooking(String bookingId, BuildContext context) async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user == null) {
+      print("No user is currently logged in.");
+      return;
+    }
+
+    try {
+      // Step 1: Update booking status to active
+      final response = await Supabase.instance.client
+          .from('bookings')
+          .update({
+            'status': 'cancelled',
+          })
+          .eq('id', bookingId)
+          .select();
+
+      if (response.isNotEmpty) {
+        print("Booking status updated to cancelled for booking ID: $bookingId");
+        deleteBookedSlots(bookingId);
+        Navigator.pop(context);
+      } else {
+        print("No booking found with the provided ID or user mismatch.");
+      }
+    } catch (e) {
+      print("Error updating booking status: $e");
     }
   }
 
