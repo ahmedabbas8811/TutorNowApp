@@ -165,7 +165,6 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   Widget buildTutorCard(Tutor tutor) {
     return GestureDetector(
       onTap: () {
-        // Navigate to TutorDetailScreen with the tutor's userId
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -223,6 +222,56 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               child: Text(
                 tutor.subjects,
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: FutureBuilder<UserRating>(
+                future: StudentHomeController().fetchUserRatings(tutor.userId),
+                builder: (context, snapshot) {
+                  // Default to 0 rating while loading
+                  final rating =
+                      snapshot.hasData ? snapshot.data!.averageRating : 0.0;
+                  final filledStars = rating.floor();
+                  final hasHalfStar = (rating - filledStars) >= 0.5;
+
+                  return Row(
+                    children: List.generate(5, (index) {
+                      if (index < filledStars) {
+                        // Filled star
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 2),
+                          child: Icon(
+                            Icons.star,
+                            size: 16.78,
+                            color: const Color(0xFFFFA31E),
+                          ),
+                        );
+                      } else if (index == filledStars && hasHalfStar) {
+                        // Half star
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 2),
+                          child: Icon(
+                            Icons.star_half,
+                            size: 16.78,
+                            color: const Color(0xFFFFA31E),
+                          ),
+                        );
+                      } else {
+                        // Empty star
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 2),
+                          child: Icon(
+                            Icons.star_border,
+                            size: 16.78,
+                            color: const Color(0xFFFFA31E),
+                          ),
+                        );
+                      }
+                    }),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 8),

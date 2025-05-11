@@ -25,3 +25,12 @@ class Tutor {
     );
   }
 }
+class UserRating {
+  final double averageRating;
+  final int totalRatings;
+
+  UserRating({
+    required this.averageRating,
+    required this.totalRatings,
+  });
+}
