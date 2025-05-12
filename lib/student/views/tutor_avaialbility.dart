@@ -127,6 +127,32 @@ class TutorAvailabilityScreen extends StatelessWidget {
               );
             }),
             const SizedBox(height: 24),
+            // Add this below your session progress indicator (Wrap widget):
+            Obx(() {
+              if (_controller.selectedSlots.isNotEmpty) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Selected Slots:",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Wrap(
+                      spacing: 8,
+                      children: _controller.selectedSlots.values.map((slot) {
+                        return Chip(
+                          label: Text("${slot["day"]} ${slot["time"]}"),
+                          backgroundColor: const Color(0xff87e64c),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                );
+              }
+              return const SizedBox();
+            }),
+            const SizedBox(height: 24),
 
             // select day section
             const Text(
@@ -141,47 +167,56 @@ class TutorAvailabilityScreen extends StatelessWidget {
                 );
               }
 
+              // Inside your Obx(() { ... }) for day selection:
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: _controller.availabilityList.map((availability) {
-                    return GestureDetector(
-                      onTap: () async {
-                        _controller.selectedDay.value = availability.day;
-                        await _controller.processSlots(availability.slots);
-                        print("Day selected: ${_controller.selectedDay.value}");
-                        print(
-                            "Slots for selected day: ${_controller.availableSlots}");
-                        _controller.filterAvailableSlots();
+                    final isDaySelected =
+                        _controller.isDayAlreadySelected(availability.day);
 
-                        print(
-                            "Filtered Slots for selected day: ${_controller.availableSlots}");
-                      },
-                      child: Obx(() {
-                        return Container(
-                          margin: const EdgeInsets.only(right: 12),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: _controller.selectedDay.value ==
-                                    availability.day
-                                ? const Color(0xff87e64c)
-                                : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            availability.day,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: _controller.selectedDay.value ==
+                    return GestureDetector(
+                      onTap: isDaySelected
+                          ? () {
+                              Get.defaultDialog(
+                                title: "Day Already Selected",
+                                middleText:
+                                    "You can only book one slot per ${availability.day}.",
+                              );
+                            }
+                          : () async {
+                              _controller.selectedDay.value = availability.day;
+                              await _controller
+                                  .processSlots(availability.slots);
+                              _controller.filterAvailableSlots();
+                            },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: isDaySelected
+                              ? Colors.grey[400] // Gray out if already selected
+                              : _controller.selectedDay.value ==
                                       availability.day
-                                  ? Colors.black
-                                  : Colors.grey[600],
-                            ),
+                                  ? const Color(0xff87e64c)
+                                  : Colors.grey[200],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          availability.day,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isDaySelected
+                                ? Colors.grey[700]
+                                : _controller.selectedDay.value ==
+                                        availability.day
+                                    ? Colors.black
+                                    : Colors.grey[600],
                           ),
-                        );
-                      }),
+                        ),
+                      ),
                     );
                   }).toList(),
                 ),
@@ -197,7 +232,15 @@ class TutorAvailabilityScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Obx(() {
-              if (_controller.availableSlots.isEmpty) {
+              if (_controller
+                  .isDayAlreadySelected(_controller.selectedDay.value)) {
+                return const Center(
+                  child: Text(
+                    "You've already selected a slot for this day.",
+                    style: TextStyle(fontSize: 16, color: Colors.red),
+                  ),
+                );
+              } else if (_controller.availableSlots.isEmpty) {
                 return const Center(
                     child: Text("No slots available for the selected day."));
               }
@@ -249,7 +292,15 @@ class TutorAvailabilityScreen extends StatelessWidget {
             }),
 
             const Spacer(),
-
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12),
+              child: const Text(
+                "If you can't find slots for a desired day, please contact the tutor",
+                style: TextStyle(
+                  fontSize: 14,
+                ),
+              ),
+            ),
             // confirm booking button
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
