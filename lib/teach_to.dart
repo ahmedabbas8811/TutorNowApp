@@ -56,7 +56,7 @@ class _QualificationScreenState extends State<TeachTo> {
                     children: [
                       const Expanded(
                         child: const Text(
-                          'Add Qualification',
+                          'Add Subject',
                           style: TextStyle(
                               fontSize: 28, fontWeight: FontWeight.bold),
                         ),

@@ -6,6 +6,7 @@ import 'package:newifchaly/editavailability_screen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
+import 'package:newifchaly/views/setpakages_screen.dart';
 import 'package:newifchaly/views/widgets/nav_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
@@ -82,7 +83,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       case 3:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => EarningsScreen()),
+          MaterialPageRoute(builder: (context) => SetpakagesScreen()),
         );
         break;
       case 4:
