@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:newifchaly/cnic_screen.dart';
 import 'package:newifchaly/province_city_dropdown.dart';
@@ -82,12 +80,10 @@ class _LocationScreenState extends State<LocationScreen> {
         print("Error storing location: $e");
         return false;
       }
-    }
-    else if(_state ==null){
-    showCustomSnackBar(context, "Please select a province");
-    return false;
-    }
-    else if(_city == null){
+    } else if (_state == null) {
+      showCustomSnackBar(context, "Please select a province");
+      return false;
+    } else if (_city == null) {
       showCustomSnackBar(context, "Please select a city");
       return false;
     }
@@ -101,7 +97,6 @@ class _LocationScreenState extends State<LocationScreen> {
     // Check if location step is already completed and restrict access
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (await _isLocationCompleted()) {
-   
         final completionData =
             await ProfileCompletionHelper.fetchCompletionData();
         final incompleteSteps =
@@ -128,94 +123,88 @@ class _LocationScreenState extends State<LocationScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: const Text(
-                      'Select your location',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                    ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: const Text(
+                    'Select your location',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
-                  
-                        TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CnicScreen(),
-                                ),
-                              );
-                            },
-                            style: ButtonStyle(
-                              overlayColor:
-                                  WidgetStateProperty.resolveWith<Color?>(
-                                (Set<WidgetState> states) {
-                                  if (states.contains(WidgetState.pressed)) {
-                                    return Colors.green.shade100;
-                                  }
-                                  return null; // Default behavior
-                                },
-                              ),
-                            ),
-                            child: const Text(
-                              "Skip For Now",
-                              style: TextStyle(
-                                  color: Colors.grey,
-                                  //  decorationStyle: TextDecorationStyle.solid,
-                                  decoration: TextDecoration.underline),
-                            ))
-                ],
-              ),
-              const SizedBox(height: 10),
-                          // Province and City Dropdown
-              ProvinceCityDropdown(
-                onProvinceSelected: (province) {
-                  setState(() {
-                    _state = province;
-                  });
-                },
-                onCitySelected: (city) {
-                  setState(() {
-                    _city = city;
-                  });
-                },
-              ),
-              const SizedBox(height: 15),
-              const SizedBox(height: 10),
-              const Spacer(),
-              SizedBox(
-                width: 330,
-                child: ElevatedButton(
-                  onPressed: () async {
-                      bool isLocationStored = await _storeLocation(); // Store location and update status
-                      if (isLocationStored==true){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CnicScreen()),
-                      );
-                      }
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CnicScreen(),
+                      ),
+                    );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff87e64c),
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                  style: ButtonStyle(
+                    overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                      (Set<WidgetState> states) {
+                        if (states.contains(WidgetState.pressed)) {
+                          return Colors.green.shade100;
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   child: const Text(
-                    'Next',
-                    style: TextStyle(fontSize: 18, color: Colors.black),
+                    "Skip For Now",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 10),
+            ProvinceCityDropdown(
+              onProvinceSelected: (province) {
+                setState(() {
+                  _state = province;
+                });
+              },
+              onCitySelected: (city) {
+                setState(() {
+                  _city = city;
+                });
+              },
+            ),
+            const SizedBox(height: 15),
+            const Spacer(),
+            SizedBox(
+              width: 330,
+              child: ElevatedButton(
+                onPressed: () async {
+                  bool isLocationStored = await _storeLocation();
+                  if (isLocationStored == true) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CnicScreen()),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff87e64c),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
+                child: const Text(
+                  'Next',
+                  style: TextStyle(fontSize: 18, color: Colors.black),
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

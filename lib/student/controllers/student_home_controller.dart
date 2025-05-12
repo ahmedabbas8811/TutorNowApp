@@ -93,4 +93,31 @@ class StudentHomeController {
       return [];
     }
   }
+
+Future<UserRating> fetchUserRatings(String userId) async {
+    try {
+      final response = await _client
+          .from('feedback')
+          .select('rating')
+          .eq('tutor_id', userId);
+
+      if (response.isEmpty) {
+        return UserRating(averageRating: 0.0, totalRatings: 0);
+      }
+
+      final totalRating = response.fold(0.0, (sum, review) => sum + (review['rating'] as num).toDouble());
+      final averageRating = totalRating / response.length;
+
+      return UserRating(
+        averageRating: averageRating,
+        totalRatings: response.length,
+      );
+    } catch (e) {
+      print('Error fetching user ratings: $e');
+      return UserRating(averageRating: 0.0, totalRatings: 0);
+    }
+  }
 }
+
+
+

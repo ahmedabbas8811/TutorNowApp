@@ -5,6 +5,7 @@ import 'package:newifchaly/models/person_model.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
+import 'package:newifchaly/views/setpakages_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
 
@@ -211,7 +212,7 @@ class PersonController extends GetxController {
         Get.to(() => SessionScreen());
         break;
       case 3:
-        Get.to(() => EarningsScreen());
+        Get.to(() => SetpakagesScreen());
         break;
       case 4:
         Get.to(() => PersonScreen());

@@ -9,6 +9,7 @@ import 'package:newifchaly/availabilityscreen.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
+import 'package:newifchaly/views/setpakages_screen.dart';
 import 'package:newifchaly/views/widgets/booking_card_shimmer.dart';
 import 'package:newifchaly/views/widgets/nav_bar.dart';
 
@@ -56,7 +57,7 @@ class _SessionScreenState extends State<SessionScreen> {
         screen = SessionScreen();
         break;
       case 3:
-        screen = EarningsScreen();
+        screen = SetpakagesScreen();
         break;
       case 4:
         screen = PersonScreen();

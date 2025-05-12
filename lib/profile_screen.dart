@@ -6,6 +6,7 @@ import 'package:newifchaly/bio_screen.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/sessionscreen.dart';
+import 'package:newifchaly/views/setpakages_screen.dart';
 import 'package:newifchaly/views/widgets/nav_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../controllers/profile_controller.dart';
@@ -60,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 3:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => EarningsScreen()),
+          MaterialPageRoute(builder: (context) => SetpakagesScreen()),
         );
         break;
       case 4:

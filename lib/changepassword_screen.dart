@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/availabilityscreen.dart';
+import 'package:newifchaly/controllers/profile_controller.dart';
 import 'package:newifchaly/earningscreen.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 import 'package:newifchaly/utils/features/auth/auth_controller.dart';
+import 'package:newifchaly/views/setpakages_screen.dart';
+import 'package:newifchaly/views/widgets/nav_bar.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   @override
@@ -13,9 +16,11 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _currentPasswordController =
+      TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _retypePasswordController = TextEditingController();
+  final TextEditingController _retypePasswordController =
+      TextEditingController();
 
   final FocusNode _currentPasswordFocusNode = FocusNode();
   final FocusNode _newPasswordFocusNode = FocusNode();
@@ -76,53 +81,50 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     _passwordError = '';
   }
 
-  void _onBottomNavTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
+  void _onItemTapped(int index) {
+    Widget screen;
     switch (index) {
       case 0:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ProfileScreen()));
+        screen = ProfileScreen();
         break;
       case 1:
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => AvailabilityScreen()));
+        screen = AvailabilityScreen();
         break;
       case 2:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SessionScreen()));
+        screen = SessionScreen();
         break;
       case 3:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => EarningsScreen()));
+        screen = SetpakagesScreen();
         break;
       case 4:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PersonScreen()));
+        screen = PersonScreen();
         break;
+      default:
+        return;
     }
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => screen));
   }
 
-  
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: Colors.white,
-    body: SingleChildScrollView(  // Add this
-      padding: const EdgeInsets.all(16.0),  // Move padding here
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Text('Change Password',
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-          ),
-          const Text('Confirm Current Password',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-          const SizedBox(height: 10),
+  @override
+  Widget build(BuildContext context) {
+    final ProfileController profilecontroller = Get.put(ProfileController());
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        // Add this
+        padding: const EdgeInsets.all(16.0), // Move padding here
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text('Change Password',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+            ),
+            const Text('Confirm Current Password',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+            const SizedBox(height: 10),
             // Current Password Field
             TextField(
               controller: _currentPasswordController,
@@ -225,9 +227,10 @@ Widget build(BuildContext context) {
                     });
                   },
                 ),
-                errorText: _newPasswordController.text.isNotEmpty && !_isPasswordValid 
-                    ? _passwordError 
-                    : null,
+                errorText:
+                    _newPasswordController.text.isNotEmpty && !_isPasswordValid
+                        ? _passwordError
+                        : null,
               ),
             ),
             const SizedBox(height: 20),
@@ -303,9 +306,10 @@ Widget build(BuildContext context) {
                           ? Icons.check_circle
                           : Icons.circle,
                       size: 16,
-                      color: _newPasswordController.text.contains(RegExp(r'[A-Z]'))
-                          ? Colors.green
-                          : Colors.grey,
+                      color:
+                          _newPasswordController.text.contains(RegExp(r'[A-Z]'))
+                              ? Colors.green
+                              : Colors.grey,
                     ),
                     SizedBox(width: 8),
                     Text('At least one uppercase letter'),
@@ -319,9 +323,10 @@ Widget build(BuildContext context) {
                           ? Icons.check_circle
                           : Icons.circle,
                       size: 16,
-                      color: _newPasswordController.text.contains(RegExp(r'[0-9]'))
-                          ? Colors.green
-                          : Colors.grey,
+                      color:
+                          _newPasswordController.text.contains(RegExp(r'[0-9]'))
+                              ? Colors.green
+                              : Colors.grey,
                     ),
                     SizedBox(width: 8),
                     Text('At least one number'),
@@ -331,11 +336,13 @@ Widget build(BuildContext context) {
                 Row(
                   children: [
                     Icon(
-                      _newPasswordController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))
+                      _newPasswordController.text
+                              .contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))
                           ? Icons.check_circle
                           : Icons.circle,
                       size: 16,
-                      color: _newPasswordController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))
+                      color: _newPasswordController.text
+                              .contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))
                           ? Colors.green
                           : Colors.grey,
                     ),
@@ -350,8 +357,8 @@ Widget build(BuildContext context) {
             ElevatedButton(
               onPressed: () async {
                 if (!_isPasswordValid) {
-                  Get.snackbar(
-                      "Invalid Password", "Please meet all password requirements.");
+                  Get.snackbar("Invalid Password",
+                      "Please meet all password requirements.");
                   return;
                 }
 
@@ -365,10 +372,9 @@ Widget build(BuildContext context) {
                 try {
                   // Call the changePassword method from AuthController
                   await _authController.changePassword(
-                    _currentPasswordController.text,
-                    _newPasswordController.text,
-                    context
-                  );
+                      _currentPasswordController.text,
+                      _newPasswordController.text,
+                      context);
                   Get.snackbar("Password Changed",
                       "Your password has been successfully updated.");
                 } catch (e) {
@@ -392,24 +398,10 @@ Widget build(BuildContext context) {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xff87e64c),
-        unselectedItemColor: Colors.black,
-        showUnselectedLabels: true,
-        currentIndex: 4, // Current active index
-        onTap: _onBottomNavTap, // Handle tap
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today), label: 'Availability'),
-          BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Bookings'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.attach_money), label: 'Earnings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
+      bottomNavigationBar: Obx(() => TutorBottomNavigationBar(
+          selectedIndex: _selectedIndex,
+          onItemTapped: _onItemTapped,
+          pendingBookingsCount: profilecontroller.pendingBookingsCount.value)),
     );
   }
 }

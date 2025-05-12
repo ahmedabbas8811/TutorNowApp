@@ -26,7 +26,7 @@ class TutorBottomNavigationBar extends StatelessWidget {
         _buildNavBarItem('assets/home_icon.svg', 'Home', 0),
         _buildNavBarItem('assets/availability.svg', 'Availability', 1),
         _buildNavBarItem('assets/bookings.svg', 'Bookings', 2),
-        _buildNavBarItem('assets/earning.svg', 'Earnings', 3),
+        _buildNavBarItem('assets/earning.svg', 'Packages', 3),
         _buildNavBarItem('assets/profile_icon.svg', 'Profile', 4),
       ],
     );

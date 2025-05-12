@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:newifchaly/availabilityscreen.dart';
 import 'package:newifchaly/controllers/profile_controller.dart';
-import 'package:newifchaly/earningscreen.dart';
+import 'package:newifchaly/controllers/user_package_controller.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/profile_screen.dart';
 import 'package:newifchaly/sessionscreen.dart';
-
-import 'package:newifchaly/views/addnewpackages_screen.dart';
+import 'package:newifchaly/user_package_detail_screen.dart';
 import 'package:newifchaly/views/widgets/nav_bar.dart';
+import 'package:newifchaly/views/addnewpackages_screen.dart';
 
 class SetpakagesScreen extends StatefulWidget {
   const SetpakagesScreen({super.key});
@@ -20,9 +18,8 @@ class SetpakagesScreen extends StatefulWidget {
 }
 
 class _SetpakagesScreenState extends State<SetpakagesScreen> {
-  int _selectedIndex = 3; // Keep this outside of the build method
+  int _selectedIndex = 3;
 
-  // On item tap, update selected index and navigate to corresponding screen
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -51,7 +48,7 @@ class _SetpakagesScreenState extends State<SetpakagesScreen> {
       case 3:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => EarningsScreen()),
+          MaterialPageRoute(builder: (context) => const SetpakagesScreen()),
         );
         break;
       case 4:
@@ -63,91 +60,146 @@ class _SetpakagesScreenState extends State<SetpakagesScreen> {
     }
   }
 
+  final UserPackageController packageController =
+      Get.put(UserPackageController());
+  final ProfileController profileController = Get.put(ProfileController());
+
   @override
   Widget build(BuildContext context) {
-    final ProfileController profileController = Get.put(ProfileController());
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 40),
-            const Text(
-              "Set Packages",
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    print("Box clicked!");
-                  },
-                  child: Container(
-                    width: 325,
-                    height: 150,
-                    child: CustomPaint(
-                      painter: DashedBorderPainter(),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: 10),
-                          Text(
-                            'You have no active package',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                        ],
+        child: Obx(() {
+          final isLoading = packageController.isLoading.value;
+          final packages = packageController.packages;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 40),
+              const Text(
+                "Set Packages",
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              if (isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (packages.isEmpty)
+                Container(
+                  width: double.infinity,
+                  height: 150,
+                  child: CustomPaint(
+                    painter: DashedBorderPainter(),
+                    child: const Center(
+                      child: Text(
+                        'You have no active package',
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                     ),
                   ),
-                ),
-                const Spacer(),
-              ],
-            ),
-            const Spacer(), // Pushes the button to the bottom
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff87e64c),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                )
+              else
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: packages.length,
+                    itemBuilder: (context, index) {
+                      final package = packages[index];
+                      return Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          side: const BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color.fromRGBO(0, 0, 0, 0.04),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserPackageDetailScreen(
+                                      package: package),
+                                ),
+                              );
+                            },
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(package.packageName,
+                                    style: const TextStyle(fontSize: 14)),
+                                Text(
+                                  '${package.price}/- PKR',
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.calendar_today, size: 18),
+                                  const SizedBox(width: 4),
+                                  Text('${package.numberOfWeeks} Weeks',
+                                      style: const TextStyle(fontSize: 14)),
+                                  const SizedBox(width: 16),
+                                  const Icon(Icons.repeat, size: 18),
+                                  const SizedBox(width: 4),
+                                  Text('${package.sessionsPerWeek}x / Week',
+                                      style: const TextStyle(fontSize: 14)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AddNewPackagesScreen()),
-                  );
-                },
-                child: const Text(
-                  "Add New Package",
-                  style: TextStyle(fontSize: 18, color: Colors.black),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff87e64c),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddNewPackagesScreen()),
+                    );
+                  },
+                  child: const Text(
+                    "Add New Package",
+                    style: TextStyle(fontSize: 18, color: Colors.black),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        }),
       ),
-   bottomNavigationBar: Obx(() => TutorBottomNavigationBar(
+      bottomNavigationBar: Obx(() => TutorBottomNavigationBar(
           selectedIndex: _selectedIndex,
           onItemTapped: _onItemTapped,
           pendingBookingsCount: profileController.pendingBookingsCount.value)),
-
     );
   }
 }
 
+// DashedBorderPainter (unchanged)
 class DashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

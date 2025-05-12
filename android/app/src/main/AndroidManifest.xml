@@ -12,7 +12,10 @@
         android:icon="@mipmap/ic_launcher"
         android:networkSecurityConfig="@xml/network_security_config"
         >
+<<<<<<< HEAD
         
+=======
+>>>>>>> fe07aefd662434f07abd0ea1f365b7b206ca0a73
         <activity
             android:name=".MainActivity"
             android:exported="true"
