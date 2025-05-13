@@ -3,10 +3,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/availabilityscreen.dart';
 import 'package:newifchaly/bio_screen.dart';
+import 'package:newifchaly/controllers/booking_controller.dart';
 import 'package:newifchaly/earningscreen.dart';
+import 'package:newifchaly/models/tutor_booking_model.dart';
 import 'package:newifchaly/personscreen.dart';
 import 'package:newifchaly/sessionscreen.dart';
 import 'package:newifchaly/views/setpakages_screen.dart';
+import 'package:newifchaly/views/widgets/bookingactivesection.dart';
 import 'package:newifchaly/views/widgets/nav_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../controllers/profile_controller.dart';
@@ -18,18 +21,29 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final TutorBookingsController booking_controller = TutorBookingsController();
   int _selectedIndex = 0; // Set initial selected index to Home (0)
   bool _isLoading = true; // Loader state
   final id = Supabase.instance.client.auth.currentUser!.id;
+  List<BookingModel> activeBookings = [];
 
   @override
   void initState() {
     super.initState();
     // Simulate loading delay
     Future.delayed(const Duration(seconds: 2), () {
+      fetchBookings();
       setState(() {
         _isLoading = false; // Stop loading after 2 seconds
       });
+    });
+  }
+
+  Future<void> fetchBookings() async {
+    final bookingsData = await booking_controller.fetchTutorBookings();
+    setState(() {
+      activeBookings = bookingsData['active']!;
+      _isLoading = false;
     });
   }
 
@@ -128,30 +142,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(height: screenHeight * 0.02),
 
                     // Upcoming Bookings Section
-                    const Text(
-                      'Upcoming Bookings',
-                      style:
-                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: const Color.fromARGB(255, 255, 255, 255)!),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                          child: buildBookingActiveSection(context,
+                              activeBookings: activeBookings,
+                              isLoading: _isLoading)),
                     ),
-                    SizedBox(height: screenHeight * 0.01),
-                    Obx(() => Container(
-                          width: screenWidth,
-                          height: screenHeight * 0.15,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey[300]!),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Center(
-                            child: Text(
-                              controller.profile.value.upcomingBookings.isEmpty
-                                  ? 'Your upcoming sessions will be shown\nhere, once booked'
-                                  : controller.profile.value.upcomingBookings
-                                      .join("\n"),
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        )),
                     SizedBox(height: screenHeight * 0.1),
 
                     // Profile Completion Section

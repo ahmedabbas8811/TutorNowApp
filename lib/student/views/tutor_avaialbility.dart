@@ -127,7 +127,7 @@ class TutorAvailabilityScreen extends StatelessWidget {
               );
             }),
             const SizedBox(height: 24),
-            // Add this below your session progress indicator (Wrap widget):
+
             Obx(() {
               if (_controller.selectedSlots.isNotEmpty) {
                 return Column(
@@ -167,7 +167,6 @@ class TutorAvailabilityScreen extends StatelessWidget {
                 );
               }
 
-              // Inside your Obx(() { ... }) for day selection:
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
