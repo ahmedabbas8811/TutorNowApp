@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:newifchaly/student/controllers/progress_controller.dart';
 import 'package:newifchaly/student/models/booking_model.dart';
 import 'package:newifchaly/student/models/progress_model.dart';
+import 'package:newifchaly/student/views/chat_screen.dart';
 import 'package:newifchaly/student/views/progressreport_stu.dart';
 import 'package:newifchaly/student/views/widgets/parentlink_popup.dart';
 import 'package:newifchaly/student/views/widgets/studentlink_popup.dart';
@@ -52,6 +53,19 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           true
                   ? NetworkImage(widget.booking.tutorImage)
                   : const AssetImage('assets/Ellipse1.png') as ImageProvider,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                        receiverId: widget.booking.tutorId,
+                        receiverName: widget.booking.tutorName,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
             const SizedBox(height: 8),
             Text(
