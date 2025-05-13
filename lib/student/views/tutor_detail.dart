@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newifchaly/student/controllers/package_controller.dart';
+import 'package:newifchaly/student/controllers/student_home_controller.dart';
 import 'package:newifchaly/student/controllers/tutor_detail_controller.dart';
+import 'package:newifchaly/student/models/student_home_model.dart';
 import 'package:newifchaly/student/views/chat_screen.dart';
 import 'package:newifchaly/student/views/widgets/about_tutor.dart';
 import 'package:newifchaly/student/views/widgets/packages.dart';
@@ -19,7 +21,8 @@ class TutorDetailScreen extends StatelessWidget {
 
     final PackagesController _Packagescontroller =
         Get.put(PackagesController(UserId: userId), tag: userId);
-
+    final StudentHomeController _homecontroller =
+        Get.put(StudentHomeController());
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -66,6 +69,20 @@ class TutorDetailScreen extends StatelessWidget {
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
+                            FutureBuilder<Location?>(
+                              future:
+                                  _homecontroller.fetchTutorLocation(userId),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Text('...');
+                                } else if (snapshot.hasError) {
+                                  return Text('Error loading location');
+                                } else {
+                                  return Text(snapshot.data!.location);
+                                }
+                              },
+                            ),
                             Row(
                               children: [
                                 const Icon(Icons.star,
@@ -75,7 +92,7 @@ class TutorDetailScreen extends StatelessWidget {
                                       _controller.reviews.isNotEmpty
                                           ? _controller.averageRating
                                               .toStringAsFixed(1)
-                                          : '0.0', 
+                                          : '0.0',
                                       style: const TextStyle(fontSize: 16),
                                     )),
                               ],
