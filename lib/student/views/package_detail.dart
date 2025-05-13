@@ -66,17 +66,19 @@ class PackageDetailScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.star, color: Colors.orange, size: 16),
-                    SizedBox(width: 4),
-                    Text(
-                      "package.rating.toString()",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
+                Obx(() {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        tutorController.averageRating.value.toStringAsFixed(1),
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  );
+                }),
                 SizedBox(height: 16),
                 Container(
                   padding: EdgeInsets.all(16),

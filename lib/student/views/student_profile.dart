@@ -96,7 +96,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                           radius: 75,
                           backgroundImage: profile.imageUrl.isNotEmpty
                               ? NetworkImage(profile.imageUrl)
-                              : AssetImage('assets/profile.jpg')
+                              : AssetImage('assets/profile.png')
                                   as ImageProvider,
                         ),
                       ),

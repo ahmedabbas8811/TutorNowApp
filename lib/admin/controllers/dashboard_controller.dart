@@ -20,11 +20,16 @@ class DashboardController {
           .length;
       int activeStudents =
           response.where((user) => user['user_type'] == 'Student').length;
-      int completedSessions = 99;
+      // Query the feedback table to get the feedback count
+      final feedbackResponse = await supabase
+          .from('feedback')
+          .select('id'); // Assuming 'id' is the primary key
+      int feedbackCount =
+          feedbackResponse != null ? feedbackResponse.length : 0;
 
       return DashboardStats(
         newUsers: newUsers,
-        completedSessions: completedSessions,
+        completedSessions: feedbackCount,
         activeTutors: activeTutors,
         activeStudents: activeStudents,
       );

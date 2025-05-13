@@ -379,38 +379,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   }).toList(),
                 );
               }),
-              const SizedBox(height: 10),
-              const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text(
-                  'Declined Bookings',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text(
-                  'These bookings were declined by the tutor.',
-                  style: TextStyle(fontSize: 14, color: Colors.black),
-                ),
-              ),
-              const SizedBox(height: 10),
-              const BookingSwipeView(
-                height: 180,
-                cards: [
-                  BookingCard(
-                    name: 'Shehdad Ali',
-                    package: 'Package Name',
-                    tutorImage: 'assets/Ellipse1.png',
-                    time: '90 Min / Session',
-                    frequency: '3X / Week',
-                    duration: '8 Weeks',
-                    price: '5000/- PKR',
-                    rating: 4.8,
-                    statusColor: Colors.red,
-                  ),
-                ],
-              ),
             ],
           ),
         ),

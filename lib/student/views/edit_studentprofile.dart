@@ -187,7 +187,7 @@ Future<void> _saveProfile() async {
 
   ImageProvider _getProfileImage() {
     if (_isImageDeleted) {
-      return const AssetImage('assets/profile.jpg');
+      return const AssetImage('assets/profile.png');
     }
     if (_selectedImage != null) {
       return FileImage(File(_selectedImage!.path));
@@ -198,7 +198,7 @@ Future<void> _saveProfile() async {
     if (widget.profile.imageUrl.isNotEmpty) {
       return NetworkImage(widget.profile.imageUrl);
     }
-    return const AssetImage('assets/profile.jpg');
+    return const AssetImage('assets/profile.png');
   }
 
   @override

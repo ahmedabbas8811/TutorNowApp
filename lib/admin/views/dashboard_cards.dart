@@ -89,7 +89,7 @@ class _PlatformEngagementCardState extends State<PlatformEngagementCard> {
                               circleColor: Colors.blue,
                               iconColor: Colors.white,
                               value: stats.completedSessions.toString(),
-                              label: 'Session done',
+                              label: 'Feedbacks Recieved',
                             ),
                           ),
                         ],
