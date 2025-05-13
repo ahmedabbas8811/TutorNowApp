@@ -32,6 +32,16 @@ class ProgressReportController {
     }
   }
 
+  Future<void> linkStudent(String bookingId, String student_email) async {
+    try {
+      await _supabase
+          .from('bookings')
+          .update({'student_email': student_email}).eq('id', bookingId);
+    } catch (e) {
+      throw Exception('Failed to link student: $e');
+    }
+  }
+
   // Fetch progress reports for a specific booking ID
   Future<List<ProgressReportModel>> fetchProgressReports(
       String bookingId) async {

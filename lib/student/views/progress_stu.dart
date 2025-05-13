@@ -4,6 +4,7 @@ import 'package:newifchaly/student/models/booking_model.dart';
 import 'package:newifchaly/student/models/progress_model.dart';
 import 'package:newifchaly/student/views/progressreport_stu.dart';
 import 'package:newifchaly/student/views/widgets/parentlink_popup.dart';
+import 'package:newifchaly/student/views/widgets/studentlink_popup.dart';
 
 class ProgressScreen extends StatefulWidget {
   final BookingModel booking;
@@ -133,15 +134,21 @@ class _ProgressScreenState extends State<ProgressScreen> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const SizedBox.shrink(); // Or a loading indicator
             }
-            if (snapshot.hasData && snapshot.data == true) {
+            if (snapshot.hasData) {
+              final isStudent = snapshot.data!;
               return ElevatedButton(
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) => ParentLink(
-                      bookingId: widget.booking.bookingId,
-                      controller: _progressReportController,
-                    ),
+                    builder: (context) => isStudent
+                        ? ParentLink(
+                            bookingId: widget.booking.bookingId,
+                            controller: _progressReportController,
+                          )
+                        : StudentLink(
+                            bookingId: widget.booking.bookingId,
+                            controller: _progressReportController,
+                          ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -155,8 +162,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   minimumSize: const Size(double.infinity, 48),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'Link Parent',
+                child: Text(
+                  isStudent ? "Link Parent" : "Link Student",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

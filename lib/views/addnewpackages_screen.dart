@@ -54,7 +54,7 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
       case 2:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) =>  SessionScreen()),
+          MaterialPageRoute(builder: (context) => SessionScreen()),
         );
         break;
       case 3:
@@ -124,9 +124,8 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
     }
 
     int sessionsPerWeek = int.tryParse(_sessionsPerWeekController.text) ?? 0;
-    if (sessionsPerWeek <= 0) {
-      showCustomSnackBar(
-          context, 'Sessions per week must be greater than zero.');
+    if (sessionsPerWeek <= 0 || sessionsPerWeek > 6) {
+      showCustomSnackBar(context, 'Sessions per week must be between 1 and 6.');
       return;
     }
 
@@ -223,10 +222,8 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
                 controller: _packageDescriptionController,
                 maxLines: 3,
                 decoration: _inputDecoration(
-                  'Tell students why they should purchase this package\n'
-                  'Add key features of your sessions\n'
-                  
-                ),
+                    'Tell students why they should purchase this package\n'
+                    'Add key features of your sessions\n'),
               ),
               const SizedBox(height: 16),
               const Text('Duration Of Each Session',
@@ -304,9 +301,10 @@ class _AddNewPackagesScreenState extends State<AddNewPackagesScreen> {
             ),
           ),
           Obx(() => TutorBottomNavigationBar(
-          selectedIndex: _selectedIndex,
-          onItemTapped: _onItemTapped,
-          pendingBookingsCount: profileController.pendingBookingsCount.value)),
+              selectedIndex: _selectedIndex,
+              onItemTapped: _onItemTapped,
+              pendingBookingsCount:
+                  profileController.pendingBookingsCount.value)),
         ],
       ),
     );

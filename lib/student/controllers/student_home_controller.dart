@@ -94,7 +94,27 @@ class StudentHomeController {
     }
   }
 
-Future<UserRating> fetchUserRatings(String userId) async {
+  Future<Location?> fetchTutorLocation(String userId) async {
+    try {
+      final response = await _client
+          .from('location')
+          .select('city, state')
+          .eq('user_id', userId)
+          .maybeSingle();
+      print(
+          "^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-LOcation resposne: ${response}");
+
+      if (response != null) {
+        return Location(location: response['city']);
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching location for user $userId: $e');
+      return null;
+    }
+  }
+
+  Future<UserRating> fetchUserRatings(String userId) async {
     try {
       final response = await _client
           .from('feedback')
@@ -105,7 +125,8 @@ Future<UserRating> fetchUserRatings(String userId) async {
         return UserRating(averageRating: 0.0, totalRatings: 0);
       }
 
-      final totalRating = response.fold(0.0, (sum, review) => sum + (review['rating'] as num).toDouble());
+      final totalRating = response.fold(
+          0.0, (sum, review) => sum + (review['rating'] as num).toDouble());
       final averageRating = totalRating / response.length;
 
       return UserRating(
@@ -118,6 +139,3 @@ Future<UserRating> fetchUserRatings(String userId) async {
     }
   }
 }
-
-
-

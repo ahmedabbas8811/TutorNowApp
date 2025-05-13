@@ -210,11 +210,41 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
               child: Text(
                 tutor.name,
                 style:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: FutureBuilder<Location?>(
+                future: _controller.fetchTutorLocation(tutor.userId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox();
+                  }
+                  if (snapshot.hasData && snapshot.data != null) {
+                    return Row(
+                      children: [
+                        Icon(Icons.location_on,
+                            size: 14, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            snapshot.data!.location,
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey[600]),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  return const SizedBox();
+                },
               ),
             ),
             Padding(
