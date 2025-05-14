@@ -353,12 +353,8 @@ class _QualificationScreenState extends State<QualificationScreen> {
                                 .qualification.educationLevel.value.isEmpty &&
                             controller
                                 .qualification.instituteName.value.isEmpty) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeachTo(),
-                            ),
-                          );
+                          Get.snackbar(
+                              "Empty Feilds", "Please Fill All Feilds");
                           return;
                         }
 
@@ -374,7 +370,7 @@ class _QualificationScreenState extends State<QualificationScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TeachingDetail(),
+                              builder: (context) => TeachTo(),
                             ),
                           );
                         }
